@@ -8,5 +8,7 @@
     <string name="login_pass">请输入密码</string>
     <string name="login_rangcode">请输入验证码</string>
     <string name="login_button">登 录</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 
 </resources>

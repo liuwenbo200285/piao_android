@@ -1,17 +1,30 @@
 package com.wenbo.piao.task;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wenbo.androidpiao.R;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
+import com.wenbo.piao.util.JsoupUtil;
 
 /**
  * 登录task
@@ -31,8 +44,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected Integer doInBackground(String... arg0) {
-		getLoginRand();
-		return 0;
+		return getLoginRand();
 	}
 
 	@Override
@@ -47,23 +59,29 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected void onPostExecute(Integer result) {
-		Log.i("login","获取登录随机码成功!");
+		if(result == 0){
+			Log.i("Login","登录成功!");
+//			Intent intent = new Intent(activity,ItemDetailActivity.this);
+//			activity.startActivity(intent);
+		}else if(result == 1){
+			Log.w("Login","获取登录随机码失败!");
+		}
 	}
 
 	@Override
 	protected void onPreExecute() {
-		Log.i("login","开始准备登录...");
+		Log.i("Login","开始准备登录...");
 	}
 
 	@Override
 	protected void onProgressUpdate(Integer... values) {
-		Log.i("login","正在登录...");
+		Log.i("Login","正在登录...");
 	}
 	
 	/**
 	 * 获取登录码
 	 */
-	private void getLoginRand() {
+	private int getLoginRand() {
 		HttpResponse response = null;
 		try {
 			HttpGet httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_URL);
@@ -76,22 +94,61 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				login(object.getString("loginRand"),
 						object.getString("randError"));
 			}else if(response.getStatusLine().getStatusCode() == 404){
-				
+				Log.w("Login","404");
+				return 1;
 			}
 		} catch (Exception e) {
 			Log.e("Login","获取登录随机码失败!",e);
+			return 1;
 		} finally {
 
 		}
+		return 0;
 	}
 	
 	private void login(String loginRand, String randError) {
 		HttpResponse response = null;
 		// 获取验证码
 		try {
-			
+			EditText userNameEditText = (EditText)activity.findViewById(R.id.editText1);
+			EditText passwordEditText = (EditText)activity.findViewById(R.id.editText2);
+			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.editText3);
+			String userName = userNameEditText.getText().toString();
+			String password = passwordEditText.getText().toString();
+			String randCode = rangCodeEditText.getText().toString();
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("method", "login"));
+			parameters.add(new BasicNameValuePair("loginRand", loginRand));
+			parameters.add(new BasicNameValuePair("refundLogin", "N"));
+			parameters.add(new BasicNameValuePair("refundFlag", "Y"));
+			parameters.add(new BasicNameValuePair("loginUser.user_name",userName));
+			parameters.add(new BasicNameValuePair("nameErrorFocus", ""));
+			parameters.add(new BasicNameValuePair("user.password",password));
+			parameters.add(new BasicNameValuePair("randCode", randCode));
+			parameters.add(new BasicNameValuePair("randErrorFocus", ""));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
+					"UTF-8");
+			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.LONGIN_CONFIM.getPath());
+			HttpPost httpPost = HttpClientUtil.getHttpPost(uri,
+					UrlEnum.LONGIN_CONFIM);
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 302) {
+			} else if (response.getStatusLine().getStatusCode() == 404) {
+			} else if (response.getStatusLine().getStatusCode() == 200) {
+				String info = EntityUtils.toString(response.getEntity());
+				Document document = Jsoup.parse(info);
+				// 判断登录状态
+				if (JsoupUtil.validateLogin(document)) {
+					//登录成功
+				} else {
+					if(StringUtils.contains(info,"系统维护中")){
+						Log.i("Login","系统维护中，请明天订票!");
+					}
+				}
+			}
 		}catch (Exception e) {
-			
+			Log.i("Login","登录出错!",e);
 		}
 	}
 

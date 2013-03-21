@@ -6,11 +6,11 @@ public enum UrlEnum {
 	//首页
 	INDEX_URL("/otsweb","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//登录初始页面url
-	LOGIN_INIT_URL("/otsweb/loginAction.do","","","",""),
+	LOGIN_INIT_URL("loginAction.do?method=loginAysnSuggest","","","",""),
 	//登录验证码
 	LOGIN_RANGCODE_URL("passCodeAction.do?rand=sjrand","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//登录url
-	LONGIN_CONFIM("/otsweb/loginAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+	LONGIN_CONFIM("loginAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"https://dynamic.12306.cn/otsweb/loginAction.do?method=init",
 			"application/x-www-form-urlencoded",""),
 	//获取人物信息url
