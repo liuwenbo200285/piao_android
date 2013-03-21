@@ -12,7 +12,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.enums.UrlEnum;
@@ -27,11 +29,14 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
 	private Activity activity = null;
 	
+	private ProgressBar progressBar = null;
+	
 	private static DefaultHttpClient httpClient = null;
 	
 	public GetRandCodeTask(Activity activity){
 		this.activity = activity;
 		httpClient = HttpClientUtil.getHttpClient();
+		progressBar = (ProgressBar)activity.findViewById(R.id.progressBar1);
 	}
 
 	@Override
@@ -43,10 +48,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	protected void onPostExecute(Bitmap result) {
 		ImageView imageView = (ImageView)activity.findViewById(R.id.imageView1);
 		imageView.setImageBitmap(result);
+		progressBar.setVisibility(View.GONE);
 	}
 
 	@Override
 	protected void onPreExecute() {
+		progressBar.setVisibility(View.VISIBLE);
 		Log.i("GetRandCodeTask.onPreExecute","开始获取验证码...");
 	}
 

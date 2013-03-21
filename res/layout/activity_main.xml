@@ -12,20 +12,23 @@
         android:id="@+id/editText1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editText2"
+        android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
         android:ems="50"
-        android:hint="@string/login_name"
         android:focusable="true"
-        android:inputType="text">
-      </EditText>
-      
+        android:hint="@string/login_name"
+        android:inputType="text" >
+        <requestFocus />
+    </EditText>
+    
     <EditText
         android:id="@+id/editText2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageView1"
         android:layout_alignLeft="@+id/editText1"
+        android:layout_below="@+id/editText1"
+        android:layout_marginTop="6dp"
         android:ems="50"
         android:hint="@string/login_pass"
         android:inputType="textPassword" />
@@ -34,8 +37,9 @@
         android:id="@+id/editText3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/editText2"
         android:layout_alignLeft="@+id/editText2"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="6dp"
         android:ems="10"
         android:hint="@string/login_rangcode"
         android:inputType="text" />
@@ -55,17 +59,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText3"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="130dp"
+        android:layout_below="@+id/editText3"
+        android:layout_marginTop="6dp"
         android:text="@string/login_button" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editText2"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editText1"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="55dp"
         android:text="@string/app_name"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

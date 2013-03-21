@@ -179,25 +179,31 @@ public class JsoupUtil {
 	 * 检测登录状态
 	 * @param inputStream
 	 */
-	public static boolean validateLogin(Document document){
+	public static int validateLogin(Document document){
 		Element element = document.getElementById("randErr");
 		if(element != null){
 			String errorString = element.child(1).childNode(0).toString();
 			Log.i("Jsoup.validateLogin","登录失败!原因："+errorString);
+			if(StringUtils.contains(errorString,"验证码")){
+				return 3;
+			}
 		}
 		element = document.getElementById("bookTicket");
 		if(element != null){
 			Log.i("Jsoup.validateLogin","登录成功!");
-			return true;
+			return 0;
 		}
 		Elements elements = document.getElementsByAttributeValue("language","javascript");
 		if(elements.size() > 0){
 			String errorMessage = elements.get(0).childNode(0).toString();
-			int i = errorMessage.indexOf("\"");
-			int n = errorMessage.indexOf(";");
-			Log.i("Jsoup.validateLogin","登录失败!原因："+StringUtils.substring(errorMessage,i+1,n-1));
+			Log.i("Jsoup.validateLogin","登录失败!原因："+errorMessage);
+			if(StringUtils.contains(errorMessage,"登录名")){
+			    return 1;
+			}else if(StringUtils.contains(errorMessage,"密码")){
+				return 2;
+			}
 		}
-		return false;
+		return 0;
 	}
 
 }

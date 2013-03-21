@@ -10,5 +10,7 @@
     <string name="login_button">登 录</string>
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
+    <string name="title_activity_user">MainActivity</string>
+    <string name="user_main">登录成功!</string>
 
 </resources>

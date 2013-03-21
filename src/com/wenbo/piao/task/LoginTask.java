@@ -16,12 +16,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
+import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
@@ -37,9 +41,12 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	
 	private Activity activity;
 	
+	private ProgressBar progressBar = null;
+	
 	public LoginTask(Activity activity){
 		this.httpClient = HttpClientUtil.getHttpClient();
 		this.activity = activity;
+		progressBar = (ProgressBar)activity.findViewById(R.id.progressBar1);
 	}
 
 	@Override
@@ -59,17 +66,33 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected void onPostExecute(Integer result) {
-		if(result == 0){
+		switch (result) {
+		case 0:
 			Log.i("Login","登录成功!");
-//			Intent intent = new Intent(activity,ItemDetailActivity.this);
-//			activity.startActivity(intent);
-		}else if(result == 1){
-			Log.w("Login","获取登录随机码失败!");
+			Intent intent = new Intent();
+            intent.setClass(activity,UserActivity.class);
+			activity.startActivity(intent);
+			activity.finish();
+			break;
+		case 1:
+			Log.w("Login","用户名不存在!");
+			break;
+		case 2:
+			Log.w("Login","密码错误!");
+			break;
+		case 3:
+			Log.w("Login","验证码错误!");
+			break;
+		default:
+			Log.w("Login","系统错误");
+			break;
 		}
+		progressBar.setVisibility(View.GONE);
 	}
 
 	@Override
 	protected void onPreExecute() {
+		progressBar.setVisibility(View.VISIBLE);
 		Log.i("Login","开始准备登录...");
 	}
 
@@ -91,22 +114,22 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				String str = EntityUtils.toString(response.getEntity());
 				JSONObject object = JSONObject.parseObject(str);
 				Log.i("Login",object.getString("loginRand")+":"+object.getString("randError"));
-				login(object.getString("loginRand"),
+				return login(object.getString("loginRand"),
 						object.getString("randError"));
 			}else if(response.getStatusLine().getStatusCode() == 404){
 				Log.w("Login","404");
-				return 1;
+				return 4;
 			}
 		} catch (Exception e) {
 			Log.e("Login","获取登录随机码失败!",e);
-			return 1;
+			return 4;
 		} finally {
 
 		}
 		return 0;
 	}
 	
-	private void login(String loginRand, String randError) {
+	private int login(String loginRand, String randError) {
 		HttpResponse response = null;
 		// 获取验证码
 		try {
@@ -139,17 +162,17 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				String info = EntityUtils.toString(response.getEntity());
 				Document document = Jsoup.parse(info);
 				// 判断登录状态
-				if (JsoupUtil.validateLogin(document)) {
-					//登录成功
-				} else {
-					if(StringUtils.contains(info,"系统维护中")){
-						Log.i("Login","系统维护中，请明天订票!");
-					}
+				if(StringUtils.contains(info,"系统维护中")){
+					Log.i("Login","系统维护中，请明天订票!");
+					return 4;
+				}else{
+					return JsoupUtil.validateLogin(document);
 				}
 			}
 		}catch (Exception e) {
 			Log.i("Login","登录出错!",e);
 		}
+		return 4;
 	}
 
 }
