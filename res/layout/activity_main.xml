@@ -51,8 +51,7 @@
         android:layout_alignBottom="@+id/editText3"
         android:layout_alignTop="@+id/editText3"
         android:layout_toRightOf="@+id/editText3"
-        android:contentDescription="@string/login_title"
-        android:src="@drawable/ic_code" />
+        android:contentDescription="@string/login_title" />
 
     <Button
         android:id="@+id/button1"
@@ -62,14 +61,6 @@
         android:layout_below="@+id/editText3"
         android:layout_marginTop="6dp"
         android:text="@string/login_button" />
-
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editText2"
-        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/textView1"

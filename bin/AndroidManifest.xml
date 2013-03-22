@@ -28,6 +28,10 @@
             android:name="com.wenbo.piao.activity.UserActivity"
             android:label="@string/title_activity_user" >
         </activity>
+        <activity
+            android:name="com.wenbo.piao.activity.UserActivity"
+            android:label="@string/title_activity_user" >
+        </activity>
     </application>
 
 </manifest>

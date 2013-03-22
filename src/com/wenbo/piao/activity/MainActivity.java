@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.enums.UrlEnum;
@@ -25,8 +24,6 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		Log.i("onStart","onStart...");
-		ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBar1);
-		progressBar.setIndeterminate(false);
 		ImageView imageView = (ImageView)findViewById(R.id.imageView1);
 		imageView.setOnClickListener(new OnClickListener() {
 			

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">皮皮无忧火车票</string>
+    <string name="app_name">无忧火车票</string>
     <string name="action_settings">Settings</string>
     <string name="login_title">无忧火车票</string>
     <string name="login_name">请输入用户名</string>
@@ -12,5 +12,6 @@
     <string name="title_item_detail">Item Detail</string>
     <string name="title_activity_user">MainActivity</string>
     <string name="user_main">登录成功!</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

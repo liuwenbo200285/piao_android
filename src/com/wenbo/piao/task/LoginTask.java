@@ -16,12 +16,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
@@ -41,12 +41,11 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	
 	private Activity activity;
 	
-	private ProgressBar progressBar = null;
+	private ProgressDialog progressDialog = null;
 	
 	public LoginTask(Activity activity){
 		this.httpClient = HttpClientUtil.getHttpClient();
 		this.activity = activity;
-		progressBar = (ProgressBar)activity.findViewById(R.id.progressBar1);
 	}
 
 	@Override
@@ -66,6 +65,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected void onPostExecute(Integer result) {
+		progressDialog.dismiss();
 		switch (result) {
 		case 0:
 			Log.i("Login","登录成功!");
@@ -75,24 +75,27 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			activity.finish();
 			break;
 		case 1:
+			Toast.makeText(activity, "用户名不存在!",Toast.LENGTH_SHORT).show();
 			Log.w("Login","用户名不存在!");
 			break;
 		case 2:
+			Toast.makeText(activity, "密码错误!",Toast.LENGTH_SHORT).show();
 			Log.w("Login","密码错误!");
 			break;
 		case 3:
+			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
 			Log.w("Login","验证码错误!");
 			break;
 		default:
+			Toast.makeText(activity, "系统错误!",Toast.LENGTH_SHORT).show();
 			Log.w("Login","系统错误");
 			break;
 		}
-		progressBar.setVisibility(View.GONE);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		progressBar.setVisibility(View.VISIBLE);
+		progressDialog = ProgressDialog.show(activity,"登录","正在登录...",true,false);
 		Log.i("Login","开始准备登录...");
 	}
 

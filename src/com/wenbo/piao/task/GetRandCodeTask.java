@@ -8,13 +8,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.enums.UrlEnum;
@@ -29,14 +28,13 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
 	private Activity activity = null;
 	
-	private ProgressBar progressBar = null;
+	private ProgressDialog progressDialog = null;
 	
 	private static DefaultHttpClient httpClient = null;
 	
 	public GetRandCodeTask(Activity activity){
 		this.activity = activity;
 		httpClient = HttpClientUtil.getHttpClient();
-		progressBar = (ProgressBar)activity.findViewById(R.id.progressBar1);
 	}
 
 	@Override
@@ -48,12 +46,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	protected void onPostExecute(Bitmap result) {
 		ImageView imageView = (ImageView)activity.findViewById(R.id.imageView1);
 		imageView.setImageBitmap(result);
-		progressBar.setVisibility(View.GONE);
+		progressDialog.dismiss();
 	}
 
 	@Override
 	protected void onPreExecute() {
-		progressBar.setVisibility(View.VISIBLE);
+		progressDialog = ProgressDialog.show(activity,"获取验证码","正在获取验证码...",true,false);
 		Log.i("GetRandCodeTask.onPreExecute","开始获取验证码...");
 	}
 
