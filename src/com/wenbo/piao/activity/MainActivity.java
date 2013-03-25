@@ -1,14 +1,18 @@
 package com.wenbo.piao.activity;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.androidpiao.R;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.LoginTask;
@@ -18,7 +22,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_main); 
 	}
 	
 	@Override
@@ -34,9 +38,26 @@ public class MainActivity extends Activity {
 		});
 		Button button = (Button)findViewById(R.id.button1);
 		button.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
+				EditText userNameText = (EditText)findViewById(R.id.editText1);
+				if(StringUtils.isBlank(userNameText.getText().toString().trim())){
+					LoginDialog.newInstance( "请输入用户名！").show(getFragmentManager(),"dialog"); 
+					userNameText.requestFocus();
+					return;
+				}
+				EditText userPassText = (EditText)findViewById(R.id.editText2);
+				if(StringUtils.isBlank(userPassText.getText().toString().trim())){
+					LoginDialog.newInstance( "请输入密码！").show(getFragmentManager(),"dialog"); 
+					userPassText.requestFocus();
+					return;
+				}
+				EditText rangCodeText = (EditText)findViewById(R.id.editText3);
+				if(StringUtils.isBlank(rangCodeText.getText().toString().trim())){
+					LoginDialog.newInstance( "请输入验证码！").show(getFragmentManager(),"dialog"); 
+					rangCodeText.requestFocus();
+					return;
+				}
 				LoginTask loginTask = new LoginTask(MainActivity.this);
 				loginTask.execute("");
 			}

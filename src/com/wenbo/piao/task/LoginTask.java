@@ -18,13 +18,10 @@ import org.jsoup.nodes.Document;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
