@@ -28,8 +28,6 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
 	private Activity activity = null;
 	
-	private ProgressDialog progressDialog = null;
-	
 	private static DefaultHttpClient httpClient = null;
 	
 	public GetRandCodeTask(Activity activity){
@@ -46,12 +44,11 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	protected void onPostExecute(Bitmap result) {
 		ImageView imageView = (ImageView)activity.findViewById(R.id.imageView1);
 		imageView.setImageBitmap(result);
-		progressDialog.dismiss();
 	}
 
 	@Override
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity,"获取验证码","正在获取验证码...",true,false);
+//		progressDialog = ProgressDialog.show(activity,"获取验证码","正在获取验证码...",true,false);
 		Log.i("GetRandCodeTask.onPreExecute","开始获取验证码...");
 	}
 

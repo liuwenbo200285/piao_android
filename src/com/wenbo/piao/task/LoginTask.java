@@ -16,7 +16,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -75,19 +78,28 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			activity.finish();
 			break;
 		case 1:
-			Toast.makeText(activity, "用户名不存在!",Toast.LENGTH_SHORT).show();
+//			Toast.makeText(activity, "用户名不存在!",Toast.LENGTH_SHORT).show();
+			new AlertDialog.Builder(activity).setTitle("登录失败!")
+			.setMessage("用户名不存在!").show();
 			Log.w("Login","用户名不存在!");
 			break;
 		case 2:
-			Toast.makeText(activity, "密码错误!",Toast.LENGTH_SHORT).show();
+//			Toast.makeText(activity, "密码错误!",Toast.LENGTH_SHORT).show();
+			new AlertDialog.Builder(activity).setTitle("登录失败!")
+			.setMessage("密码错误!").show();
 			Log.w("Login","密码错误!");
 			break;
 		case 3:
-			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
+//			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
+			new AlertDialog.Builder(activity).setTitle("登录失败!")
+			.setMessage("验证码错误!").show();
+			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity);
+			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			Log.w("Login","验证码错误!");
 			break;
 		default:
-			Toast.makeText(activity, "系统错误!",Toast.LENGTH_SHORT).show();
+			new AlertDialog.Builder(activity).setTitle("登录失败!")
+			.setMessage("系统错误!").show();
 			Log.w("Login","系统错误");
 			break;
 		}
