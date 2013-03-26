@@ -28,9 +28,25 @@
             android:name="com.wenbo.piao.activity.UserActivity"
             android:label="@string/title_activity_user" >
         </activity>
+       <activity
+            android:name="com.wenbo.piao.activity.TestMyActivityGroup"
+            android:label="@string/title_activity_info" >
+        </activity>
         <activity
-            android:name="com.wenbo.piao.activity.UserActivity"
-            android:label="@string/title_activity_user" >
+            android:name="com.wenbo.piao.activity.Info1Activity"
+            android:label="@string/title_activity_info1" >
+        </activity>
+        <activity
+            android:name="com.wenbo.piao.activity.Info2Activity"
+            android:label="@string/title_activity_info2" >
+        </activity>
+        <activity
+            android:name="com.wenbo.piao.activity.Info3Activity"
+            android:label="@string/title_activity_info3" >
+        </activity>
+        <activity
+            android:name="com.wenbo.piao.activity.Info4Activity"
+            android:label="@string/title_activity_info4" >
         </activity>
     </application>
 

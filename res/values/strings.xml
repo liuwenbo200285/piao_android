@@ -12,6 +12,19 @@
     <string name="title_item_detail">Item Detail</string>
     <string name="title_activity_user">MainActivity</string>
     <string name="user_main">登录成功!</string>
+    <string name="buy_ticket">买票</string>
+    <string name="rob_ticket">抢票</string>
+    <string name="see_order">订单</string>
+    <string name="about">关于</string>
     <string name="hello_world">Hello world!</string>
+    <string name="hello_world1">Hello world1!</string>
+    <string name="hello_world2">Hello world2!</string>
+    <string name="hello_world3">Hello world3!</string>
+    <string name="hello_world4">Hello world4!</string>
+    <string name="title_activity_info">InfoActivity</string>
+    <string name="title_activity_info1">Info1Activity</string>
+    <string name="title_activity_info2">Info2Activity</string>
+    <string name="title_activity_info3">Info3Activity</string>
+    <string name="title_activity_info4">Info4Activity</string>
 
 </resources>
