@@ -26,5 +26,12 @@
     <string name="title_activity_info2">Info2Activity</string>
     <string name="title_activity_info3">Info3Activity</string>
     <string name="title_activity_info4">Info4Activity</string>
-
+    <string name="title_activity_action_bar">ActionBarActivity</string>
+    <string name="action_bar_search">搜索</string>
+    <string name="action_bar_add">增加</string>
+    <string name="action_bar_edit">编辑</string>
+    <string name="action_bar_share">分享</string>
+	<string name="action_bar_sort">排序</string>
+	<string name="action_bar_sort_size">排序大小</string>
+	<string name="action_bar_sort_alpha">透明度</string>
 </resources>

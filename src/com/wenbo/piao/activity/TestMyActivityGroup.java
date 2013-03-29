@@ -1,15 +1,14 @@
 package com.wenbo.piao.activity;
 
-import com.wenbo.androidpiao.R;
-
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
+import com.wenbo.androidpiao.R;
+
 public class TestMyActivityGroup extends AbstractMyActivityGroup{
-    //加载的Activity的名字，LocalActivityManager就是通过这些名字来查找对应的Activity的。
+	 //加载的Activity的名字，LocalActivityManager就是通过这些名字来查找对应的Activity的。
     private static final String CONTENT_ACTIVITY_NAME_1 = "contentActivity1";
     private static final String CONTENT_ACTIVITY_NAME_2 = "contentActivity2";
     private static final String CONTENT_ACTIVITY_NAME_3 = "contentActivity3";
@@ -21,7 +20,7 @@ public class TestMyActivityGroup extends AbstractMyActivityGroup{
         setContentView(R.layout.my_activity_group);
         super.onCreate(savedInstanceState);
         
-        ((RadioButton)findViewById(R.id.button1)).setChecked(true);
+        ((RadioButton)findViewById(R.id.radio_button1)).setChecked(true);
     }
     
     /**
@@ -37,32 +36,39 @@ public class TestMyActivityGroup extends AbstractMyActivityGroup{
      */
     @Override
     protected void initRadioBtns() {
-        initRadioBtn(R.id.button1);
-        initRadioBtn(R.id.button2);
-        initRadioBtn(R.id.button3);
-        initRadioBtn(R.id.button4);
+        initRadioBtn(R.id.radio_button1);
+        initRadioBtn(R.id.radio_button1);
+        initRadioBtn(R.id.radio_button2);
+        initRadioBtn(R.id.radio_button3);
+        initRadioBtn(R.id.radio_button4);
     }
-    
-           
 
-	@Override
-	public void onClick(View view) {
-		 switch (view.getId()) {
-         case R.id.button1:
-             setContainerView(CONTENT_ACTIVITY_NAME_1, Info1Activity.class);
-             break;
-         case R.id.button2:
-             setContainerView(CONTENT_ACTIVITY_NAME_2, Info2Activity.class);
-             break;
-         case R.id.button3:
-             setContainerView(CONTENT_ACTIVITY_NAME_3, Info3Activity.class);
-             break;
-         case R.id.button4:
-             setContainerView(CONTENT_ACTIVITY_NAME_4, Info4Activity.class);
-             break;
-         default:
-             break;
-         }		
-	}      
+    /**
+     * 导航按钮被点击时，具体发生的变化
+     */
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            switch (buttonView.getId()) {
+            
+            case R.id.radio_button1:
+                setContainerView(CONTENT_ACTIVITY_NAME_1,Info1Activity.class);
+                break;
+                
+            case R.id.radio_button2:
+                setContainerView(CONTENT_ACTIVITY_NAME_2, Info2Activity.class);
+                break;
+                
+            case R.id.radio_button3:
+                setContainerView(CONTENT_ACTIVITY_NAME_3, Info3Activity.class);
+                break;
+                
+            case R.id.radio_button4:
+                setContainerView(CONTENT_ACTIVITY_NAME_4, Info4Activity.class);
+                break;
+            default:
+                break;
+            }
+        }
+    }   
     
 }
