@@ -26,7 +26,6 @@ import android.widget.EditText;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.activity.ActionBarActivity;
-import com.wenbo.piao.activity.TestMyActivityGroup;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -72,7 +71,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		case 0:
 			Log.i("Login","登录成功!");
 			Intent intent = new Intent();
-            intent.setClass(activity,ActionBarActivity.class);
+            intent.setClass(activity,UserActivity.class);
 			activity.startActivity(intent);
 			activity.finish();
 			break;

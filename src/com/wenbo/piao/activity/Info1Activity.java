@@ -1,12 +1,12 @@
 package com.wenbo.piao.activity;
 
-import com.wenbo.androidpiao.R;
-import com.wenbo.androidpiao.R.layout;
-import com.wenbo.androidpiao.R.menu;
-
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+
+import com.wenbo.androidpiao.R;
+import com.wenbo.piao.dialog.LoginDialog;
 
 public class Info1Activity extends Activity {
 
@@ -15,10 +15,63 @@ public class Info1Activity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info1);
 	}
+	
+	
+
+	@Override
+	protected void onDestroy() {
+		Log.i("method","onDestroy");
+		super.onDestroy();
+	}
+
+
+
+	@Override
+	protected void onPause() {
+		Log.i("method","onPause");
+		super.onPause();
+	}
+
+
+
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		Log.i("method","onRestart");
+		super.onRestart();
+	}
+
+
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		Log.i("method","onResume");
+		super.onResume();
+	}
+
+
+
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		Log.i("method","onStart");
+		super.onStart();
+	}
+
+
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		Log.i("method","onStop");
+		super.onStop();
+	}
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.info1, menu);
 		return true;
 	}
