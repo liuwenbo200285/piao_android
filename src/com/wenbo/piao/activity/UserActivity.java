@@ -72,7 +72,7 @@ public class UserActivity extends Activity {
 			ft.hide(currentFragment);
 			ft.show(hideFragment);
 		}
-		ft.addToBackStack(null);
+//		ft.addToBackStack(null);
 		ft.commit();
 		currentFragment = hideFragment;
 		return super.onOptionsItemSelected(item);
