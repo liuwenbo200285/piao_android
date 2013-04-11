@@ -2,20 +2,15 @@
 
     <item android:id="@+id/tab1"
           android:showAsAction="always"
-          android:orderInCategory="1"
-          android:title="订票"/>
-
-    <item android:id="@+id/tab2"
-          android:showAsAction="always"
           android:orderInCategory="2"
           android:title="抢票"/>
 
-    <item android:id="@+id/tab3"
+    <item android:id="@+id/tab2"
           android:showAsAction="always"
           android:orderInCategory="3"
           android:title="订单"/>
     
-    <item android:id="@+id/tab4"
+    <item android:id="@+id/tab3"
           android:showAsAction="always"
           android:orderInCategory="4"
           android:title="联系人"/>

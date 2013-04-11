@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">无忧火车票</string>
     <string name="action_settings">Settings</string>
     <string name="login_title">无忧火车票</string>
@@ -46,4 +45,9 @@
 	<string name="action_bar_sort">排序</string>
 	<string name="action_bar_sort_size">排序大小</string>
 	<string name="action_bar_sort_alpha">透明度</string>
+	<string name="first_seat">一等座</string>
+	<string name="second_seat">二等座</string>
+	<string name="hard_sleeper">硬 卧</string>
+	<string name="hard_seat">硬 座</string>
+	<string name="no_seat">无 座</string>
 </resources>

@@ -33,7 +33,7 @@ public class UserActivity extends Activity {
 			}
 		});
 		FragmentTransaction ft = fm.beginTransaction();
-		ft.add(R.id.details,new OrderFragment(),"tab1");
+		ft.add(R.id.details,new RobitOrderFragment(),"tab1");
 		ft.commit();
 	}
 
@@ -50,23 +50,20 @@ public class UserActivity extends Activity {
 		Fragment hideFragment = null;
 		switch (item.getItemId()) {
 		case R.id.tab1:
-			hideFragment = fm.findFragmentByTag("tab1");
-			break;
-		case R.id.tab2:
 			hideFragment = fm.findFragmentByTag("tab2");
 			if(hideFragment == null){
 				hideFragment = new RobitOrderFragment();
 				ft.add(hideFragment,"tab2");
 			}
 			break;
-		case R.id.tab3:
+		case R.id.tab2:
 			hideFragment = fm.findFragmentByTag("tab3");
 			if(hideFragment == null){
 				hideFragment = new OrderInfoFragment();
 				ft.add(hideFragment,"tab3");
 			}
 			break;
-		case R.id.tab4:
+		case R.id.tab3:
 			hideFragment = fm.findFragmentByTag("tab4");
 			if(hideFragment == null){
 				hideFragment = new ContactFragment();
