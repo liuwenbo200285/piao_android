@@ -1,15 +1,16 @@
 package com.wenbo.piao.Fragment;
 
+import java.util.Calendar;
+
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.wenbo.androidpiao.R;
@@ -19,6 +20,16 @@ public class OrderFragment extends Fragment {
 	private static Activity activity = null;
 	
 	private Spinner spinner = null;
+	
+	private static final int SHOW_DATAPICK = 0;
+	
+	private static final int DATE_DIALOG_ID = 1;
+	
+	private int mYear;  
+    private int mMonth;
+    private int mDay;
+    
+    private EditText beginDate;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,23 +62,26 @@ public class OrderFragment extends Fragment {
 	@Override
 	public void onStart() {
 		// TODO Auto-generated method stub
-//		Log.i("method","onStart");
 		activity = getActivity();
-		Button button = (Button)activity.findViewById(R.id.button1);
-		spinner = (Spinner)activity.findViewById(R.id.spinner1);
-		// Create an ArrayAdapter using the string array and a default spinner layout
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
-		        R.array.planets_array, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		button.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				new AlertDialog.Builder(getActivity()).setTitle("登录失败!")
-				.setMessage("密码错误!").show();
-			}
-		});
+//		beginDate = (EditText)activity.findViewById(R.id.editText3);
+//		final Button button = (Button)activity.findViewById(R.id.button1);
+//		spinner = (Spinner)activity.findViewById(R.id.spinner1);
+//		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
+//		        R.array.planets_array, android.R.layout.simple_spinner_item);
+//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//		spinner.setAdapter(adapter);
+//		button.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				new DatePickerDialog(activity,mDateSetListener, mYear, mMonth,  
+//		                  mDay);
+//			}
+//		});
+//		final Calendar c = Calendar.getInstance();
+//        mYear = c.get(Calendar.YEAR);  
+//        mMonth = c.get(Calendar.MONTH);  
+//        mDay = c.get(Calendar.DAY_OF_MONTH);
+//        setDateTime(); 
 		super.onStart();
 	}
 
@@ -77,8 +91,41 @@ public class OrderFragment extends Fragment {
 //		Log.i("method","onStop");
 		super.onStop();
 	}
-	
-	
 
+	/**
+     * 设置日期
+     */
+	private void setDateTime(){
+       final Calendar c = Calendar.getInstance();  
+       
+       mYear = c.get(Calendar.YEAR);  
+       mMonth = c.get(Calendar.MONTH);  
+       mDay = c.get(Calendar.DAY_OF_MONTH); 
+  
+       updateDateDisplay(); 
+	}
 	
+	/**
+	 * 更新日期显示
+	 */
+	private void updateDateDisplay(){
+		beginDate.setText(new StringBuilder().append(mYear).append("-")
+    		   .append((mMonth + 1) < 10 ? "0" + (mMonth + 1) : (mMonth + 1)).append("-")
+               .append((mDay < 10) ? "0" + mDay : mDay)); 
+	}
+	
+    /** 
+     * 日期控件的事件 
+     */  
+    private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {  
+  
+       public void onDateSet(DatePicker view, int year, int monthOfYear,  
+              int dayOfMonth) {  
+           mYear = year;  
+           mMonth = monthOfYear;  
+           mDay = dayOfMonth;  
+           updateDateDisplay();
+       }  
+    };
+    
 }
