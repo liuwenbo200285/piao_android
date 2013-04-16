@@ -3,8 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
-  android:orientation="vertical"
-  >
+  android:orientation="vertical">
 
     <EditText
         android:id="@+id/startArea"
@@ -106,5 +105,58 @@
         android:layout_above="@+id/hard_seat"
         android:layout_toRightOf="@+id/startTime"
         android:text="@string/select" />
+
+    <EditText
+        android:id="@+id/orderPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/second_seat"
+        android:layout_toLeftOf="@+id/selectPeople"
+        android:ems="10"
+        android:editable="false"
+        android:hint="@string/orderPeople"
+        android:inputType="textPersonName" >
+    </EditText>
+    
+    <Button
+        android:id="@+id/selectPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/orderCodeImg"
+        android:layout_alignRight="@+id/endArea"
+        android:text="@string/selectPeople" />
+
+    <ImageView
+        android:id="@+id/orderCodeImg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/orderCode"
+        android:layout_alignRight="@+id/orderPeople"
+        android:layout_below="@+id/orderPeople"
+        android:layout_toRightOf="@+id/orderCode"
+        android:contentDescription="@string/login_title"
+        android:src="@drawable/ic_code" />
+
+    <EditText
+        android:id="@+id/orderCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startTrainNo"
+        android:layout_below="@+id/orderPeople"
+        android:layout_marginTop="14dp"
+        android:ems="5"
+        android:hint="@string/orderCode"
+        android:inputType="text" >
+    </EditText>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/orderCodeImg"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="@string/beginOrder" />
 
 </RelativeLayout>

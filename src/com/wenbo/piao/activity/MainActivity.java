@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
 	 * 获取登录验证码
 	 */
 	private void getLoginRangeCode(){
-		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this);
+		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 	}
 

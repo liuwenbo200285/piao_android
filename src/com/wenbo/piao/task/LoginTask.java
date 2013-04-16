@@ -91,7 +91,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 //			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
 			new AlertDialog.Builder(activity).setTitle("登录失败!")
 			.setMessage("验证码错误!").show();
-			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity);
+			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,1);
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			Log.w("Login","验证码错误!");
 			break;

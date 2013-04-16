@@ -29,9 +29,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
 	private static DefaultHttpClient httpClient = null;
 	
-	public GetRandCodeTask(Activity activity){
+	private int type;
+	
+	public GetRandCodeTask(Activity activity,int type){
 		this.activity = activity;
 		httpClient = HttpClientUtil.getHttpClient();
+		this.type = type;
 	}
 
 	@Override
@@ -41,7 +44,13 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
-		ImageView imageView = (ImageView)activity.findViewById(R.id.imageView1);
+		ImageView imageView = null;
+		if(type == 1){
+			imageView = (ImageView)activity.findViewById(R.id.imageView1);
+			
+		}else if(type == 2){
+			imageView = (ImageView)activity.findViewById(R.id.orderCodeImg);
+		}
 		imageView.setImageBitmap(result);
 	}
 

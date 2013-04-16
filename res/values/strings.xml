@@ -50,4 +50,8 @@
 	<string name="hard_sleeper">硬 卧</string>
 	<string name="hard_seat">硬 座</string>
 	<string name="no_seat">无 座</string>
+	<string name="selectPeople">选择乘客</string>
+	<string name="orderPeople">订票乘客</string>
+	<string name="orderCode">验证码</string>
+	<string name="beginOrder">开始抢票</string>
 </resources>

@@ -17,7 +17,7 @@
         android:theme="@android:style/Theme.DeviceDefault.Light"
         android:uiOptions="splitActionBarWhenNarrow">
         <activity
-            android:name="com.wenbo.piao.activity.UserActivity"
+            android:name="com.wenbo.piao.activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +25,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.wenbo.piao.activity.ActionBarActivity"
+            android:name="com.wenbo.piao.activity.UserActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.wenbo.piao.activity.MainActivity"
+            android:name="com.wenbo.piao.activity.ActionBarActivity"
             android:label="@string/app_name" >
         </activity>
         <activity

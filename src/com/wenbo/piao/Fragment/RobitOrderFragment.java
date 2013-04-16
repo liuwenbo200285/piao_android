@@ -2,23 +2,25 @@ package com.wenbo.piao.Fragment;
 
 import java.util.Calendar;
 
-import com.wenbo.androidpiao.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
-import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.wenbo.androidpiao.R;
+import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.task.GetRandCodeTask;
 
 public class RobitOrderFragment extends Fragment {
 	
@@ -28,7 +30,13 @@ public class RobitOrderFragment extends Fragment {
 	
 	private Button selectDate;
 	
+	private Button selectPeople;
+	
 	private DatePickerDialog datePickerDialog;
+	
+	private EditText orderPeople;
+	
+	private ImageView orderCode;
 	
 	private int mYear;  
     private int mMonth;
@@ -68,6 +76,25 @@ public class RobitOrderFragment extends Fragment {
 				datePickerDialog.show();
 			}
 		});
+        selectPeople = (Button)activity.findViewById(R.id.selectPeople);
+        selectPeople.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				showDialog();
+			}
+		});
+        orderPeople = (EditText)activity.findViewById(R.id.orderPeople);
+        orderCode = (ImageView)activity.findViewById(R.id.orderCodeImg);
+        orderCode.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				GetRandCodeTask getRandCode = new GetRandCodeTask(activity,2);
+		        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+			}
+		});
+        GetRandCodeTask getRandCode = new GetRandCodeTask(activity,2);
+        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 		super.onStart();
 	}
 
@@ -105,5 +132,33 @@ public class RobitOrderFragment extends Fragment {
        }  
     };
 	
-	
+	private void showDialog(){
+		final String[] items = {"张三","李四","王五","赵六","赵六","赵六","赵六","赵六","赵六","赵六"};
+		final boolean [] checkedItems = new boolean[items.length];
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+		.setIcon(android.R.drawable.btn_star);
+		builder.setMultiChoiceItems(items, checkedItems,new OnMultiChoiceClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+//				Log.i("which",which+"");
+//				Log.i("isChecked",isChecked+"");
+			}
+		});
+		builder.setTitle("选择订票乘客")// 设置Dialog的标题
+		.setPositiveButton("取消",null)
+	    .setNegativeButton("确定",new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				StringBuilder sbBuilder = new StringBuilder();
+				for(int i = 0; i < checkedItems.length; i++){
+					if(checkedItems[i]){
+						sbBuilder.append(items[i]+",");
+					}
+				}
+				orderPeople.setText(sbBuilder.toString());
+			}
+		});
+		AlertDialog dialog = builder.create();
+        dialog.show();
+	}
 }
