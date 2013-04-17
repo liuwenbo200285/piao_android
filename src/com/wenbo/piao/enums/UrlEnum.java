@@ -14,8 +14,8 @@ public enum UrlEnum {
 			"https://dynamic.12306.cn/otsweb/loginAction.do?method=init",
 			"application/x-www-form-urlencoded",""),
 	//获取人物信息url
-	GET_ORDER_PERSON("/otsweb/order/confirmPassengerAction.do","application/json, text/javascript, */*",
-			"","application/x-www-form-urlencoded",
+	GET_ORDER_PERSON("passengerAction.do","application/json, text/javascript, */*",
+			"https://dynamic.12306.cn/otsweb/passengerAction.do?method=initUsualPassenger12306","application/x-www-form-urlencoded",
 			"XMLHttpRequest"),
 	//查询火车票
 	SEARCH_TICKET("/otsweb/order/querySingleAction.do","","https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init","",""),

@@ -86,7 +86,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 				getRandCode(urlEnum);
 			}
 		} catch (Exception e) {
-			Log.e("GetRandCodeTask.getRandCode","获取验证码失败!",e);
+			Log.e("GetRandCodeTask.getRandCode","获取验证码失败!",e.fillInStackTrace());
 		} finally {
 			
 		}
