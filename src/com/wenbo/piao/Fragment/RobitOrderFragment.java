@@ -2,7 +2,6 @@ package com.wenbo.piao.Fragment;
 
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
@@ -23,9 +22,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.UrlEnum;
@@ -54,6 +50,7 @@ public class RobitOrderFragment extends Fragment {
     private String[] contacts;
     private boolean[] checkedItems;
     private Map<String,UserInfo> userInfoMap;
+    private AlertDialog dialog;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,10 +68,14 @@ public class RobitOrderFragment extends Fragment {
 	
 	
 	
+	
+	
 	@Override
 	public void onStart() {
 		// TODO Auto-generated method stub
 		Log.i("onStart","onStart");
+		GetRandCodeTask getRandCode = new GetRandCodeTask(activity,2);
+        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 		super.onStart();
 	}
 	
@@ -104,8 +105,15 @@ public class RobitOrderFragment extends Fragment {
         selectPeople.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				showDialog();
+				if(userInfoMap == null){
+					userInfoMap = new HashMap<String,UserInfo>();
+					getPersonInfo();
+				}else{
+					if(userInfoMap.isEmpty()){
+						getPersonInfo();
+					}
+					showDialog();
+				}
 			}
 		});
         orderPeople = (EditText)activity.findViewById(R.id.orderPeople);
@@ -117,8 +125,6 @@ public class RobitOrderFragment extends Fragment {
 		        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			}
 		});
-        GetRandCodeTask getRandCode = new GetRandCodeTask(activity,2);
-        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -147,33 +153,6 @@ public class RobitOrderFragment extends Fragment {
 	public void onResume() {
 		// TODO Auto-generated method stub
 		Log.i("onResume","onResume");
-		GetPersonConstanct personConstanct = new GetPersonConstanct(activity);
-        AsyncTask<String,Integer,String> task = personConstanct.execute("");
-        try {
-        	String info = task.get();
-        	JSONObject jsonObject = JSON.parseObject(info);
-			List<UserInfo> userInfos = JSONArray.parseArray(
-					jsonObject.getString("rows"), UserInfo.class);
-			if (userInfos == null || userInfos.size() == 0) {
-				new AlertDialog.Builder(activity).setTitle("订票人!")
-				.setMessage("此账号还没有添加联系人!").show();
-				Log.i("GetPersonConstanct","此账号没有添加联系人!");
-			}else{
-				userInfoMap = new HashMap<String, UserInfo>();
-				UserInfo userInfo = null;
-				contacts = new String[userInfos.size()];
-				for (int i = 0; i < userInfos.size(); i++) {
-					userInfo = userInfos.get(i);
-					if (userInfo != null) {
-						userInfo.setIndex(i);
-						userInfoMap.put(userInfo.getPassenger_name(), userInfo);
-						contacts[i] = userInfo.getPassenger_name();
-					}
-				}
-			}
-		} catch (Exception e) {
-			
-		}
 		super.onResume();
 	}
 
@@ -224,39 +203,57 @@ public class RobitOrderFragment extends Fragment {
        }  
     };
 	
-	private void showDialog(){
-		final String[] items = contacts;
-		if(items == null || items.length == 0){
-			new AlertDialog.Builder(activity).setTitle("订票人!")
-			.setMessage("此账号还没有添加联系人!").show();
-		}
-		if(checkedItems == null){
-			checkedItems = new boolean[items.length];
-		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-		.setMultiChoiceItems(items, checkedItems,new OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-				// TODO Auto-generated method stub
-				
-			}
-		})
-		.setIcon(android.R.drawable.btn_star);
-		builder.setTitle("选择订票乘客")// 设置Dialog的标题
-		.setPositiveButton("取消",null)
-	    .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				StringBuilder sbBuilder = new StringBuilder();
-				for(int i = 0; i < checkedItems.length; i++){
-					if(checkedItems[i]){
-						sbBuilder.append(items[i]+",");
-					}
+	public void showDialog(){
+		if(dialog == null){
+	        try {
+	        	if(userInfoMap.isEmpty()){
+	    			new AlertDialog.Builder(activity).setTitle("订票人!")
+	    			.setMessage("此账号还没有添加联系人!").show();
+	    			return;
+	    		}
+	        	contacts = new String[userInfoMap.size()];
+	        	int i = 0;
+	        	for(String key:userInfoMap.keySet()){
+	        		contacts[i] = key;
+	        		i++;
+	        	}
+				if(checkedItems == null){
+					checkedItems = new boolean[contacts.length];
 				}
-				orderPeople.setText(sbBuilder.toString());
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+				.setMultiChoiceItems(contacts, checkedItems,new OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+					}
+				})
+				.setIcon(android.R.drawable.btn_star);
+				builder.setTitle("选择订票乘客")// 设置Dialog的标题
+				.setPositiveButton("取消",null)
+			    .setNegativeButton("确定",new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						StringBuilder sbBuilder = new StringBuilder();
+						for(int i = 0; i < checkedItems.length; i++){
+							if(checkedItems[i]){
+								sbBuilder.append(contacts[i]+",");
+							}
+						}
+						orderPeople.setText(sbBuilder.toString());
+					}
+				});
+				dialog = builder.create();
+		        dialog.show();
+			    
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
-		AlertDialog dialog = builder.create();
-        dialog.show();
+		}else{
+			dialog.show();
+		}
+	}
+	
+	private void getPersonInfo(){
+		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(activity,userInfoMap,this);
+		AsyncTask<String, Integer, String> task = getPersonConstanct.execute("");
 	}
 }

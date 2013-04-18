@@ -5,6 +5,7 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
@@ -47,6 +48,7 @@ import org.apache.http.protocol.HttpContext;
 
 import android.util.Log;
 
+import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.ssl.SSLSocketFactoryEx;
@@ -54,6 +56,8 @@ import com.wenbo.piao.ssl.SSLSocketFactoryEx;
 public class HttpClientUtil {
 
 	private static DefaultHttpClient httpClient;
+	
+	private static Map<String,UserInfo> userinfoMap;
 
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -221,5 +225,12 @@ public class HttpClientUtil {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * 获取订票联系人信息
+	 * @return
+	 */
+	public static Map<String,UserInfo> getUserInfoMap(){
+		return userinfoMap;
+	}
 }

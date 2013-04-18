@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,6 +18,11 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.wenbo.piao.Fragment.RobitOrderFragment;
+import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 
@@ -31,25 +37,49 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	
 	private ProgressDialog progressDialog;
 	
-	public GetPersonConstanct(Activity activity){
+	private Map<String,UserInfo> userInfoMap;	
+	
+	private RobitOrderFragment robitOrderFragment;
+	
+	public GetPersonConstanct(Activity activity,Map<String,UserInfo> userInfoMap
+			,RobitOrderFragment robitOrderFragment){
 		this.activity = activity;
+		this.userInfoMap = userInfoMap;
+		this.robitOrderFragment = robitOrderFragment;
 	}
 	
 	@Override
 	protected String doInBackground(String... arg0) {
-		return getOrderPerson();
+		if(userInfoMap.isEmpty()){
+			String info = getOrderPerson();
+	    	JSONObject jsonObject = JSON.parseObject(info);
+	    	List<UserInfo>  userInfos = JSONArray.parseArray(
+					jsonObject.getString("rows"), UserInfo.class);
+			if (userInfos != null && !userInfos.isEmpty()) {
+				UserInfo userInfo = null;
+				for (int i = 0; i < userInfos.size(); i++) {
+					userInfo = userInfos.get(i);
+					if (userInfo != null) {
+						userInfo.setIndex(i);
+						userInfoMap.put(userInfo.getPassenger_name(), userInfo);
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
 	protected void onPostExecute(String result) {
 		progressDialog.dismiss();
+		robitOrderFragment.showDialog();
 		super.onPostExecute(result);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
-		super.onPreExecute();
+		 progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
+		 super.onPreExecute();
 	}
 
 	@Override
