@@ -1,9 +1,12 @@
 package com.wenbo.piao.task;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,6 +21,7 @@ import org.jsoup.nodes.Document;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -25,7 +29,6 @@ import android.widget.EditText;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
-import com.wenbo.piao.activity.ActionBarActivity;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -43,6 +46,10 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	private Activity activity;
 	
 	private ProgressDialog progressDialog = null;
+	
+	private String username;
+	
+	private String password;
 	
 	public LoginTask(Activity activity){
 		this.httpClient = HttpClientUtil.getHttpClient();
@@ -70,6 +77,16 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		switch (result) {
 		case 0:
 			Log.i("Login","登录成功!");
+			BufferedWriter writer = null;
+//			try {
+//				writer = new BufferedWriter(new OutputStreamWriter(activity.openFileOutput("pass.txt",Context.MODE_PRIVATE)));
+//				writer.write(username+"\n");
+//				writer.write(password+"\n");
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}finally{
+//				IOUtils.closeQuietly(writer);
+//			}
 			Intent intent = new Intent();
             intent.setClass(activity,UserActivity.class);
 			activity.startActivity(intent);
@@ -149,15 +166,15 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			EditText userNameEditText = (EditText)activity.findViewById(R.id.editText1);
 			EditText passwordEditText = (EditText)activity.findViewById(R.id.editText2);
 			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.editText3);
-			String userName = userNameEditText.getText().toString();
-			String password = passwordEditText.getText().toString();
+			username = userNameEditText.getText().toString();
+			password = passwordEditText.getText().toString();
 			String randCode = rangCodeEditText.getText().toString();
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method", "login"));
 			parameters.add(new BasicNameValuePair("loginRand", loginRand));
 			parameters.add(new BasicNameValuePair("refundLogin", "N"));
 			parameters.add(new BasicNameValuePair("refundFlag", "Y"));
-			parameters.add(new BasicNameValuePair("loginUser.user_name",userName));
+			parameters.add(new BasicNameValuePair("loginUser.user_name",username));
 			parameters.add(new BasicNameValuePair("nameErrorFocus", ""));
 			parameters.add(new BasicNameValuePair("user.password",password));
 			parameters.add(new BasicNameValuePair("randCode", randCode));

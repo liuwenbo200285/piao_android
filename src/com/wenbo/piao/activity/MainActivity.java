@@ -1,8 +1,16 @@
 package com.wenbo.piao.activity;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +36,25 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		Log.i("onStart","onStart...");
+		final EditText userNameText = (EditText)findViewById(R.id.editText1);
+		final EditText userPassText = (EditText)findViewById(R.id.editText2);
+		final EditText rangCodeText = (EditText)findViewById(R.id.editText3);
+//		BufferedReader bufferedReader = null;
+//		 try {
+//	            bufferedReader = new BufferedReader(new InputStreamReader(this.openFileInput("pass.txt")));
+//	            String username = bufferedReader.readLine();
+//	            String password = bufferedReader.readLine();
+//	            if(StringUtils.isNotBlank(username)){
+//	            	userNameText.setText(username.trim());
+//	            }
+//	            if(StringUtils.isNotBlank(password)){
+//	            	userPassText.setText(password.trim());
+//	            }
+//	     }catch (Exception e) {
+//	            return;
+//	     }finally{
+//	    	 IOUtils.closeQuietly(bufferedReader);
+//	     }
 		ImageView imageView = (ImageView)findViewById(R.id.imageView1);
 		imageView.setOnClickListener(new OnClickListener() {
 			
@@ -40,19 +67,16 @@ public class MainActivity extends Activity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				EditText userNameText = (EditText)findViewById(R.id.editText1);
 				if(StringUtils.isBlank(userNameText.getText().toString().trim())){
 					LoginDialog.newInstance( "请输入用户名！").show(getFragmentManager(),"dialog"); 
 					userNameText.requestFocus();
 					return;
 				}
-				EditText userPassText = (EditText)findViewById(R.id.editText2);
 				if(StringUtils.isBlank(userPassText.getText().toString().trim())){
 					LoginDialog.newInstance( "请输入密码！").show(getFragmentManager(),"dialog"); 
 					userPassText.requestFocus();
 					return;
 				}
-				EditText rangCodeText = (EditText)findViewById(R.id.editText3);
 				if(StringUtils.isBlank(rangCodeText.getText().toString().trim())){
 					LoginDialog.newInstance( "请输入验证码！").show(getFragmentManager(),"dialog"); 
 					rangCodeText.requestFocus();
