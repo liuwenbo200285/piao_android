@@ -1,16 +1,12 @@
 package com.wenbo.piao.activity;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,10 +18,29 @@ import android.widget.ImageView;
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.Account;
+import com.wenbo.piao.sqllite.service.AccountService;
+import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.LoginTask;
 
 public class MainActivity extends Activity {
+	
+	private AccountService accountService;
+	
+	private AlertDialog dialog;
+	
+	private List<Account> accounts;
+	
+	private String[] contacts;
+	
+	private boolean [] checkedItems;
+	
+	private EditText userNameText;
+	
+	private EditText userPassText;
+	
+	private EditText rangCodeText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,34 +51,25 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		Log.i("onStart","onStart...");
-		final EditText userNameText = (EditText)findViewById(R.id.editText1);
-		final EditText userPassText = (EditText)findViewById(R.id.editText2);
-		final EditText rangCodeText = (EditText)findViewById(R.id.editText3);
-//		BufferedReader bufferedReader = null;
-//		 try {
-//	            bufferedReader = new BufferedReader(new InputStreamReader(this.openFileInput("pass.txt")));
-//	            String username = bufferedReader.readLine();
-//	            String password = bufferedReader.readLine();
-//	            if(StringUtils.isNotBlank(username)){
-//	            	userNameText.setText(username.trim());
-//	            }
-//	            if(StringUtils.isNotBlank(password)){
-//	            	userPassText.setText(password.trim());
-//	            }
-//	     }catch (Exception e) {
-//	            return;
-//	     }finally{
-//	    	 IOUtils.closeQuietly(bufferedReader);
-//	     }
-		ImageView imageView = (ImageView)findViewById(R.id.imageView1);
+		userNameText = (EditText)findViewById(R.id.username);
+		userPassText = (EditText)findViewById(R.id.password);
+		rangCodeText = (EditText)findViewById(R.id.rangcode);
+		accountService = SqlLiteUtil.getAccountService(this);
+		Account account = accountService.queryLastLoginAccount();
+		if(account != null){
+			userNameText.setText(account.getName());
+			userPassText.setText(account.getPassword());
+			rangCodeText.requestFocus();
+			accounts = accountService.findAllAccounts();
+		}
+		ImageView imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		imageView.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View arg0) {
 				getLoginRangeCode();
 			}
 		});
-		Button button = (Button)findViewById(R.id.button1);
+		Button button = (Button)findViewById(R.id.loginButton);
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -82,12 +88,65 @@ public class MainActivity extends Activity {
 					rangCodeText.requestFocus();
 					return;
 				}
-				LoginTask loginTask = new LoginTask(MainActivity.this);
+				LoginTask loginTask = new LoginTask(MainActivity.this,accountService);
 				loginTask.execute("");
+			}
+		});
+		Button selectAccountButton = (Button)findViewById(R.id.selectAccountbutton);
+		selectAccountButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				showDialog();
 			}
 		});
 		getLoginRangeCode();
 		super.onStart();
+	}
+	
+	public void showDialog(){
+		if(dialog == null){
+	        try {
+	        	if(accounts == null || accounts.isEmpty()){
+	    			new AlertDialog.Builder(this).setTitle("选择账号")
+	    			.setMessage("没有可以选择的账号!").setNegativeButton("确定",null).show();
+	    			return;
+	    		}
+	        	contacts = new String[accounts.size()];
+	        	int i = 0;
+	        	for(Account dbAccount:accounts){
+	        		contacts[i] = dbAccount.getName();
+	        		i++;
+	        	}
+				if(checkedItems == null){
+					checkedItems = new boolean[contacts.length];
+				}
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+				.setSingleChoiceItems(contacts,0,new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String name = contacts[which];
+						for(Account findAccount:accounts){
+							if(name.equals(findAccount.getName())){
+								userNameText.setText(findAccount.getName());
+								userPassText.setText(findAccount.getPassword());
+								rangCodeText.requestFocus();
+								dialog.dismiss();
+								break;
+							}
+						}
+					}
+				})
+				.setIcon(android.R.drawable.btn_dropdown);
+				builder.setTitle("选择登录账号");
+				dialog = builder.create();
+		        dialog.show();
+			    
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else{
+			dialog.show();
+		}
 	}
 	
 	@Override

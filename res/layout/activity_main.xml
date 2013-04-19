@@ -9,65 +9,60 @@
     tools:context=".MainActivity" >
     
     <EditText
-        android:id="@+id/editText1"
-        android:layout_width="fill_parent"
+        android:id="@+id/username"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="6dp"
-        android:ems="50"
         android:focusable="true"
         android:hint="@string/login_name"
         android:inputType="text" >
+        
     </EditText>
     
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText1"
-        android:layout_below="@+id/editText1"
+        android:layout_alignLeft="@+id/username"
+        android:layout_below="@+id/username"
         android:layout_marginTop="6dp"
-        android:ems="50"
         android:hint="@string/login_pass"
         android:inputType="textPassword" />
     
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/rangcode"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText2"
-        android:layout_alignLeft="@+id/editText2"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/password"
+        android:layout_below="@+id/password"
         android:layout_marginTop="6dp"
-        android:ems="10"
         android:hint="@string/login_rangcode"
         android:inputType="text" />
-
+    
     <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignBottom="@+id/editText3"
-        android:layout_alignTop="@+id/editText3"
-        android:layout_toRightOf="@+id/editText3"
+        android:id="@+id/rangCodeImg"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_alignBottom="@+id/rangcode"
+        android:layout_alignRight="@+id/password"
+        android:layout_toRightOf="@+id/rangcode"
         android:contentDescription="@string/login_title" />
 
     <Button
-        android:id="@+id/button1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText3"
-        android:layout_below="@+id/editText3"
-        android:layout_marginTop="6dp"
-        android:text="@string/login_button" />
-
-    <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/selectAccountbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/app_name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_alignBottom="@+id/username"
+        android:layout_alignRight="@+id/password"
+        android:text="@string/selectAccount" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/rangcode"
+        android:layout_below="@+id/rangcode"
+        android:layout_marginTop="14dp"
+        android:text="@string/login_button" />
 
 </RelativeLayout>

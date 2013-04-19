@@ -1,12 +1,10 @@
 package com.wenbo.piao.task;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,9 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -30,7 +26,10 @@ import android.widget.EditText;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.androidpiao.R;
 import com.wenbo.piao.activity.UserActivity;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.Account;
+import com.wenbo.piao.sqllite.service.AccountService;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
 
@@ -51,9 +50,12 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	
 	private String password;
 	
-	public LoginTask(Activity activity){
+	private AccountService accountService;
+	
+	public LoginTask(Activity activity,AccountService accountService){
 		this.httpClient = HttpClientUtil.getHttpClient();
 		this.activity = activity;
+		this.accountService = accountService;
 	}
 
 	@Override
@@ -77,16 +79,11 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		switch (result) {
 		case 0:
 			Log.i("Login","登录成功!");
-			BufferedWriter writer = null;
-//			try {
-//				writer = new BufferedWriter(new OutputStreamWriter(activity.openFileOutput("pass.txt",Context.MODE_PRIVATE)));
-//				writer.write(username+"\n");
-//				writer.write(password+"\n");
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}finally{
-//				IOUtils.closeQuietly(writer);
-//			}
+			Account account = new Account();
+			account.setName(username);
+			account.setPassword(password);
+			account.setUpdateDate(new Date());
+			accountService.create(account);
 			Intent intent = new Intent();
             intent.setClass(activity,UserActivity.class);
 			activity.startActivity(intent);
@@ -94,28 +91,20 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			break;
 		case 1:
 //			Toast.makeText(activity, "用户名不存在!",Toast.LENGTH_SHORT).show();
-			new AlertDialog.Builder(activity).setTitle("登录失败!")
-			.setMessage("用户名不存在!").show();
-			Log.w("Login","用户名不存在!");
+			LoginDialog.newInstance( "用户名不存在！").show(activity.getFragmentManager(),"dialog"); 
 			break;
 		case 2:
 //			Toast.makeText(activity, "密码错误!",Toast.LENGTH_SHORT).show();
-			new AlertDialog.Builder(activity).setTitle("登录失败!")
-			.setMessage("密码错误!").show();
-			Log.w("Login","密码错误!");
+			LoginDialog.newInstance( "密码错误！").show(activity.getFragmentManager(),"dialog"); 
 			break;
 		case 3:
 //			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
-			new AlertDialog.Builder(activity).setTitle("登录失败!")
-			.setMessage("验证码错误!").show();
+			LoginDialog.newInstance("验证码错误！").show(activity.getFragmentManager(),"dialog"); 
 			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,1);
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
-			Log.w("Login","验证码错误!");
 			break;
 		default:
-			new AlertDialog.Builder(activity).setTitle("登录失败!")
-			.setMessage("系统错误!").show();
-			Log.w("Login","系统错误");
+			LoginDialog.newInstance("系统错误！").show(activity.getFragmentManager(),"dialog"); 
 			break;
 		}
 	}
@@ -163,9 +152,9 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		HttpResponse response = null;
 		// 获取验证码
 		try {
-			EditText userNameEditText = (EditText)activity.findViewById(R.id.editText1);
-			EditText passwordEditText = (EditText)activity.findViewById(R.id.editText2);
-			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.editText3);
+			EditText userNameEditText = (EditText)activity.findViewById(R.id.username);
+			EditText passwordEditText = (EditText)activity.findViewById(R.id.password);
+			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.rangcode);
 			username = userNameEditText.getText().toString();
 			password = passwordEditText.getText().toString();
 			String randCode = rangCodeEditText.getText().toString();

@@ -145,7 +145,6 @@
         android:layout_alignLeft="@+id/startTrainNo"
         android:layout_below="@+id/orderPeople"
         android:layout_marginTop="14dp"
-        android:ems="5"
         android:hint="@string/orderCode"
         android:inputType="text" >
     </EditText>

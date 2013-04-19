@@ -46,7 +46,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	protected void onPostExecute(Bitmap result) {
 		ImageView imageView = null;
 		if(type == 1){
-			imageView = (ImageView)activity.findViewById(R.id.imageView1);
+			imageView = (ImageView)activity.findViewById(R.id.rangCodeImg);
 			
 		}else if(type == 2){
 			imageView = (ImageView)activity.findViewById(R.id.orderCodeImg);

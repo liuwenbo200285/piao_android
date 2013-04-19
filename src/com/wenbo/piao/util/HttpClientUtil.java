@@ -48,9 +48,9 @@ import org.apache.http.protocol.HttpContext;
 
 import android.util.Log;
 
-import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.ssl.SSLSocketFactoryEx;
 
 public class HttpClientUtil {

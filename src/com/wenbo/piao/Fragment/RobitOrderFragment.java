@@ -23,8 +23,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.androidpiao.R;
-import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 

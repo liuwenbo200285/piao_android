@@ -1,4 +1,6 @@
-package com.wenbo.piao.domain;
+package com.wenbo.piao.sqllite.domain;
+
+import com.j256.ormlite.field.DatabaseField;
 
 /**
  * 用户信息domian
@@ -7,20 +9,49 @@ package com.wenbo.piao.domain;
  */
 public class UserInfo {
 	//序号，订票时需要用到
+	@DatabaseField(id = true)
 	private Integer index;
+	
+	@DatabaseField(canBeNull = true)
 	private String first_letter;
+	
+	@DatabaseField(canBeNull = true)
 	private String isUserSelf;
+	
+	@DatabaseField(canBeNull = true)
     private String mobile_no;
+	
+	@DatabaseField(canBeNull = true)
     private String old_passenger_id_no;
+	
+	@DatabaseField(canBeNull = true)
     private String old_passenger_id_type_code;
+	
+	@DatabaseField(canBeNull = true)
     private String old_passenger_name;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_flag;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_id_no;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_id_type_code;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_id_type_name;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_name;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_type;
+	
+	@DatabaseField(canBeNull = true)
     private String passenger_type_name;
+	
+	@DatabaseField(canBeNull = true)
     private String recordCount;
 	public Integer getIndex() {
 		return index;

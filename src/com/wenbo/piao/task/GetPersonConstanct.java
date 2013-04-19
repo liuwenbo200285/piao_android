@@ -22,8 +22,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.Fragment.RobitOrderFragment;
-import com.wenbo.piao.domain.UserInfo;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 
 /**
@@ -51,10 +52,15 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	@Override
 	protected String doInBackground(String... arg0) {
 		if(userInfoMap.isEmpty()){
-			String info = getOrderPerson();
-	    	JSONObject jsonObject = JSON.parseObject(info);
-	    	List<UserInfo>  userInfos = JSONArray.parseArray(
-					jsonObject.getString("rows"), UserInfo.class);
+			List<UserInfo> userInfos = SqlLiteUtil.getUserInfoService(activity).findAllInfos();
+			boolean isInit = false;
+			if(userInfos == null || userInfos.isEmpty()){
+				String info = getOrderPerson();
+		    	JSONObject jsonObject = JSON.parseObject(info);
+		    	userInfos = JSONArray.parseArray(
+						jsonObject.getString("rows"), UserInfo.class);
+		    	isInit = true;
+			}
 			if (userInfos != null && !userInfos.isEmpty()) {
 				UserInfo userInfo = null;
 				for (int i = 0; i < userInfos.size(); i++) {
@@ -62,6 +68,9 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 					if (userInfo != null) {
 						userInfo.setIndex(i);
 						userInfoMap.put(userInfo.getPassenger_name(), userInfo);
+						if(isInit){
+							SqlLiteUtil.getUserInfoService(activity).create(userInfo);
+						}
 					}
 				}
 			}
