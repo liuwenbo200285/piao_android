@@ -14,6 +14,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,9 +22,12 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wenbo.piao.Fragment.ContactFragment;
 import com.wenbo.piao.Fragment.RobitOrderFragment;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.sqllite.service.UserInfoService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 
@@ -40,19 +44,24 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	
 	private Map<String,UserInfo> userInfoMap;	
 	
-	private RobitOrderFragment robitOrderFragment;
+	private UserInfoService userInfoService;
+	
+	private Fragment fragment;
 	
 	public GetPersonConstanct(Activity activity,Map<String,UserInfo> userInfoMap
-			,RobitOrderFragment robitOrderFragment){
+			,Fragment fragment){
 		this.activity = activity;
 		this.userInfoMap = userInfoMap;
-		this.robitOrderFragment = robitOrderFragment;
+		this.fragment = fragment;
 	}
 	
 	@Override
 	protected String doInBackground(String... arg0) {
 		if(userInfoMap.isEmpty()){
-			List<UserInfo> userInfos = SqlLiteUtil.getUserInfoService(activity).findAllInfos();
+			if(userInfoService == null){
+				userInfoService = SqlLiteUtil.getUserInfoService(activity);
+			}
+			List<UserInfo> userInfos = userInfoService.findAllInfos();
 			boolean isInit = false;
 			if(userInfos == null || userInfos.isEmpty()){
 				String info = getOrderPerson();
@@ -63,13 +72,15 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 			}
 			if (userInfos != null && !userInfos.isEmpty()) {
 				UserInfo userInfo = null;
+				Account account = HttpClientUtil.getAccount();
 				for (int i = 0; i < userInfos.size(); i++) {
 					userInfo = userInfos.get(i);
 					if (userInfo != null) {
 						userInfo.setIndex(i);
 						userInfoMap.put(userInfo.getPassenger_name(), userInfo);
 						if(isInit){
-							SqlLiteUtil.getUserInfoService(activity).create(userInfo);
+							userInfo.setAccountName(account.getName());
+							userInfoService.create(userInfo);
 						}
 					}
 				}
@@ -81,7 +92,14 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	@Override
 	protected void onPostExecute(String result) {
 		progressDialog.dismiss();
-		robitOrderFragment.showDialog();
+		HttpClientUtil.setUserInfoMap(userInfoMap);
+		if(fragment.getClass() == RobitOrderFragment.class){
+			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
+			robitOrderFragment.showDialog();
+		}else if(fragment.getClass() == ContactFragment.class){
+			ContactFragment contactFragment = (ContactFragment)fragment;
+			contactFragment.showView();
+		}
 		super.onPostExecute(result);
 	}
 
@@ -105,9 +123,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 		HttpResponse response = null;
 		try {
 			HttpClient httpClient = HttpClientUtil.getHttpClient();
-			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
-			HttpPost httpPost = HttpClientUtil.getHttpPost(uri,
-					UrlEnum.GET_ORDER_PERSON);
+//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
+			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_PERSON);
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method", "getPagePassengerAll"));
 			parameters.add(new BasicNameValuePair("pageIndex",

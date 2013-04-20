@@ -24,6 +24,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+        android:exported="false"
+    	android:name=".RobitOrderService"  
+    	android:enabled="true" >  
+   		<intent-filter>  
+        	<action android:name="com.wenbo.piao.service.RobitOrderService" />  
+    	</intent-filter>  
+		</service>
         <activity
             android:name="com.wenbo.piao.activity.UserActivity"
             android:label="@string/app_name" >

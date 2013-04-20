@@ -17,7 +17,7 @@ public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final String DATABASE_NAME = "android_piao";
 
-	private static final int Version = 2;
+	private static final int Version = 4;
 
 	private static Dao<Account, Integer> accountDao = null;
 

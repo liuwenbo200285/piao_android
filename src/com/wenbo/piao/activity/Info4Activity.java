@@ -1,12 +1,12 @@
 package com.wenbo.piao.activity;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 
 import com.wenbo.androidpiao.R;
 
-public class Info4Activity extends Activity {
+public class Info4Activity extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

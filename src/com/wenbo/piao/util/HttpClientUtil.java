@@ -50,6 +50,7 @@ import android.util.Log;
 
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.ssl.SSLSocketFactoryEx;
 
@@ -58,7 +59,9 @@ public class HttpClientUtil {
 	private static DefaultHttpClient httpClient;
 	
 	private static Map<String,UserInfo> userinfoMap;
-
+	
+	private static Account account;
+	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
         	try {
@@ -165,8 +168,8 @@ public class HttpClientUtil {
 	/**
 	 *requestType 1 GET 2 POST
 	 */
-	public static HttpPost getHttpPost(URI uri,UrlEnum urlEnum){
-		HttpPost httpPost = new HttpPost(uri);
+	public static HttpPost getHttpPost(UrlEnum urlEnum){
+		HttpPost httpPost = new HttpPost("https://dynamic.12306.cn/otsweb/"+urlEnum.getPath());
 		if(StringUtils.isNotEmpty(urlEnum.getAccept())){
 			httpPost.addHeader("Accept",urlEnum.getAccept());
 		}
@@ -226,11 +229,23 @@ public class HttpClientUtil {
 		return null;
 	}
 	
+	public static Account getAccount(){
+		return HttpClientUtil.account;
+	}
+	
+	public static void setAccount(Account account){
+		HttpClientUtil.account = account;
+	}
+	
+	public static void setUserInfoMap(Map<String,UserInfo> userinfoMap){
+		HttpClientUtil.userinfoMap = userinfoMap;
+	}
+	
 	/**
 	 * 获取订票联系人信息
 	 * @return
 	 */
 	public static Map<String,UserInfo> getUserInfoMap(){
-		return userinfoMap;
+		return HttpClientUtil.userinfoMap;
 	}
 }

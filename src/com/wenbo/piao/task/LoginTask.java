@@ -84,6 +84,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			account.setPassword(password);
 			account.setUpdateDate(new Date());
 			accountService.create(account);
+			HttpClientUtil.setAccount(account);
 			Intent intent = new Intent();
             intent.setClass(activity,UserActivity.class);
 			activity.startActivity(intent);
@@ -100,6 +101,9 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		case 3:
 //			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
 			LoginDialog.newInstance("验证码错误！").show(activity.getFragmentManager(),"dialog"); 
+			EditText editText = (EditText)activity.findViewById(R.id.rangcode);
+			editText.setText("");
+			editText.requestFocus();
 			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,1);
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			break;
@@ -170,9 +174,8 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			parameters.add(new BasicNameValuePair("randErrorFocus", ""));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
 					"UTF-8");
-			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.LONGIN_CONFIM.getPath());
-			HttpPost httpPost = HttpClientUtil.getHttpPost(uri,
-					UrlEnum.LONGIN_CONFIM);
+//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.LONGIN_CONFIM.getPath());
+			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.LONGIN_CONFIM);
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 302) {

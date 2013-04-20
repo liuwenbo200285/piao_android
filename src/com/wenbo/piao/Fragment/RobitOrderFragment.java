@@ -10,7 +10,7 @@ import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,15 +18,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.androidpiao.R;
+import com.wenbo.piao.dialog.LoginDialog;
+import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
+import com.wenbo.piao.util.HttpClientUtil;
 
 public class RobitOrderFragment extends Fragment {
 	
@@ -51,6 +56,15 @@ public class RobitOrderFragment extends Fragment {
     private boolean[] checkedItems;
     private Map<String,UserInfo> userInfoMap;
     private AlertDialog dialog;
+    private EditText fromStation;
+    private EditText toStation;
+    private EditText trainNo;
+    private EditText rangeCode;
+    private CheckBox firstSeat;
+    private CheckBox secondSeat;
+    private CheckBox hardSleeper;
+    private CheckBox hardSeat;
+    private CheckBox noSeat;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,6 +107,15 @@ public class RobitOrderFragment extends Fragment {
         mMonth = c.get(Calendar.MONTH);  
         mDay = c.get(Calendar.DAY_OF_MONTH);
         setDateTime();
+        fromStation = (EditText)activity.findViewById(R.id.startArea);
+        toStation = (EditText)activity.findViewById(R.id.endArea);
+        trainNo = (EditText)activity.findViewById(R.id.startTrainNo);
+        firstSeat = (CheckBox)activity.findViewById(R.id.first_seat);
+        secondSeat = (CheckBox)activity.findViewById(R.id.second_seat);
+        hardSleeper = (CheckBox)activity.findViewById(R.id.hard_sleeper);
+        hardSeat = (CheckBox)activity.findViewById(R.id.hard_seat);
+        noSeat= (CheckBox)activity.findViewById(R.id.no_seat);
+        rangeCode = (EditText)activity.findViewById(R.id.rangcode);
         selectDate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -105,6 +128,7 @@ public class RobitOrderFragment extends Fragment {
         selectPeople.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				userInfoMap = HttpClientUtil.getUserInfoMap();
 				if(userInfoMap == null){
 					userInfoMap = new HashMap<String,UserInfo>();
 					getPersonInfo();
@@ -123,6 +147,24 @@ public class RobitOrderFragment extends Fragment {
 			public void onClick(View v) {
 				GetRandCodeTask getRandCode = new GetRandCodeTask(activity,2);
 		        getRandCode.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+			}
+		});
+        Button orderButton = (Button)activity.findViewById(R.id.orderButton);
+        orderButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(activity,RobitOrderService.class);
+				Bundle bundle = new Bundle();
+				bundle.putString(ParameterEnum.FROMSTATION.getValue(),fromStation.getText().toString());
+				bundle.putString(ParameterEnum.TOSTATION.getValue(),toStation.getText().toString());
+				bundle.putString(ParameterEnum.TRAINNO.getValue(),trainNo.getText().toString());
+				bundle.putString(ParameterEnum.ORDERPERSON.getValue(),orderPeople.getText().toString());
+				bundle.putString(ParameterEnum.ORDERDATE.getValue(),trainDate.getText().toString());
+				bundle.putString(ParameterEnum.ORDERSEAT.getValue(),getOrderSet());
+				bundle.putString(ParameterEnum.ORDERTIME.getValue(),"12:00--18:00");
+				bundle.putString(ParameterEnum.RANGECODE.getValue(),rangeCode.getText().toString());
+				intent.putExtras(bundle);
+				activity.startService(intent);
 			}
 		});
 		super.onActivityCreated(savedInstanceState);
@@ -207,8 +249,7 @@ public class RobitOrderFragment extends Fragment {
 		if(dialog == null){
 	        try {
 	        	if(userInfoMap.isEmpty()){
-	    			new AlertDialog.Builder(activity).setTitle("订票人!")
-	    			.setMessage("此账号还没有添加联系人!").show();
+	    			LoginDialog.newInstance( "此账号还没有添加联系人！").show(activity.getFragmentManager(),"dialog"); 
 	    			return;
 	    		}
 	        	contacts = new String[userInfoMap.size()];
@@ -254,6 +295,26 @@ public class RobitOrderFragment extends Fragment {
 	
 	private void getPersonInfo(){
 		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(activity,userInfoMap,this);
-		AsyncTask<String, Integer, String> task = getPersonConstanct.execute("");
+		getPersonConstanct.execute("");
+	}
+	
+	private String getOrderSet(){
+		StringBuilder builder = new StringBuilder();
+		if(firstSeat.isChecked()){
+			builder.append("3,");
+		}
+		if(secondSeat.isChecked()){
+			builder.append("4,");
+		}
+		if(hardSleeper.isChecked()){
+			builder.append("7,");
+		}
+		if(hardSeat.isChecked()){
+			builder.append("9,");
+		}
+		if(noSeat.isChecked()){
+			builder.append("10,");
+		}
+		return builder.toString();
 	}
 }

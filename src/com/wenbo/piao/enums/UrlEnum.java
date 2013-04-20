@@ -18,19 +18,19 @@ public enum UrlEnum {
 			"https://dynamic.12306.cn/otsweb/passengerAction.do?method=initUsualPassenger12306","application/x-www-form-urlencoded",
 			"XMLHttpRequest"),
 	//查询火车票
-	SEARCH_TICKET("/otsweb/order/querySingleAction.do","","https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init","",""),
+	SEARCH_TICKET("order/querySingleAction.do","","https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init","",""),
 	//点击预定
-	BOOK_TICKET("/otsweb/order/querySingleAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+	BOOK_TICKET("order/querySingleAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init","application/x-www-form-urlencoded",""),
-	GET_ORDER_INFO("/otsweb/order/confirmPassengerAction.do","application/json, text/javascript, */*",
+	GET_ORDER_INFO("order/confirmPassengerAction.do","application/json, text/javascript, */*",
 			"https://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=init",
 			"application/x-www-form-urlencoded","XMLHttpRequest"),
 	//确认订单验证码
 	ORDER_RANGCODE_URL("/passCodeAction.do?rand=randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//获取坐席值的url
-	GET_SEAT_VALUE("/otsweb/passCodeAction.do?rand:randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
+	GET_SEAT_VALUE("passCodeAction.do?rand:randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//查询预订车票余票信息
-	SEARCH_TICKET_INFO("/otsweb/order/confirmPassengerAction.do","application/json, text/javascript, */*","","","");
+	SEARCH_TICKET_INFO("order/confirmPassengerAction.do","application/json, text/javascript, */*","","","");
 	private String path;
 	
 	private String accept;

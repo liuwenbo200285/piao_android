@@ -112,16 +112,20 @@ public class MainActivity extends Activity {
 	    			return;
 	    		}
 	        	contacts = new String[accounts.size()];
-	        	int i = 0;
-	        	for(Account dbAccount:accounts){
-	        		contacts[i] = dbAccount.getName();
-	        		i++;
-	        	}
-				if(checkedItems == null){
+	        	if(checkedItems == null){
 					checkedItems = new boolean[contacts.length];
 				}
+	        	int i = 0;
+	        	int select = 0;
+	        	for(Account dbAccount:accounts){
+	        		contacts[i] = dbAccount.getName();
+	        		if(userNameText.getText().toString().equals(dbAccount.getName())){
+	        			select = i;
+	        		}
+	        		i++;
+	        	}
 				AlertDialog.Builder builder = new AlertDialog.Builder(this)
-				.setSingleChoiceItems(contacts,0,new DialogInterface.OnClickListener() {
+				.setSingleChoiceItems(contacts,select,new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						String name = contacts[which];

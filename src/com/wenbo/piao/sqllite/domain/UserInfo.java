@@ -12,6 +12,9 @@ public class UserInfo {
 	@DatabaseField(id = true)
 	private Integer index;
 	
+	@DatabaseField(canBeNull = false)
+	private String accountName;
+	
 	@DatabaseField(canBeNull = true)
 	private String first_letter;
 	
@@ -53,6 +56,10 @@ public class UserInfo {
 	
 	@DatabaseField(canBeNull = true)
     private String recordCount;
+	
+	@DatabaseField(canBeNull = true)
+	private String sex_name;
+	
 	public Integer getIndex() {
 		return index;
 	}
@@ -143,5 +150,17 @@ public class UserInfo {
 	public void setRecordCount(String recordCount) {
 		this.recordCount = recordCount;
 	}
-    
+	public String getSex_name() {
+		return sex_name;
+	}
+	public void setSex_name(String sex_name) {
+		this.sex_name = sex_name;
+	}
+	public String getAccountName() {
+		return accountName;
+	}
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+	
 }

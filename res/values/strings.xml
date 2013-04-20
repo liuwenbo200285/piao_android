@@ -55,4 +55,5 @@
 	<string name="orderPeople">订票乘客</string>
 	<string name="orderCode">验证码</string>
 	<string name="beginOrder">开始抢票</string>
+	<string name="syncUser">同步联系人</string>
 </resources>

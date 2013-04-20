@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout   
+    android:id="@+id/RelativeLayout01"   
+    android:layout_width="fill_parent"   
+    xmlns:android="http://schemas.android.com/apk/res/android"   
+    android:layout_height="wrap_content"   
+    android:paddingBottom="4dip"   
+    android:paddingLeft="12dip"  
+    android:paddingRight="12dip">
+<TextView 
+	android:id="@+id/textView1"
+    android:layout_height="wrap_content"   
+    android:textSize="20sp"   
+    android:layout_width="fill_parent"
+    android:textIsSelectable="true"
+    />
+<TextView
+    android:id="@+id/textView2"
+    android:layout_height="wrap_content"   
+    android:layout_width="fill_parent"   
+    android:layout_below="@+id/textView1"   
+    android:textIsSelectable="true" 
+    />
+</RelativeLayout>

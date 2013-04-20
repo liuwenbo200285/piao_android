@@ -29,6 +29,8 @@ public class ConfigInfo {
 	private Integer searchSleepTime;
 	
 	private Integer searchWatiTime;
+	
+	private String rangeCode;
 
 	public String getUsername() {
 		return username;
@@ -124,5 +126,13 @@ public class ConfigInfo {
 
 	public void setSearchWatiTime(Integer searchWatiTime) {
 		this.searchWatiTime = searchWatiTime;
+	}
+
+	public String getRangeCode() {
+		return rangeCode;
+	}
+
+	public void setRangeCode(String rangeCode) {
+		this.rangeCode = rangeCode;
 	}
 }
