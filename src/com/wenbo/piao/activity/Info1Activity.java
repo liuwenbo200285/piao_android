@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.Spinner;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 
 public class Info1Activity extends Activity {
 	

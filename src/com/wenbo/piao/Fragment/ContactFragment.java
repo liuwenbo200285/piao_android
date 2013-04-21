@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.sqllite.service.UserInfoService;

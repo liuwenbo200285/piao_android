@@ -1,12 +1,10 @@
 package com.wenbo.piao.activity;
 
-import com.wenbo.androidpiao.R;
-import com.wenbo.androidpiao.R.layout;
-import com.wenbo.androidpiao.R.menu;
-
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
+
+import com.wenbo.piao.R;
 
 public class Info3Activity extends Activity {
 

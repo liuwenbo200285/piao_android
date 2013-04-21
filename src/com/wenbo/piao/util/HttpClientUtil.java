@@ -193,7 +193,7 @@ public class HttpClientUtil {
 	}
 	
 	public static HttpGet getHttpGet(UrlEnum urlEnum){
-		HttpGet httpGet = new HttpGet("https://dynamic.12306.cn/otsweb/"+urlEnum.getPath());
+		HttpGet httpGet = new HttpGet(UrlEnum.DO_MAIN.getPath()+urlEnum.getPath());
 		if(StringUtils.isNotEmpty(urlEnum.getAccept())){
 			httpGet.addHeader("Accept",urlEnum.getAccept());
 		}

@@ -1,12 +1,8 @@
 package com.wenbo.piao.Fragment;
 
-import com.wenbo.androidpiao.R;
-import com.wenbo.piao.task.GetPersonConstanct;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +10,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.wenbo.piao.R;
 
 public class OrderInfoFragment extends Fragment {
 	private Activity activity;

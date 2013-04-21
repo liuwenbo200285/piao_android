@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 
 public class ActionBarActivity extends Activity {
 	

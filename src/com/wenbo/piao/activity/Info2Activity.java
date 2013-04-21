@@ -8,7 +8,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 
 public class Info2Activity extends Activity {
 

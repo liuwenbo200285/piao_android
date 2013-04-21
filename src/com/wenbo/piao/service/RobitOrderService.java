@@ -2,6 +2,7 @@ package com.wenbo.piao.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class RobitOrderService extends Service {
 	private Map<String,UserInfo> userInfoMap;
 	
 	private UserInfo userInfo;
+	
+	private boolean isBegin;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -60,40 +63,50 @@ public class RobitOrderService extends Service {
 	@Override
 	public void onCreate() {
 		Log.i("RobitOrderService","onCreate");
-		httpClient = HttpClientUtil.getHttpClient();
 		super.onCreate();
 	}
 
 	@Override
 	public void onDestroy() {
 		Log.i("RobitOrderService","onDestroy");
+		isBegin = false;
 		super.onDestroy();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("RobitOrderService","onStartCommand");
+		httpClient = HttpClientUtil.getHttpClient();
 		Bundle bundle = intent.getExtras();
 		configInfo = new ConfigInfo();
-		configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
-		configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
-		configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
-		configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
-		configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
+//		configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
+//		configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
+//		configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
+//		configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
+//		configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
+//		configInfo.setRangeCode(bundle.getString(ParameterEnum.RANGECODE.getValue()));
+//		configInfo.setToStation(bundle.getString(ParameterEnum.TOSTATION.getValue()));
+//		configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
+		configInfo.setFromStation("CSQ");
+		configInfo.setToStation("SZQ");
+		configInfo.setOrderDate("2013-04-23");
+		configInfo.setTrainClass("D#");
+		configInfo.setOrderPerson("阳茜,刘丽,");
+		configInfo.setOrderSeat("4,");
+		configInfo.setOrderTime("12:00--18:00");
 		configInfo.setRangeCode(bundle.getString(ParameterEnum.RANGECODE.getValue()));
-		configInfo.setToStation(bundle.getString(ParameterEnum.TOSTATION.getValue()));
-		configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
+		configInfo.setTrainNo("");
 		userInfoMap = HttpClientUtil.getUserInfoMap();
+		isBegin = true;
 		new Thread(new Runnable() {
-			
 			@Override
 			public void run() {
-				while(true){
-					Log.i("service","ing....");
+				while(isBegin){
 					try {
-						Thread.sleep(1000);
+						searchTicket(configInfo.getOrderDate());
 					} catch (Exception e) {
 						e.printStackTrace();
+						isBegin = false;
 					}
 				}
 			}
@@ -111,34 +124,33 @@ public class RobitOrderService extends Service {
 		String info = null;
 		OrderParameter orderParameter = null;
 		try {
-			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
-			HttpParams httpParams = httpGet.getParams();
-			httpParams.setParameter("method", "queryLeftTicket")
+			HttpGet httpget = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
+			httpget.getParams().setParameter("method", "queryLeftTicket")
 					.setParameter("orderRequest.train_date", date)
 					.setParameter("orderRequest.from_station_telecode",
 							configInfo.getFromStation())
 					.setParameter("orderRequest.to_station_telecode",
 							configInfo.getToStation());
 			if (StringUtils.isNotEmpty(configInfo.getTrainNo())) {
-				httpParams.setParameter("orderRequest.train_no",
+				httpget.getParams().setParameter("orderRequest.train_no",
 						configInfo.getTrainNo());
 			} else {
-				httpParams.setParameter("orderRequest.train_no", "");
+				httpget.getParams().setParameter("orderRequest.train_no", "");
 			}
-			httpParams.setParameter("trainPassType", "QB")
+			httpget.getParams().setParameter("trainPassType", "QB")
 					.setParameter("trainClass", configInfo.getTrainClass())
 					.setParameter("includeStudent", "00")
 					.setParameter("seatTypeAndNum", "")
 					.setParameter("orderRequest.start_time_str",configInfo.getOrderTime());
-			response = httpClient.execute(httpGet);
-			int code = response.getStatusLine().getStatusCode();
-			info = EntityUtils.toString(response.getEntity());
+			response = httpClient.execute(httpget);
+			if(response.getStatusLine().getStatusCode() == 200){
+				info = EntityUtils.toString(response.getEntity());
+			}
 			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date)) == null){
 //				HttpClientUtils.closeQuietly(response);
 				Log.i("searchTicket","没有余票,休息2秒，继续刷票");
 				Thread.sleep(2*1000);
-				response = httpClient.execute(httpGet);
-				code = response.getStatusLine().getStatusCode();
+				response = httpClient.execute(httpget);
 				info = EntityUtils.toString(response.getEntity());
 				if(StringUtils.contains(info, "系统维护中")){
 					return;
@@ -154,6 +166,8 @@ public class RobitOrderService extends Service {
 			orderTicket(date, params, orderParameter.getTicketType());
 		} catch (Exception e) {
 			Log.e("searchTicket","searchTicket error!", e);
+			isBegin = false;
+			return;
 		} finally {
 			Log.i("searchTicket","close searchTicket");
 //			HttpClientUtils.closeQuietly(response);

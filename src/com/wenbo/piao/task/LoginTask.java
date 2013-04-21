@@ -24,7 +24,7 @@ import android.util.Log;
 import android.widget.EditText;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;

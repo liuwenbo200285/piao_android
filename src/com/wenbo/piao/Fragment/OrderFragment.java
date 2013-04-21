@@ -13,7 +13,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 
 public class OrderFragment extends Fragment {
 	

@@ -4,7 +4,7 @@ import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 
-import com.wenbo.androidpiao.R;
+import com.wenbo.piao.R;
 
 public class Info4Activity extends ListActivity {
 
