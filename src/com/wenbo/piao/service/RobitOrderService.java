@@ -89,7 +89,7 @@ public class RobitOrderService extends Service {
 //		configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
 		configInfo.setFromStation("CSQ");
 		configInfo.setToStation("SZQ");
-		configInfo.setOrderDate("2013-04-23");
+		configInfo.setOrderDate("2013-04-25");
 		configInfo.setTrainClass("D#");
 		configInfo.setOrderPerson("阳茜,刘丽,");
 		configInfo.setOrderSeat("4,");

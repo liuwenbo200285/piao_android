@@ -13,6 +13,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -133,30 +134,13 @@ public class HttpClientUtil {
                 httpClient.getCookieSpecs().register("easy", csf);
         		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
         		httpClient.setHttpRequestRetryHandler(myRetryHandler);
-        		// 以下为新增内容
-        		httpClient.setRedirectHandler(new RedirectHandler(){
-    				@Override
-    				public URI getLocationURI(HttpResponse response,HttpContext context)
-    						throws ProtocolException {
-    					return null;
-    				}
-    				@Override
-    				public boolean isRedirectRequested(HttpResponse response,HttpContext context) {
-    					boolean isRedirect=false;
-    		            try {
-    		                isRedirect = new DefaultRedirectHandler().isRedirectRequested(response, context);
-    		            } catch (Exception e) {
-    		                e.printStackTrace();
-    		            }
-    		            if (!isRedirect) {
-    		                int responseCode = response.getStatusLine().getStatusCode();
-    		                if (responseCode == 301 || responseCode == 302) {
-    		                    return true;
-    		                }
-    		            }
-    		            return isRedirect;
-    				}
-        		});
+        		httpClient.setReuseStrategy(new ConnectionReuseStrategy() {                
+					@Override
+					public boolean keepAlive(HttpResponse response, HttpContext context) {
+						System.out.println(response);
+						return true;
+					}
+    		});
 			} catch (Exception e) {
 				Log.e("HttpClientUtil.getHttpClient","初始化httpclient失败",e);
 			}
@@ -169,7 +153,7 @@ public class HttpClientUtil {
 	 *requestType 1 GET 2 POST
 	 */
 	public static HttpPost getHttpPost(UrlEnum urlEnum){
-		HttpPost httpPost = new HttpPost("https://dynamic.12306.cn/otsweb/"+urlEnum.getPath());
+		HttpPost httpPost = new HttpPost(UrlEnum.DO_MAIN.getPath()+urlEnum.getPath());
 		if(StringUtils.isNotEmpty(urlEnum.getAccept())){
 			httpPost.addHeader("Accept",urlEnum.getAccept());
 		}
