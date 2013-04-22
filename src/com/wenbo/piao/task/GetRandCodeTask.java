@@ -39,7 +39,13 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(String... arg0) {
-		return getRandCode(UrlEnum.LOGIN_RANGCODE_URL);
+		UrlEnum urlEnum = null;
+		if(type == 1){
+			urlEnum = UrlEnum.LOGIN_RANGCODE_URL;
+		}else if(type == 2){
+			urlEnum = UrlEnum.ORDER_RANGCODE_URL;
+		}
+		return getRandCode(urlEnum);
 	}
 
 	@Override

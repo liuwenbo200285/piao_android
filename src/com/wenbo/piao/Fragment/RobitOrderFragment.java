@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +30,7 @@ import android.widget.ImageView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.ParameterEnum;
+import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.domain.UserInfo;
@@ -47,6 +49,8 @@ public class RobitOrderFragment extends Fragment {
 	private Button selectPeople;
 
 	private DatePickerDialog datePickerDialog;
+	
+	private ProgressDialog progressDialog;
 
 	private EditText orderPeople;
 
@@ -89,9 +93,6 @@ public class RobitOrderFragment extends Fragment {
 	public void onStart() {
 		// TODO Auto-generated method stub
 		Log.i("onStart", "onStart");
-		GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
-		getRandCode.execute(UrlEnum.DO_MAIN.getPath()
-				+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 		super.onStart();
 	}
 
@@ -178,6 +179,7 @@ public class RobitOrderFragment extends Fragment {
 					activity.startService(intent);
 					type = 1;
 					orderButton.setText("停止抢票");
+					progressDialog = ProgressDialog.show(activity,"订票中","正在努力抢票...",true,true);
 				}else{
 					activity.stopService(intent);
 					orderButton.setText("开始抢票");
@@ -353,10 +355,67 @@ public class RobitOrderFragment extends Fragment {
 		// 自定义一个广播接收器
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			System.out.println("OnReceiver");
 			Bundle bundle = intent.getExtras();
-			int a = bundle.getInt("i");
+			int a = bundle.getInt("status");
+			progressDialog.dismiss();
+			switch (a){
+			case 1:
+				LoginDialog.newInstance("系统维护中！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 2:
+				break;
+			case 3:
+				LoginDialog.newInstance("车次输入错误！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 4:
+				LoginDialog.newInstance("还有未处理的订单！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 5:
+				LoginDialog.newInstance("预订坐席填写不正确！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 6:
+				LoginDialog.newInstance("订票人格式填写不正确！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 7:
+				LoginDialog.newInstance("一个账号最多只能预定5张火车票！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 8:
+				LoginDialog.newInstance("输入的验证码不正确！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 9:
+				LoginDialog.newInstance("票数不够！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 10:
+				LoginDialog.newInstance("非法的订票请求！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 11:
+				LoginDialog.newInstance("订票成功！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			case 12:
+				orderCode.setVisibility(View.VISIBLE);
+				GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
+				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
+						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
+				LoginDialog.newInstance("请输入验证码！").show(
+						activity.getFragmentManager(),"dialog");
+				break;
+			default:
+				break;
+			}
 			Log.i("onReceive",a+"");
+			activity.stopService(intent);
+			orderButton.setText("开始抢票");
+			type = 0;
 			// pb.setProgress(a);
 			// tv.setText(String.valueOf(a));
 			// 处理接收到的内容

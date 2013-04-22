@@ -26,7 +26,7 @@ public enum UrlEnum {
 			"https://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=init",
 			"application/x-www-form-urlencoded","XMLHttpRequest"),
 	//确认订单验证码
-	ORDER_RANGCODE_URL("/passCodeAction.do?rand=randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
+	ORDER_RANGCODE_URL("passCodeAction.do?rand=randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//获取坐席值的url
 	GET_SEAT_VALUE("passCodeAction.do?rand:randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//查询预订车票余票信息
