@@ -124,25 +124,25 @@ public class RobitOrderService extends Service {
 		String info = null;
 		OrderParameter orderParameter = null;
 		try {
-			HttpGet httpget = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
-			httpget.getParams().setParameter("method", "queryLeftTicket")
-					.setParameter("orderRequest.train_date", date)
-					.setParameter("orderRequest.from_station_telecode",
-							configInfo.getFromStation())
-					.setParameter("orderRequest.to_station_telecode",
-							configInfo.getToStation());
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("method","queryLeftTicket"));
+			parameters.add(new BasicNameValuePair("orderRequest.train_date",date));
+			parameters.add(new BasicNameValuePair("orderRequest.from_station_telecode",configInfo.getFromStation()));
+			parameters.add(new BasicNameValuePair("orderRequest.to_station_telecode",configInfo.getToStation()));
 			if (StringUtils.isNotEmpty(configInfo.getTrainNo())) {
-				httpget.getParams().setParameter("orderRequest.train_no",
-						configInfo.getTrainNo());
+				parameters.add(new BasicNameValuePair("orderRequest.train_no",configInfo.getTrainNo()));
 			} else {
-				httpget.getParams().setParameter("orderRequest.train_no", "");
+				parameters.add(new BasicNameValuePair("orderRequest.train_no",""));
 			}
-			httpget.getParams().setParameter("trainPassType", "QB")
-					.setParameter("trainClass", configInfo.getTrainClass())
-					.setParameter("includeStudent", "00")
-					.setParameter("seatTypeAndNum", "")
-					.setParameter("orderRequest.start_time_str",configInfo.getOrderTime());
-			response = httpClient.execute(httpget);
+			parameters.add(new BasicNameValuePair("trainPassType","QB"));
+			parameters.add(new BasicNameValuePair("trainClass",configInfo.getTrainClass()));
+			parameters.add(new BasicNameValuePair("includeStudent","00"));
+			parameters.add(new BasicNameValuePair("seatTypeAndNum",""));
+			parameters.add(new BasicNameValuePair("orderRequest.start_time_str",configInfo.getOrderTime()));
+			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
+			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
+			httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
+			response = httpClient.execute(httpGet);
 			if(response.getStatusLine().getStatusCode() == 200){
 				info = EntityUtils.toString(response.getEntity());
 			}
@@ -150,7 +150,7 @@ public class RobitOrderService extends Service {
 //				HttpClientUtils.closeQuietly(response);
 				Log.i("searchTicket","没有余票,休息2秒，继续刷票");
 				Thread.sleep(2*1000);
-				response = httpClient.execute(httpget);
+				response = httpClient.execute(httpGet);
 				info = EntityUtils.toString(response.getEntity());
 				if(StringUtils.contains(info, "系统维护中")){
 					return;
@@ -487,16 +487,18 @@ public class RobitOrderService extends Service {
 			String[] params, String date, String rangCode) {
 		HttpResponse response = null;
 		try {
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("method","getQueueCount"));
+			parameters.add(new BasicNameValuePair("train_date",date));
+			parameters.add(new BasicNameValuePair("train_no",params[3]));
+			parameters.add(new BasicNameValuePair("station",params[0]));
+			parameters.add(new BasicNameValuePair("seat",seatNum));
+			parameters.add(new BasicNameValuePair("from",params[4]));
+			parameters.add(new BasicNameValuePair("to",params[5]));
+			parameters.add(new BasicNameValuePair("ticket",ticketNo));
+			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
 			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
-			HttpParams httpParams = httpGet.getParams();
-			httpParams.setParameter("method", "getQueueCount")
-					.setParameter("train_date", date)
-					.setParameter("train_no", params[3])
-					.setParameter("station", params[0])
-					.setParameter("seat", seatNum)
-					.setParameter("from", params[4])
-					.setParameter("to", params[5])
-					.setParameter("ticket", ticketNo);
+			httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET_INFO.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
 				Log.i("checkTicket",EntityUtils.toString(response.getEntity()));
