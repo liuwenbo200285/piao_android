@@ -7,14 +7,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.wenbo.piao.R;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 
@@ -25,14 +23,15 @@ import com.wenbo.piao.util.HttpClientUtil;
  */
 public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
-	private Activity activity = null;
-	
-	private static DefaultHttpClient httpClient = null;
+	private ImageView imageView = null;
 	
 	private int type;
 	
-	public GetRandCodeTask(Activity activity,int type){
-		this.activity = activity;
+	private static DefaultHttpClient httpClient = null;
+	
+	
+	public GetRandCodeTask(ImageView imageView,int type){
+		this.imageView = imageView;
 		httpClient = HttpClientUtil.getHttpClient();
 		this.type = type;
 	}
@@ -50,13 +49,6 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
-		ImageView imageView = null;
-		if(type == 1){
-			imageView = (ImageView)activity.findViewById(R.id.rangCodeImg);
-			
-		}else if(type == 2){
-			imageView = (ImageView)activity.findViewById(R.id.orderCodeImg);
-		}
 		imageView.setImageBitmap(result);
 	}
 

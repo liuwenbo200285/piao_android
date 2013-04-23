@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.wenbo.piao.R;
@@ -15,6 +16,7 @@ public class Info2Activity extends Activity {
 	private static final String[] m={"A型","B型","O型","AB型","其他"};
 	private Spinner spinner;
 	private ArrayAdapter<String> adapter;
+	public ImageView imageView;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -37,7 +39,10 @@ public class Info2Activity extends Activity {
 		
 		//设置默认值
 		spinner.setVisibility(View.VISIBLE);
+		imageView = new ImageView(this);
 	}
+	
+	
 	
 	//使用数组形式操作
 	class SpinnerSelectedListener implements OnItemSelectedListener{

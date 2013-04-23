@@ -1,7 +1,6 @@
 package com.wenbo.piao.util;
 
 import java.io.IOException;
-import java.net.URI;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -19,9 +18,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.RedirectHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
@@ -36,7 +33,6 @@ import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieSpecFactory;
 import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.BasicHttpParams;
@@ -62,6 +58,8 @@ public class HttpClientUtil {
 	private static Map<String,UserInfo> userinfoMap;
 	
 	private static Account account;
+	
+	private static String[] params;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -225,6 +223,14 @@ public class HttpClientUtil {
 		HttpClientUtil.userinfoMap = userinfoMap;
 	}
 	
+	public static String[] getParams() {
+		return params;
+	}
+
+	public static void setParams(String[] params) {
+		HttpClientUtil.params = params;
+	}
+
 	/**
 	 * 获取订票联系人信息
 	 * @return

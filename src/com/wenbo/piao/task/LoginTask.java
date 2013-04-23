@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
@@ -104,7 +105,8 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			EditText editText = (EditText)activity.findViewById(R.id.rangcode);
 			editText.setText("");
 			editText.requestFocus();
-			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,1);
+			ImageView imageView = (ImageView)activity.findViewById(R.id.rangCodeImg);
+			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(imageView,1);
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			break;
 		default:

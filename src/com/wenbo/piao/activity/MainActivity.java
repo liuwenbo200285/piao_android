@@ -41,6 +41,8 @@ public class MainActivity extends Activity {
 	private EditText userPassText;
 	
 	private EditText rangCodeText;
+	
+	private ImageView imageView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class MainActivity extends Activity {
 		userNameText = (EditText)findViewById(R.id.username);
 		userPassText = (EditText)findViewById(R.id.password);
 		rangCodeText = (EditText)findViewById(R.id.rangcode);
+		imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		accountService = SqlLiteUtil.getAccountService(this);
 		Account account = accountService.queryLastLoginAccount();
 		if(account != null){
@@ -186,7 +189,7 @@ public class MainActivity extends Activity {
 	 * 获取登录验证码
 	 */
 	private void getLoginRangeCode(){
-		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,1);
+		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(imageView,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 	}
 

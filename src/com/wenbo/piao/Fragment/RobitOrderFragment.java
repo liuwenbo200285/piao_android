@@ -12,9 +12,9 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +30,6 @@ import android.widget.ImageView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.ParameterEnum;
-import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.domain.UserInfo;
@@ -73,13 +72,14 @@ public class RobitOrderFragment extends Fragment {
 	private CheckBox hardSeat;
 	private CheckBox noSeat;
 	private Button orderButton;
+	private Intent intent;
 	private int type=0;
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		return inflater.inflate(R.layout.activity_info2, null);
+		return inflater.inflate(R.layout.activity_info2,null);
 	}
 
 	@Override
@@ -146,16 +146,16 @@ public class RobitOrderFragment extends Fragment {
 		orderCode.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
-				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
-						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
+//				GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
+//				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
+//						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			}
 		});
 		orderButton = (Button) activity.findViewById(R.id.orderButton);
 		orderButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent();
+				intent = new Intent();
 				intent.setClass(activity, RobitOrderService.class);
 				if(type == 0){
 					Bundle bundle = new Bundle();
@@ -173,13 +173,11 @@ public class RobitOrderFragment extends Fragment {
 							getOrderSet());
 					bundle.putString(ParameterEnum.ORDERTIME.getValue(),
 							"12:00--18:00");
-					bundle.putString(ParameterEnum.RANGECODE.getValue(), rangeCode
-							.getText().toString());
 					intent.putExtras(bundle);
 					activity.startService(intent);
 					type = 1;
 					orderButton.setText("停止抢票");
-					progressDialog = ProgressDialog.show(activity,"订票中","正在努力抢票...",true,true);
+//					progressDialog = ProgressDialog.show(activity,"订票中","正在努力抢票...",true,false);
 				}else{
 					activity.stopService(intent);
 					orderButton.setText("开始抢票");
@@ -354,10 +352,10 @@ public class RobitOrderFragment extends Fragment {
 
 		// 自定义一个广播接收器
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			Bundle bundle = intent.getExtras();
+		public void onReceive(Context context, Intent receiveIntent) {
+			Bundle bundle = receiveIntent.getExtras();
 			int a = bundle.getInt("status");
-			progressDialog.dismiss();
+//			progressDialog.dismiss();
 			switch (a){
 			case 1:
 				LoginDialog.newInstance("系统维护中！").show(
@@ -402,12 +400,36 @@ public class RobitOrderFragment extends Fragment {
 						activity.getFragmentManager(),"dialog");
 				break;
 			case 12:
-				orderCode.setVisibility(View.VISIBLE);
-				GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
+				LayoutInflater li = LayoutInflater.from(activity);
+				View orderCodeView = li.inflate(R.layout.rangcodeview, null);
+				ImageView imageView = (ImageView)orderCodeView.findViewById(R.id.orderCodeImg);
+				imageView.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						GetRandCodeTask getRandCode = new GetRandCodeTask((ImageView)view, 2);
+						getRandCode.execute(UrlEnum.DO_MAIN.getPath()
+								+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
+					}
+				});
+				GetRandCodeTask getRandCode = new GetRandCodeTask(imageView, 2);
 				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
 						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
-				LoginDialog.newInstance("请输入验证码！").show(
-						activity.getFragmentManager(),"dialog");
+				rangeCode = (EditText)orderCodeView.findViewById(R.id.orderCode);
+				new AlertDialog.Builder(activity)
+				.setTitle("请输入验证码！")
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setView(orderCodeView)
+				.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						intent.getExtras().putString(ParameterEnum.RANGECODE.getValue(),rangeCode.getText().toString());
+						activity.startService(intent);
+						type = 1;
+						orderButton.setText("停止抢票");
+					}
+				})
+				.setNegativeButton("取消", null)
+				.show();
 				break;
 			default:
 				break;

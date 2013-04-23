@@ -87,11 +87,12 @@ public class RobitOrderService extends Service {
 		Bundle bundle = intent.getExtras();
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		isBegin = true;
-		if(configInfo == null && params == null){
+		params = HttpClientUtil.getParams();
+		if(params == null){
 			configInfo = new ConfigInfo();
 //			configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
 //			configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
-//			configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
+			configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
 //			configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
 //			configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
 //			configInfo.setRangeCode(bundle.getString(ParameterEnum.RANGECODE.getValue()));
@@ -103,7 +104,7 @@ public class RobitOrderService extends Service {
 			configInfo.setToStation("SZQ");
 			configInfo.setOrderDate("2013-04-25");
 			configInfo.setTrainClass("D#");
-			configInfo.setOrderPerson("阳茜,");
+//			configInfo.setOrderPerson("阳茜,");
 			configInfo.setOrderSeat("4,");
 			configInfo.setOrderTime("12:00--18:00");
 			configInfo.setTrainNo("");
@@ -127,7 +128,7 @@ public class RobitOrderService extends Service {
 				public void run() {
 					while(isBegin){
 						try {
-							checkOrderInfo(ticketNo, seatNum, token, params,configInfo.getOrderDate());
+							checkOrderInfo(ticketNo, seatNum, token,configInfo.getOrderDate());
 						} catch (Exception e) {
 							e.printStackTrace();
 							isBegin = false;
@@ -187,6 +188,7 @@ public class RobitOrderService extends Service {
 			}
 			Log.i("searchTicket","有票了，开始订票~~~~~~~~~");
 			params = JsoupUtil.getTicketInfo(orderParameter.getDocument());
+			HttpClientUtil.setParams(params);
 			Log.i("searchTicket","ticketType:" + orderParameter.getTicketType());
 			orderTicket(date, params, orderParameter.getTicketType());
 		} catch (Exception e) {
@@ -380,8 +382,7 @@ public class RobitOrderService extends Service {
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 */
-	public void checkOrderInfo(String ticketNo, String seatNum, String token,
-			String[] params, String date) {
+	public void checkOrderInfo(String ticketNo, String seatNum, String token,String date) {
 		HttpResponse response = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
@@ -488,7 +489,7 @@ public class RobitOrderService extends Service {
 					if (StringUtils.isNotEmpty(msg)) {
 						Log.i("checkOrderInfo",msg);
 					} else {
-						checkTicket(ticketNo, seatNum, token, params, date,configInfo.getRangeCode());
+						checkTicket(ticketNo, seatNum, token, date,configInfo.getRangeCode());
 					}
 				} else {
 					String errorMessage = jsonObject.getString("errMsg");
@@ -497,7 +498,7 @@ public class RobitOrderService extends Service {
 						sendStatus(StatusCodeEnum.ORDER_CODE_ERROR.getCode());
 						return;
 					}
-					checkOrderInfo(ticketNo, seatNum, token, params, date);
+					checkOrderInfo(ticketNo, seatNum, token, date);
 				}
 			}
 		} catch (Exception e) {
@@ -513,8 +514,7 @@ public class RobitOrderService extends Service {
 	 * @param ticketNo
 	 * @param params
 	 */
-	public void checkTicket(String ticketNo, String seatNum, String token,
-			String[] params, String date, String rangCode) {
+	public void checkTicket(String ticketNo, String seatNum, String token, String date, String rangCode) {
 		HttpResponse response = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
@@ -533,7 +533,7 @@ public class RobitOrderService extends Service {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				Log.i("checkTicket",EntityUtils.toString(response.getEntity()));
 				Thread.sleep(1000);
-				orderTicketToQueue(ticketNo, seatNum, token, params, date,
+				orderTicketToQueue(ticketNo, seatNum, token, date,
 						rangCode);
 			}
 		} catch (Exception e) {
@@ -544,7 +544,7 @@ public class RobitOrderService extends Service {
 	}
 
 	public void orderTicketToQueue(String ticketNo, String seatNum,
-			String token, String[] params, String date, String rangCode) {
+			String token, String date, String rangCode) {
 		HttpResponse response = null;
 		HttpPost httpPost = null;
 		try {
@@ -678,6 +678,7 @@ public class RobitOrderService extends Service {
 		isBegin = false;
 		Intent intent = new Intent("com.wenbo.piao.robitService");
 		intent.putExtra("status",status);
+		System.out.println(params);
 		sendBroadcast(intent);
 	}
 

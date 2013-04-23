@@ -136,7 +136,6 @@
         android:layout_below="@+id/orderPeople"
         android:layout_toRightOf="@+id/orderCode"
         android:contentDescription="@string/login_title"
-        android:visibility="invisible"
         android:src="@drawable/ic_code" />
 
     <EditText
@@ -158,5 +157,4 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="18dp"
         android:text="@string/beginOrder" />
-
 </RelativeLayout>

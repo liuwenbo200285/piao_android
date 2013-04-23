@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.Fragment.ContactFragment;
@@ -18,11 +19,14 @@ public class UserActivity extends Activity {
 	
 	public static FragmentManager fm;
 	
+	public ImageView rangcodeImageView;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user);
+		rangcodeImageView = new ImageView(this);
 		getActionBar().setTitle(R.string.app_name);
 		fm = getFragmentManager();
 		fm.addOnBackStackChangedListener(new OnBackStackChangedListener() {
