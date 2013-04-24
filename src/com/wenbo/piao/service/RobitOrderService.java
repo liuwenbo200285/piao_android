@@ -35,8 +35,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.domain.OrderParameter;
-import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.ParameterEnum;
+import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
@@ -61,6 +61,8 @@ public class RobitOrderService extends Service {
 	private boolean isBegin;
 	
 	private int status;
+	
+	private String orderCode;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -84,11 +86,11 @@ public class RobitOrderService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("RobitOrderService","onStartCommand");
 		httpClient = HttpClientUtil.getHttpClient();
-		Bundle bundle = intent.getExtras();
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		isBegin = true;
 		params = HttpClientUtil.getParams();
 		if(params == null){
+			Bundle bundle = intent.getExtras();
 			configInfo = new ConfigInfo();
 //			configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
 //			configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
@@ -102,12 +104,12 @@ public class RobitOrderService extends Service {
 			configInfo.setSearchWatiTime(10);
 			configInfo.setFromStation("CSQ");
 			configInfo.setToStation("SZQ");
-			configInfo.setOrderDate("2013-04-25");
+			configInfo.setOrderDate("2013-04-26");
 			configInfo.setTrainClass("D#");
-//			configInfo.setOrderPerson("阳茜,");
 			configInfo.setOrderSeat("4,");
 			configInfo.setOrderTime("12:00--18:00");
 			configInfo.setTrainNo("");
+			HttpClientUtil.setConfigInfo(configInfo);
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -122,7 +124,11 @@ public class RobitOrderService extends Service {
 				}
 			}).start();
 		}else{
-			configInfo.setRangeCode(bundle.getString(ParameterEnum.RANGECODE.getValue()));
+			configInfo = HttpClientUtil.getConfigInfo();
+			seatNum = HttpClientUtil.getSeatNum();
+			token = HttpClientUtil.getToken();
+			ticketNo = HttpClientUtil.getTicketNo();
+			orderCode = intent.getExtras().getString(ParameterEnum.RANGECODE.getValue());
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -333,9 +339,9 @@ public class RobitOrderService extends Service {
 				Element element = document.getElementById("left_ticket");
 				if (element != null) {
 					ticketNo = element.attr("value");
+					HttpClientUtil.setTicketNo(ticketNo);
 					Log.i("orderTicket",ticketNo);
 				} else {
-					Log.i("orderTicket","~~~~~~~~~~~~~~~~~~~~~可能还有未处理的订单或者系统维护等其它异常~~~~~~~~~~~~~~~~!");
 					sendStatus(StatusCodeEnum.HAVA_NO_DETAIL_ORDER.getCode());
 					return;
 				}
@@ -352,12 +358,14 @@ public class RobitOrderService extends Service {
 							.getElementsContainingOwnText(trainSeatEnum
 									.getName());
 					seatNum = elements.get(0).attr("value");
+					HttpClientUtil.setSeatNum(seatNum);
 					Log.i("orderTicket",seatNum);
 				}
 				Elements elements = document.getElementsByAttributeValue(
 						"name", "org.apache.struts.taglib.html.TOKEN");
 				if (elements != null) {
 					token = elements.get(0).attr("value");
+					HttpClientUtil.setToken(token);
 				}
 				sendStatus(StatusCodeEnum.INPUT_ORDERCODE.getCode());
 			} else {
@@ -474,7 +482,7 @@ public class RobitOrderService extends Service {
 			parameters.add(new BasicNameValuePair("orderRequest.reserve_flag",
 					"A"));
 			parameters.add(new BasicNameValuePair("tFlag", "dc"));
-			parameters.add(new BasicNameValuePair("rand", configInfo.getRangeCode()));
+			parameters.add(new BasicNameValuePair("rand",orderCode));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
 					"UTF-8");
 			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_INFO);
@@ -489,13 +497,16 @@ public class RobitOrderService extends Service {
 					if (StringUtils.isNotEmpty(msg)) {
 						Log.i("checkOrderInfo",msg);
 					} else {
-						checkTicket(ticketNo, seatNum, token, date,configInfo.getRangeCode());
+						checkTicket(ticketNo, seatNum, token, date,orderCode);
 					}
 				} else {
 					String errorMessage = jsonObject.getString("errMsg");
 					Log.i("checkOrderInfo",errorMessage);
 					if(StringUtils.contains(errorMessage,"验证码不正确")){
-						sendStatus(StatusCodeEnum.ORDER_CODE_ERROR.getCode());
+						sendStatus(StatusCodeEnum.INPUT_ORDERCODE.getCode());
+						return;
+					}else if(StringUtils.contains(errorMessage,"验证码 必须输入")){
+						sendStatus(StatusCodeEnum.INPUT_ORDERCODE.getCode());
 						return;
 					}
 					checkOrderInfo(ticketNo, seatNum, token, date);
@@ -650,7 +661,11 @@ public class RobitOrderService extends Service {
 //				HttpClientUtils.closeQuietly(response);
 				Log.i("orderTicketToQueue",jsonObject.toJSONString());
 				String errorMessage = jsonObject.getString("errMsg");
-				if ("Y".equals(errorMessage)
+				if("席别不能为空！".equals(errorMessage)){
+					searchTicket(date);
+				}else if("请不要重复提交！".equals(errorMessage)){
+					searchTicket(date);
+				}else if ("Y".equals(errorMessage)
 						|| StringUtils.isEmpty(errorMessage)) {
 					Log.i("orderTicketToQueue","订票成功了，赶紧付款吧!");
 					sendStatus(StatusCodeEnum.ORDER_SUCCESS.getCode());
@@ -678,7 +693,6 @@ public class RobitOrderService extends Service {
 		isBegin = false;
 		Intent intent = new Intent("com.wenbo.piao.robitService");
 		intent.putExtra("status",status);
-		System.out.println(params);
 		sendBroadcast(intent);
 	}
 

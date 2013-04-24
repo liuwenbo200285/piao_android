@@ -45,6 +45,7 @@ import org.apache.http.protocol.HttpContext;
 
 import android.util.Log;
 
+import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.Account;
@@ -60,6 +61,14 @@ public class HttpClientUtil {
 	private static Account account;
 	
 	private static String[] params;
+	
+	private static ConfigInfo configInfo;
+	
+	private static String seatNum;
+	
+	private static String token;
+	
+	private static String ticketNo;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -238,4 +247,37 @@ public class HttpClientUtil {
 	public static Map<String,UserInfo> getUserInfoMap(){
 		return HttpClientUtil.userinfoMap;
 	}
+
+	public static ConfigInfo getConfigInfo() {
+		return configInfo;
+	}
+
+	public static void setConfigInfo(ConfigInfo configInfo) {
+		HttpClientUtil.configInfo = configInfo;
+	}
+
+	public static String getSeatNum() {
+		return seatNum;
+	}
+
+	public static void setSeatNum(String seatNum) {
+		HttpClientUtil.seatNum = seatNum;
+	}
+
+	public static String getToken() {
+		return token;
+	}
+
+	public static void setToken(String token) {
+		HttpClientUtil.token = token;
+	}
+
+	public static String getTicketNo() {
+		return ticketNo;
+	}
+
+	public static void setTicketNo(String ticketNo) {
+		HttpClientUtil.ticketNo = ticketNo;
+	}
+	
 }

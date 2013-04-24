@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -46,15 +45,9 @@ public class RobitOrderFragment extends Fragment {
 	private Button selectDate;
 
 	private Button selectPeople;
-
 	private DatePickerDialog datePickerDialog;
-	
 	private ProgressDialog progressDialog;
-
 	private EditText orderPeople;
-
-	private ImageView orderCode;
-
 	private int mYear;
 	private int mMonth;
 	private int mDay;
@@ -66,12 +59,16 @@ public class RobitOrderFragment extends Fragment {
 	private EditText toStation;
 	private EditText trainNo;
 	private EditText rangeCode;
-	private CheckBox firstSeat;
-	private CheckBox secondSeat;
-	private CheckBox hardSleeper;
-	private CheckBox hardSeat;
-	private CheckBox noSeat;
 	private Button orderButton;
+	private Button selectSeatButton;
+	private EditText selectSeatText;
+	private AlertDialog selectSeatDialog;
+	private Button selectTimeButton;
+	private EditText selectTimeText;
+	private AlertDialog selectTimeDialog;
+	private Button selectTrainTypeButton;
+	private EditText selectTrainTypeText;
+	private AlertDialog selectTrainTypeDialog;
 	private Intent intent;
 	private int type=0;
 	
@@ -111,12 +108,6 @@ public class RobitOrderFragment extends Fragment {
 		fromStation = (EditText) activity.findViewById(R.id.startArea);
 		toStation = (EditText) activity.findViewById(R.id.endArea);
 		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
-		firstSeat = (CheckBox) activity.findViewById(R.id.first_seat);
-		secondSeat = (CheckBox) activity.findViewById(R.id.second_seat);
-		hardSleeper = (CheckBox) activity.findViewById(R.id.hard_sleeper);
-		hardSeat = (CheckBox) activity.findViewById(R.id.hard_seat);
-		noSeat = (CheckBox) activity.findViewById(R.id.no_seat);
-		rangeCode = (EditText) activity.findViewById(R.id.orderCode);
 		selectDate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -142,15 +133,6 @@ public class RobitOrderFragment extends Fragment {
 			}
 		});
 		orderPeople = (EditText) activity.findViewById(R.id.orderPeople);
-		orderCode = (ImageView) activity.findViewById(R.id.orderCodeImg);
-		orderCode.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-//				GetRandCodeTask getRandCode = new GetRandCodeTask(activity, 2);
-//				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
-//						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
-			}
-		});
 		orderButton = (Button) activity.findViewById(R.id.orderButton);
 		orderButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -169,8 +151,7 @@ public class RobitOrderFragment extends Fragment {
 							orderPeople.getText().toString());
 					bundle.putString(ParameterEnum.ORDERDATE.getValue(), trainDate
 							.getText().toString());
-					bundle.putString(ParameterEnum.ORDERSEAT.getValue(),
-							getOrderSet());
+					bundle.putString(ParameterEnum.ORDERSEAT.getValue(),"");
 					bundle.putString(ParameterEnum.ORDERTIME.getValue(),
 							"12:00--18:00");
 					intent.putExtras(bundle);
@@ -185,6 +166,30 @@ public class RobitOrderFragment extends Fragment {
 				}
 			}
 		});
+		selectSeatButton  = (Button)activity.findViewById(R.id.seatButton);
+		selectSeatButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				showSeatDialog();
+			}
+		});
+		selectSeatText = (EditText)activity.findViewById(R.id.seatText);
+		selectTimeButton  = (Button)activity.findViewById(R.id.timeButton);
+		selectTimeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showTimeDialog();
+			}
+		});
+		selectTimeText = (EditText)activity.findViewById(R.id.timeText);
+		selectTrainTypeButton  = (Button)activity.findViewById(R.id.trainTypeButton);
+		selectTrainTypeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showTrainTypeDialog();
+			}
+		});
+		selectTrainTypeText = (EditText)activity.findViewById(R.id.trainTypeText);
 		//注册监听service
 		IntentFilter intentFilter = new IntentFilter("com.wenbo.piao.robitService");
 		MyReceiver myReceiver = new MyReceiver();
@@ -266,6 +271,97 @@ public class RobitOrderFragment extends Fragment {
 			updateDateDisplay();
 		}
 	};
+	
+	private void showTrainTypeDialog(){
+		if(selectTrainTypeDialog == null){
+			final String[] trainType = {"全部","动车","Z字头","T字头","K字头","其它"};
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+			.setSingleChoiceItems(trainType,0,new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+				}
+			})
+			.setIcon(android.R.drawable.btn_star);
+				builder.setTitle("选择车次类型")
+				.setPositiveButton("取消", null)
+				.setNegativeButton("确定",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,int which) {
+							selectTrainTypeText.setText(trainType[which]);
+						}
+					});
+				selectTrainTypeDialog = builder.create();
+				selectTrainTypeDialog.show();
+		}else{
+			selectTrainTypeDialog.show();
+		}
+	}
+	
+	private void showTimeDialog(){
+		if(selectTimeDialog == null){
+			final String[] times = {"00:00--24:00","00:00--06:00","06:00--12:00","12:00--18:00","18:00--24:00"};
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+			.setSingleChoiceItems(times,0,new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+				}
+			})
+			.setIcon(android.R.drawable.btn_star);
+				builder.setTitle("选择时间段")
+				.setPositiveButton("取消", null)
+				.setNegativeButton("确定",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,int which) {
+							selectTimeText.setText(times[which]);
+						}
+					});
+				selectTimeDialog = builder.create();
+				selectTimeDialog.show();
+		}else{
+			selectTimeDialog.show();
+		}
+	}
+	
+	private void showSeatDialog(){
+		if(selectSeatDialog == null){
+			final String[] seats = {"商务座","特等座","一等座","二等座","高级软卧","软卧","硬卧","软座","硬座","无座"};
+			final boolean[] selectSeats = new boolean[seats.length];
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+			.setMultiChoiceItems(seats, selectSeats,
+					new OnMultiChoiceClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which, boolean isChecked) {
+						}
+					}).setIcon(android.R.drawable.btn_star);
+				builder.setTitle("选择乘客坐席")
+				.setPositiveButton("取消", null)
+				.setNegativeButton("确定",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							StringBuilder sbBuilder = new StringBuilder();
+							for (int i = 0; i < selectSeats.length; i++) {
+								if (selectSeats[i]) {
+									sbBuilder.append(selectSeats[i]
+											+ ",");
+								}
+							}
+							selectSeatText.setText(sbBuilder
+									.toString());
+						}
+					});
+				selectSeatDialog = builder.create();
+				selectSeatDialog.show();
+		}else{
+			selectSeatDialog.show();
+		}
+	}
 
 	public void showDialog() {
 		if (dialog == null) {
@@ -327,27 +423,7 @@ public class RobitOrderFragment extends Fragment {
 				activity, userInfoMap, this);
 		getPersonConstanct.execute("");
 	}
-
-	private String getOrderSet() {
-		StringBuilder builder = new StringBuilder();
-		if (firstSeat.isChecked()) {
-			builder.append("3,");
-		}
-		if (secondSeat.isChecked()) {
-			builder.append("4,");
-		}
-		if (hardSleeper.isChecked()) {
-			builder.append("7,");
-		}
-		if (hardSeat.isChecked()) {
-			builder.append("9,");
-		}
-		if (noSeat.isChecked()) {
-			builder.append("10,");
-		}
-		return builder.toString();
-	}
-
+	
 	public class MyReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器
@@ -422,7 +498,7 @@ public class RobitOrderFragment extends Fragment {
 				.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						intent.getExtras().putString(ParameterEnum.RANGECODE.getValue(),rangeCode.getText().toString());
+						intent.putExtra(ParameterEnum.RANGECODE.getValue(), rangeCode.getText().toString());
 						activity.startService(intent);
 						type = 1;
 						orderButton.setText("停止抢票");
