@@ -46,60 +46,35 @@
         android:layout_alignBaseline="@+id/startTrainNo"
         android:layout_alignBottom="@+id/startTrainNo"
         android:layout_alignLeft="@+id/endArea"
-        android:editable="false"
+        android:layout_alignRight="@+id/endArea"
         android:ems="6"
         android:hint="@string/startTime"
-        android:inputType="text" />
-
-    <Button
-        android:id="@+id/selectPeople"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/orderPeople"
-        android:layout_alignRight="@+id/endArea"
-        android:text="@string/selectPeople" />
+        android:inputType="date" />
 
     <EditText
         android:id="@+id/orderPeople"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/startTrainNo"
+        android:layout_alignRight="@+id/startTime"
         android:layout_below="@+id/startTrainNo"
         android:layout_marginTop="13dp"
-        android:layout_toLeftOf="@+id/seatButton"
-        android:editable="false"
         android:ems="10"
         android:hint="@string/orderPeople"
         android:inputType="text" />
-
-    <Button
-        android:id="@+id/seatButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/seatText"
-        android:layout_alignParentRight="true"
-        android:text="@string/selectOrder" />
-
-    <Button
-        android:id="@+id/selectDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/startTime"
-        android:layout_alignParentRight="true"
-        android:text="@string/select" />
 
     <EditText
         android:id="@+id/seatText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/orderPeople"
+        android:layout_alignRight="@+id/orderPeople"
         android:layout_below="@+id/orderPeople"
         android:layout_marginTop="13dp"
-        android:layout_toLeftOf="@+id/seatButton"
-        android:editable="false"
         android:ems="10"
         android:hint="@string/peopleSeat"
         android:inputType="text" >
+
     </EditText>
 
     <EditText
@@ -110,48 +85,29 @@
         android:layout_below="@+id/seatText"
         android:layout_centerVertical="true"
         android:layout_marginTop="13dp"
-        android:editable="false"
+        android:layout_toLeftOf="@+id/orderButton"
         android:ems="10"
         android:hint="@string/peopleTime"
         android:inputType="text" />
-
-    <Button
-        android:id="@+id/orderButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="76dp"
-        android:text="@string/beginOrder" />
 
     <EditText
         android:id="@+id/trainTypeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/timeText"
-        android:layout_below="@+id/timeText"
-        android:layout_marginTop="13dp"
-        android:editable="false"
+        android:layout_alignBottom="@+id/timeText"
+        android:layout_toRightOf="@+id/timeText"
+        android:ems="10"
         android:hint="@string/selectTrainType"
-        android:inputType="text"
-        android:ems="10" >
+        android:inputType="text" >
     </EditText>
 
     <Button
-        android:id="@+id/timeButton"
+        android:id="@+id/orderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/trainTypeText"
-        android:layout_alignParentRight="true"
-        android:text="@string/selectTime" />
-
-    <Button
-        android:id="@+id/trainTypeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/trainTypeText"
-        android:layout_toRightOf="@+id/trainTypeText"
-        android:text="@string/selectTrainType" />
+        android:layout_below="@+id/timeText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="@string/beginOrder" />
 
 </RelativeLayout>

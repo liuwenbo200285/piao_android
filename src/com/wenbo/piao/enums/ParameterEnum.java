@@ -2,6 +2,10 @@ package com.wenbo.piao.enums;
 
 public enum ParameterEnum {
 	
+	TRAIN_TYPE("trainType"),
+	
+	ROBIT_STATE("state"),
+	
 	RANGECODE("rangeCode"),
 	//
 	ORDERTIME("orderTime"),

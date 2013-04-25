@@ -1,7 +1,11 @@
 package com.wenbo.piao.activity;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
@@ -18,8 +22,11 @@ import android.widget.ImageView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.Account;
+import com.wenbo.piao.sqllite.domain.Station;
 import com.wenbo.piao.sqllite.service.AccountService;
+import com.wenbo.piao.sqllite.service.StationService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.LoginTask;
@@ -103,6 +110,37 @@ public class MainActivity extends Activity {
 			}
 		});
 		getLoginRangeCode();
+		InputStream inputStream = null;
+		try {
+			SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
+			StationService stationService = sqlliteHelper.getStationService();
+			List<Station> list = stationService.findAllStations();
+			if(list == null || list.isEmpty()){
+				inputStream = getAssets().open("station.txt");
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String str = bufferedReader.readLine();
+				String[] infos = StringUtils.split(str,"@");
+				if(infos != null && infos.length > 0){
+					for(String info:infos){
+						String [] station = StringUtils.split(info,"\\|");
+						if(station != null && station.length > 0){
+							Station dbStation = new Station();
+							dbStation.setSimpleCode(station[0]);
+							dbStation.setZhCode(station[1]);
+							dbStation.setStationCode(station[2]);
+							dbStation.setPinyingCode(station[3]);
+							dbStation.setSimplePinyingCode(station[4]);
+							dbStation.setCode(station[5]);
+							stationService.create(dbStation);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			Log.e("init station fail","init station fail",e);
+		}finally{
+			IOUtils.closeQuietly(inputStream);
+		}
 		super.onStart();
 	}
 	

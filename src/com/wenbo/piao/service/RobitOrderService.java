@@ -89,25 +89,22 @@ public class RobitOrderService extends Service {
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		isBegin = true;
 		params = HttpClientUtil.getParams();
-		if(params == null){
+		status = intent.getExtras().getInt(ParameterEnum.ROBIT_STATE.getValue());
+		if(status != StatusCodeEnum.INPUT_ORDERCODE.getCode()){
 			Bundle bundle = intent.getExtras();
 			configInfo = new ConfigInfo();
-//			configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
-//			configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
-			configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
-//			configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
-//			configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
-//			configInfo.setRangeCode(bundle.getString(ParameterEnum.RANGECODE.getValue()));
-//			configInfo.setToStation(bundle.getString(ParameterEnum.TOSTATION.getValue()));
-//			configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
-			configInfo.setSearchSleepTime(10);
-			configInfo.setSearchWatiTime(10);
 			configInfo.setFromStation("CSQ");
 			configInfo.setToStation("SZQ");
-			configInfo.setOrderDate("2013-04-26");
-			configInfo.setTrainClass("D#");
-			configInfo.setOrderSeat("4,");
-			configInfo.setOrderTime("12:00--18:00");
+//			configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
+//			configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
+//			configInfo.setToStation(bundle.getString(ParameterEnum.TOSTATION.getValue()));
+			configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
+			configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
+			configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
+			configInfo.setTrainClass(bundle.getString(ParameterEnum.TRAIN_TYPE.getValue()));
+			configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
+			configInfo.setSearchSleepTime(10);
+			configInfo.setSearchWatiTime(10);
 			configInfo.setTrainNo("");
 			HttpClientUtil.setConfigInfo(configInfo);
 			new Thread(new Runnable() {
@@ -179,6 +176,9 @@ public class RobitOrderService extends Service {
 				info = EntityUtils.toString(response.getEntity());
 			}
 			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date)) == null){
+				if(isBegin == false){
+					return;
+				}
 				Log.i("searchTicket","没有余票,休息2秒，继续刷票");
 				Thread.sleep(2*1000);
 				response = httpClient.execute(httpGet);

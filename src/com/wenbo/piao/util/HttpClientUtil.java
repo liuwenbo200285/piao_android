@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -69,6 +70,11 @@ public class HttpClientUtil {
 	private static String token;
 	
 	private static String ticketNo;
+	
+	public static Map<String,String> seatMap;
+	
+	public static Map<String,String> trainTypeMap;
+	
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -278,6 +284,36 @@ public class HttpClientUtil {
 
 	public static void setTicketNo(String ticketNo) {
 		HttpClientUtil.ticketNo = ticketNo;
+	}
+
+	public static Map<String, String> getSeatMap() {
+		if(seatMap == null){
+			seatMap = new HashMap<String, String>();
+			seatMap.put("商务座","1");
+			seatMap.put("特等座","2");
+			seatMap.put("一等座","3");
+			seatMap.put("二等座","4");
+			seatMap.put("高级软卧","5");
+			seatMap.put("软卧","6");
+			seatMap.put("硬卧","7");
+			seatMap.put("软座","8");
+			seatMap.put("硬座","9");
+			seatMap.put("无座","10");
+		}
+		return seatMap;
+	}
+
+	public static Map<String, String> getTrainTypeMap() {
+		if(trainTypeMap == null){
+			trainTypeMap = new HashMap<String, String>();
+			trainTypeMap.put("全部","QB");
+			trainTypeMap.put("动车","D");
+			trainTypeMap.put("Z字头","Z");
+			trainTypeMap.put("T字头","T");
+			trainTypeMap.put("K字头","K");
+			trainTypeMap.put("其他","QT");
+		}
+		return trainTypeMap;
 	}
 	
 }
