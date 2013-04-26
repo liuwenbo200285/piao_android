@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/startArea"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,10 +13,11 @@
         android:layout_marginLeft="1dp"
         android:ems="8"
         android:hint="@string/startArea"
-        android:inputType="text" >
-    </EditText>
+        android:inputType="text"
+        android:completionThreshold="1">
+    </AutoCompleteTextView>
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/endArea"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,88 +27,92 @@
         android:layout_toRightOf="@+id/startArea"
         android:ems="8"
         android:hint="@string/endArea"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/startTrainNo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/startArea"
-        android:layout_below="@+id/startArea"
-        android:layout_marginTop="13dp"
-        android:ems="8"
-        android:hint="@string/startTrainNo"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/startTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/startTrainNo"
-        android:layout_alignBottom="@+id/startTrainNo"
-        android:layout_alignLeft="@+id/endArea"
-        android:layout_alignRight="@+id/endArea"
-        android:ems="6"
-        android:hint="@string/startTime"
-        android:inputType="date" />
-
-    <EditText
-        android:id="@+id/orderPeople"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/startTrainNo"
-        android:layout_alignRight="@+id/startTime"
-        android:layout_below="@+id/startTrainNo"
-        android:layout_marginTop="13dp"
-        android:ems="10"
-        android:hint="@string/orderPeople"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/seatText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/orderPeople"
-        android:layout_alignRight="@+id/orderPeople"
-        android:layout_below="@+id/orderPeople"
-        android:layout_marginTop="13dp"
-        android:ems="10"
-        android:hint="@string/peopleSeat"
-        android:inputType="text" >
-
-    </EditText>
-
-    <EditText
-        android:id="@+id/timeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/seatText"
-        android:layout_below="@+id/seatText"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="13dp"
-        android:layout_toLeftOf="@+id/orderButton"
-        android:ems="10"
-        android:hint="@string/peopleTime"
-        android:inputType="text" />
+        android:inputType="text"
+        android:completionThreshold="1" />
 
     <EditText
         android:id="@+id/trainTypeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/timeText"
-        android:layout_toRightOf="@+id/timeText"
+        android:layout_alignLeft="@+id/endArea"
         android:ems="10"
         android:hint="@string/selectTrainType"
         android:inputType="text" >
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/startTrainNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/startTime"
+        android:layout_alignBottom="@+id/startTime"
+        android:layout_alignLeft="@+id/trainTypeText"
+        android:layout_alignParentRight="true"
+        android:ems="8"
+        android:hint="@string/startTrainNo"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startArea"
+        android:layout_below="@+id/startArea"
+        android:layout_marginTop="15dp"
+        android:layout_toLeftOf="@+id/trainTypeText"
+        android:ems="10"
+        android:hint="@string/peopleTime"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/startTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/timeText"
+        android:layout_alignRight="@+id/timeText"
+        android:layout_below="@+id/timeText"
+        android:layout_marginTop="15dp"
+        android:ems="6"
+        android:hint="@string/startTime"
+        android:inputType="date" >
     </EditText>
 
     <Button
         android:id="@+id/orderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/timeText"
+        android:layout_below="@+id/startTrainNo"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="116dp"
         android:text="@string/beginOrder" />
+
+    <EditText
+        android:id="@+id/orderPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/seatText"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/startTrainNo"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="@string/orderPeople"
+        android:inputType="text" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/seatText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startTime"
+        android:layout_alignRight="@+id/endArea"
+        android:layout_below="@+id/orderPeople"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="@string/peopleSeat"
+        android:inputType="text" />
 
 </RelativeLayout>

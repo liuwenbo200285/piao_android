@@ -2,6 +2,7 @@ package com.wenbo.piao.Fragment;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,17 +27,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.service.RobitOrderService;
+import com.wenbo.piao.sqllite.SqlliteHelper;
+import com.wenbo.piao.sqllite.domain.Station;
 import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.sqllite.service.StationService;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -56,8 +63,8 @@ public class RobitOrderFragment extends Fragment {
 	private boolean[] checkedItems;
 	private Map<String, UserInfo> userInfoMap;
 	private AlertDialog dialog;
-	private EditText fromStation;
-	private EditText toStation;
+	private AutoCompleteTextView fromStation;
+	private AutoCompleteTextView toStation;
 	private EditText trainNo;
 	private EditText rangeCode;
 	private Button orderButton;
@@ -70,6 +77,7 @@ public class RobitOrderFragment extends Fragment {
 	private Intent intent;
 	private int type = 0;
 	private int status = 0;
+	private StationService stationService;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,6 +105,8 @@ public class RobitOrderFragment extends Fragment {
 		// TODO Auto-generated method stub
 		Log.i("onActivityCreated", "onActivityCreated");
 		activity = getActivity();
+		SqlliteHelper sqlliteHelper = new SqlliteHelper(activity);
+		stationService = sqlliteHelper.getStationService();
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
@@ -113,11 +123,63 @@ public class RobitOrderFragment extends Fragment {
 		mMonth = c.get(Calendar.MONTH);
 		mDay = c.get(Calendar.DAY_OF_MONTH);
 		setDateTime();
-		fromStation = (EditText) activity.findViewById(R.id.startArea);
-		fromStation.addTextChangedListener(watcher);
-		toStation = (EditText) activity.findViewById(R.id.endArea);
-		toStation.addTextChangedListener(watcher);
+		fromStation = (AutoCompleteTextView) activity.findViewById(R.id.startArea);
+		fromStation.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				List<Station> stations =  stationService.findStationLike(s.toString());
+				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,stations);
+		        fromStation.setAdapter(adapter);
+			}
+		});
+		toStation = (AutoCompleteTextView) activity.findViewById(R.id.endArea);
+		toStation.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				List<Station> stations =  stationService.findStationLike(s.toString());
+				if(!stations.isEmpty()){
+					String[] temp = new String[stations.size()];
+					for(int i =0; i < stations.size(); i++){
+						Station station = stations.get(i);
+						temp[i] = station.getSimplePinyingCode()+"|"+station.getZhCode();
+					}
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,android.R.layout.simple_dropdown_item_1line, temp);
+					toStation.setAdapter(adapter);
+				}
+				
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+			}
+		});
+//		toStation.addTextChangedListener(watcher);
 		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
+		trainNo.setOnFocusChangeListener(new OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if(hasFocus){
+					
+				}
+			}
+		});
 		orderPeople = (EditText) activity.findViewById(R.id.orderPeople);
 		orderPeople.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
@@ -486,7 +548,6 @@ public class RobitOrderFragment extends Fragment {
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
 			// TODO Auto-generated method stub
-			Log.d("===============", "beforTextChanged is called");
 
 		}
 
@@ -495,6 +556,7 @@ public class RobitOrderFragment extends Fragment {
 			// TODO Auto-generated method stub
 			Log.d("=================", "afterTextChanged is called!");
 			Log.d("=================",s.toString());
+			String str = s.toString();
 		}
 	};
 

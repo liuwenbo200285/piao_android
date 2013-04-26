@@ -1,25 +1,25 @@
 package com.wenbo.piao.activity;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.SqlliteHelper;
@@ -29,6 +29,7 @@ import com.wenbo.piao.sqllite.service.AccountService;
 import com.wenbo.piao.sqllite.service.StationService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
+import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
 
 public class MainActivity extends Activity {
@@ -43,28 +44,55 @@ public class MainActivity extends Activity {
 	
 	private boolean [] checkedItems;
 	
-	private EditText userNameText;
+	private AutoCompleteTextView userNameText;
 	
 	private EditText userPassText;
 	
 	private EditText rangCodeText;
 	
 	private ImageView imageView;
+	
+	private StationService stationService;
+	
+	private String lastInput;
+	
+	private List<Station> stations;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main); 
+		userNameText = (AutoCompleteTextView)findViewById(R.id.username);
+		userNameText.setThreshold(2);
+		userNameText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				stations =  stationService.findStationLike(s.toString());
+				StationAdapter adapter = new StationAdapter(MainActivity.this,android.R.layout.simple_dropdown_item_1line,stations);
+				userNameText.setAdapter(adapter);
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+			}
+		});
+		
 	}
 	
 	@Override
 	protected void onStart() {
 		Log.i("onStart","onStart...");
-		userNameText = (EditText)findViewById(R.id.username);
 		userPassText = (EditText)findViewById(R.id.password);
 		rangCodeText = (EditText)findViewById(R.id.rangcode);
 		imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		accountService = SqlLiteUtil.getAccountService(this);
+		stationService = new SqlliteHelper(this).getStationService();
 		Account account = accountService.queryLastLoginAccount();
 		if(account != null){
 			userNameText.setText(account.getName());
@@ -109,38 +137,8 @@ public class MainActivity extends Activity {
 				showDialog();
 			}
 		});
+		initDataStation();
 		getLoginRangeCode();
-		InputStream inputStream = null;
-		try {
-			SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
-			StationService stationService = sqlliteHelper.getStationService();
-			List<Station> list = stationService.findAllStations();
-			if(list == null || list.isEmpty()){
-				inputStream = getAssets().open("station.txt");
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-				String str = bufferedReader.readLine();
-				String[] infos = StringUtils.split(str,"@");
-				if(infos != null && infos.length > 0){
-					for(String info:infos){
-						String [] station = StringUtils.split(info,"\\|");
-						if(station != null && station.length > 0){
-							Station dbStation = new Station();
-							dbStation.setSimpleCode(station[0]);
-							dbStation.setZhCode(station[1]);
-							dbStation.setStationCode(station[2]);
-							dbStation.setPinyingCode(station[3]);
-							dbStation.setSimplePinyingCode(station[4]);
-							dbStation.setCode(station[5]);
-							stationService.create(dbStation);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			Log.e("init station fail","init station fail",e);
-		}finally{
-			IOUtils.closeQuietly(inputStream);
-		}
 		super.onStart();
 	}
 	
@@ -229,6 +227,20 @@ public class MainActivity extends Activity {
 	private void getLoginRangeCode(){
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(imageView,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+	}
+	
+	/**
+	 * 获取登录验证码
+	 */
+	private void initDataStation(){
+		SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
+		StationService stationService = sqlliteHelper.getStationService();
+//		stationService.delAll();
+		long num = stationService.countAllStation();
+		if(num == 0){
+			InitStationTask initStationTask = new InitStationTask(this);
+			initStationTask.execute("");
+		}
 	}
 
 }

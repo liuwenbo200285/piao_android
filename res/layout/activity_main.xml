@@ -8,16 +8,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
     
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:focusable="true"
         android:hint="@string/login_name"
-        android:inputType="text" >
-        
-    </EditText>
+        android:inputType="text" 
+        >
+    </AutoCompleteTextView>
     
     <EditText
         android:id="@+id/password"
