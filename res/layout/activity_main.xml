@@ -15,8 +15,7 @@
         android:layout_marginTop="6dp"
         android:focusable="true"
         android:hint="@string/login_name"
-        android:inputType="text" 
-        >
+        android:inputType="text">
     </AutoCompleteTextView>
     
     <EditText
@@ -37,7 +36,8 @@
         android:layout_below="@+id/password"
         android:layout_marginTop="6dp"
         android:hint="@string/login_rangcode"
-        android:inputType="text" />
+        android:inputType="text">
+    </EditText>
     
     <ImageView
         android:id="@+id/rangCodeImg"

@@ -92,7 +92,6 @@ public class RobitOrderService extends Service {
 		configInfo = HttpClientUtil.getConfigInfo();
 		if(status != StatusCodeEnum.INPUT_ORDERCODE.getCode()){
 			configInfo.setSearchWatiTime(10);
-			configInfo.setTrainNo("");
 			HttpClientUtil.setConfigInfo(configInfo);
 			new Thread(new Runnable() {
 				@Override
@@ -166,7 +165,7 @@ public class RobitOrderService extends Service {
 					return;
 				}
 				Log.i("searchTicket","没有余票,休息2秒，继续刷票");
-				Thread.sleep(2*1000);
+				Thread.sleep(500);
 				response = httpClient.execute(httpGet);
 				info = EntityUtils.toString(response.getEntity());
 				if(StringUtils.contains(info, "系统维护中")){

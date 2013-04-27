@@ -8,8 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,12 +17,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.wenbo.piao.R;
-import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.Account;
-import com.wenbo.piao.sqllite.domain.Station;
 import com.wenbo.piao.sqllite.service.AccountService;
 import com.wenbo.piao.sqllite.service.StationService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
@@ -51,12 +47,6 @@ public class MainActivity extends Activity {
 	private EditText rangCodeText;
 	
 	private ImageView imageView;
-	
-	private StationService stationService;
-	
-	private String lastInput;
-	
-	private List<Station> stations;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +82,11 @@ public class MainActivity extends Activity {
 		rangCodeText = (EditText)findViewById(R.id.rangcode);
 		imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		accountService = SqlLiteUtil.getAccountService(this);
-		stationService = new SqlliteHelper(this).getStationService();
+//		stationService = new SqlliteHelper(this).getStationService();
 		Account account = accountService.queryLastLoginAccount();
 		if(account != null){
 			userNameText.setText(account.getName());
 			userPassText.setText(account.getPassword());
-			rangCodeText.requestFocus();
 			accounts = accountService.findAllAccounts();
 		}
 		ImageView imageView = (ImageView)findViewById(R.id.rangCodeImg);

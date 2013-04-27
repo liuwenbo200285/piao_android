@@ -1,8 +1,11 @@
 package com.wenbo.piao.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -12,6 +15,8 @@ import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wenbo.piao.R;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -22,6 +27,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.EditText;
 
 public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	
@@ -33,6 +39,8 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	
 	private ProgressDialog progressDialog;
 	
+	private Map<String,String> trainCodeMap = null;
+	
 	public GetTrainNoTast(Activity activity,ConfigInfo configInfo){
 		this.activity = activity;
 		this.configInfo = configInfo;
@@ -42,12 +50,17 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	@Override
 	protected String[] doInBackground(String... arg0) {
 		String info = getTrainNo();
+		if(StringUtils.isBlank(info)){
+			return null;
+		}
 		JSONArray arry = JSONArray.parseArray(info);
 		String[] infos = new String[arry.size()];
+		trainCodeMap = new HashMap<String, String>();
 		for(int i = 0; i < arry.size(); i++){
 			JSONObject object = arry.getJSONObject(i);
 			String str=object.getString("value")+"("+object.getString("start_station_name")+object.getString("start_time")
 					+"→"+object.getString("end_station_name")+object.getString("end_time")+")";
+			trainCodeMap.put(object.getString("value"),object.getString("id"));
 			infos[i] = str;
 		}
 		return infos;
@@ -56,13 +69,24 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	@Override
 	protected void onPostExecute(final String[] result) {
 		progressDialog.dismiss();
+		if(result == null){
+			LoginDialog.newInstance("没有找到可以乘坐的车次！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		final EditText editText = (EditText)activity.findViewById(R.id.startTrainNo);
+		final EditText trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
 		.setSingleChoiceItems(result, 0,
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,
 							int which) {
-						System.out.println(result[which]);
+						String trainNo = StringUtils.split(result[which],"(")[0];
+						editText.setText(trainNo);
+						String code = trainCodeMap.get(trainNo.trim());
+						trainCode.setText(code);
+						dialog.dismiss();
 					}
 				}).setIcon(android.R.drawable.btn_star);
 		builder.setTitle("选择车次类型");

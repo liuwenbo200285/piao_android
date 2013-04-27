@@ -2,6 +2,8 @@ package com.wenbo.piao.sqllite.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
@@ -71,6 +73,9 @@ public class StationService {
 	 */
 	public List<Station> findStationLike(String station){
 		try {
+			if(StringUtils.isBlank(station)){
+				return null;
+			}
 			QueryBuilder<Station,Integer> queryBuilder = stationDao.queryBuilder();
 			Where<Station,Integer> where = queryBuilder.where();
 			where.like("simplePinyingCode",station+"%");
