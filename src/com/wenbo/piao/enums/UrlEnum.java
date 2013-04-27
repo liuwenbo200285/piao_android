@@ -30,7 +30,10 @@ public enum UrlEnum {
 	//获取坐席值的url
 	GET_SEAT_VALUE("passCodeAction.do?rand:randp","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","","",""),
 	//查询预订车票余票信息
-	SEARCH_TICKET_INFO("order/confirmPassengerAction.do","application/json, text/javascript, */*","","","");
+	SEARCH_TICKET_INFO("order/confirmPassengerAction.do","application/json, text/javascript, */*","","",""),
+	//按出发和到达站查询车次
+	SEARCH_TRAINNO("order/querySingleAction.do?method=queryststrainall","application/json, text/javascript, */*","https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init",
+				"application/x-www-form-urlencoded","");
 	private String path;
 	
 	private String accept;

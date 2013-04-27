@@ -27,7 +27,6 @@ import org.jsoup.select.Elements;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -90,20 +89,8 @@ public class RobitOrderService extends Service {
 		isBegin = true;
 		params = HttpClientUtil.getParams();
 		status = intent.getExtras().getInt(ParameterEnum.ROBIT_STATE.getValue());
+		configInfo = HttpClientUtil.getConfigInfo();
 		if(status != StatusCodeEnum.INPUT_ORDERCODE.getCode()){
-			Bundle bundle = intent.getExtras();
-			configInfo = new ConfigInfo();
-			configInfo.setFromStation("CSQ");
-			configInfo.setToStation("SZQ");
-//			configInfo.setTrainNo(bundle.getString(ParameterEnum.TRAINNO.getValue()));
-//			configInfo.setFromStation(bundle.getString(ParameterEnum.FROMSTATION.getValue()));
-//			configInfo.setToStation(bundle.getString(ParameterEnum.TOSTATION.getValue()));
-			configInfo.setOrderDate(bundle.getString(ParameterEnum.ORDERDATE.getValue()));
-			configInfo.setOrderPerson(bundle.getString(ParameterEnum.ORDERPERSON.getValue()));
-			configInfo.setOrderSeat(bundle.getString(ParameterEnum.ORDERSEAT.getValue()));
-			configInfo.setTrainClass(bundle.getString(ParameterEnum.TRAIN_TYPE.getValue()));
-			configInfo.setOrderTime(bundle.getString(ParameterEnum.ORDERTIME.getValue()));
-			configInfo.setSearchSleepTime(10);
 			configInfo.setSearchWatiTime(10);
 			configInfo.setTrainNo("");
 			HttpClientUtil.setConfigInfo(configInfo);
@@ -121,7 +108,6 @@ public class RobitOrderService extends Service {
 				}
 			}).start();
 		}else{
-			configInfo = HttpClientUtil.getConfigInfo();
 			seatNum = HttpClientUtil.getSeatNum();
 			token = HttpClientUtil.getToken();
 			ticketNo = HttpClientUtil.getTicketNo();

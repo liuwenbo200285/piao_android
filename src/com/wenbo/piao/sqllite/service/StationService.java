@@ -81,4 +81,25 @@ public class StationService {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Station findStationByZHName(String name){
+		try {
+			QueryBuilder<Station,Integer> queryBuilder = stationDao.queryBuilder();
+			Where<Station,Integer> where = queryBuilder.where();
+			where.eq("zhCode",name);
+			List<Station> stations = queryBuilder.query();
+			if(!stations.isEmpty()){
+				return stations.get(0);
+			}
+			return null;
+		} catch (Exception e) {
+			Log.e("StationService","findStationLike Station error!",e);
+		}
+		return null;
+	}
 }

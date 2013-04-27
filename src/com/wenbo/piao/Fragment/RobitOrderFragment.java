@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -37,6 +36,7 @@ import android.widget.ImageView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
+import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.service.RobitOrderService;
@@ -46,12 +46,12 @@ import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.sqllite.service.StationService;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
+import com.wenbo.piao.task.GetTrainNoTast;
 import com.wenbo.piao.util.HttpClientUtil;
 
 public class RobitOrderFragment extends Fragment {
 
 	private Activity activity;
-
 	private EditText trainDate;
 	private DatePickerDialog datePickerDialog;
 	private ProgressDialog progressDialog;
@@ -78,6 +78,9 @@ public class RobitOrderFragment extends Fragment {
 	private int type = 0;
 	private int status = 0;
 	private StationService stationService;
+	private ConfigInfo configInfo;
+	private List<Station> fromStations;
+	private List<Station> toStations;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -138,26 +141,18 @@ public class RobitOrderFragment extends Fragment {
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				List<Station> stations =  stationService.findStationLike(s.toString());
-				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,stations);
-		        fromStation.setAdapter(adapter);
+				fromStations =  stationService.findStationLike(s.toString());
+				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,fromStations);
+				fromStation.setAdapter(adapter);
 			}
 		});
 		toStation = (AutoCompleteTextView) activity.findViewById(R.id.endArea);
 		toStation.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				List<Station> stations =  stationService.findStationLike(s.toString());
-				if(!stations.isEmpty()){
-					String[] temp = new String[stations.size()];
-					for(int i =0; i < stations.size(); i++){
-						Station station = stations.get(i);
-						temp[i] = station.getSimplePinyingCode()+"|"+station.getZhCode();
-					}
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,android.R.layout.simple_dropdown_item_1line, temp);
-					toStation.setAdapter(adapter);
-				}
-				
+				toStations =  stationService.findStationLike(s.toString());
+				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,toStations);
+				toStation.setAdapter(adapter);
 			}
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -176,7 +171,9 @@ public class RobitOrderFragment extends Fragment {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus){
-					
+					getConfigInfo();
+					GetTrainNoTast trainNoTast = new GetTrainNoTast(activity,configInfo);
+					trainNoTast.execute("");
 				}
 			}
 		});
@@ -205,16 +202,15 @@ public class RobitOrderFragment extends Fragment {
 				intent = new Intent();
 				intent.setClass(activity, RobitOrderService.class);
 				if (type == 0) {
+					getConfigInfo();
+					configInfo.setTrainNo("");
+					configInfo.setOrderPerson(orderPeople.getText().toString());
 					Bundle bundle = new Bundle();
-					// bundle.putString(ParameterEnum.FROMSTATION.getValue(),fromStation.getText().toString());
-					// bundle.putString(ParameterEnum.TOSTATION.getValue(),
-					// toStation.getText().toString());
-					// bundle.putString(ParameterEnum.TRAINNO.getValue(),
-					// trainNo.getText().toString());
-					bundle.putString(ParameterEnum.ORDERPERSON.getValue(),
-							orderPeople.getText().toString());
-					bundle.putString(ParameterEnum.ORDERDATE.getValue(),
-							trainDate.getText().toString());
+					if ("全部".equals(selectTrainTypeText.getText().toString())) {
+						configInfo.setTrainClass("QB#D#Z#T#K#QT#");
+					} else {
+						configInfo.setTrainClass(HttpClientUtil.getTrainTypeMap().get(selectTrainTypeText.getText().toString())+ "#");
+					}
 					StringBuilder sbBuilder = new StringBuilder();
 					String[] seats = StringUtils.split(selectSeatText.getText()
 							.toString(), ",");
@@ -222,21 +218,8 @@ public class RobitOrderFragment extends Fragment {
 						sbBuilder.append(HttpClientUtil.getSeatMap().get(seat)
 								+ ",");
 					}
-					if ("全部".equals(selectTrainTypeText.getText().toString())) {
-						bundle.putString(ParameterEnum.TRAIN_TYPE.getValue(),
-								"QB#D#Z#T#K#QT#");
-					} else {
-						bundle.putString(
-								ParameterEnum.TRAIN_TYPE.getValue(),
-								HttpClientUtil.getTrainTypeMap().get(
-										selectTrainTypeText.getText()
-												.toString())
-										+ "#");
-					}
-					bundle.putString(ParameterEnum.ORDERSEAT.getValue(),
-							sbBuilder.toString());
-					bundle.putString(ParameterEnum.ORDERTIME.getValue(),
-							selectTimeText.getText().toString());
+					configInfo.setOrderSeat(sbBuilder.toString());
+					configInfo.setOrderTime(selectTimeText.getText().toString());
 					intent.putExtra(ParameterEnum.ROBIT_STATE.getValue(),
 							status);
 					intent.putExtras(bundle);
@@ -564,6 +547,70 @@ public class RobitOrderFragment extends Fragment {
 		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(
 				activity, userInfoMap, this);
 		getPersonConstanct.execute("");
+	}
+	
+	private void getConfigInfo(){
+		if(configInfo == null){
+			configInfo = new ConfigInfo();
+		}
+		String from = fromStation.getText().toString();
+		if(StringUtils.isBlank(from)){
+			LoginDialog.newInstance("请输入始发地！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		Station dbFromStation = null;
+		if(fromStations != null && !fromStations.isEmpty()){
+			for(Station station:fromStations){
+				if(station.getZhCode().equals(from)){
+					dbFromStation = station;
+				}
+			}
+		}else{
+			dbFromStation = stationService.findStationByZHName(from);
+		}
+		if(dbFromStation == null){
+			LoginDialog.newInstance("没有找到该始发地！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		configInfo.setFromStation(dbFromStation.getStationCode());
+		String to = toStation.getText().toString();
+		if(StringUtils.isBlank(to)){
+			LoginDialog.newInstance("请输入目的地！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		if(toStations != null && !toStations.isEmpty()){
+			for(Station station:toStations){
+				if(station.getZhCode().equals(to)){
+					dbFromStation = station;
+				}
+			}
+		}else{
+			dbFromStation = stationService.findStationByZHName(to);
+		}
+		if(dbFromStation == null){
+			LoginDialog.newInstance("没有找到该目的地！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		configInfo.setToStation(dbFromStation.getStationCode());
+		String date = trainDate.getText().toString();
+		if(StringUtils.isBlank(date)){
+			LoginDialog.newInstance("请选择乘车日期！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		configInfo.setOrderDate(date);
+		String time = selectTimeText.getText().toString();
+		if(StringUtils.isBlank(time)){
+			LoginDialog.newInstance("请选择出发时间！").show(
+					activity.getFragmentManager(), "dialog");
+			return;
+		}
+		configInfo.setOrderTime(time);
+		HttpClientUtil.setConfigInfo(configInfo);
 	}
 
 	public class MyReceiver extends BroadcastReceiver {

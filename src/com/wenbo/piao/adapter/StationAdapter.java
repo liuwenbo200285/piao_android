@@ -3,8 +3,6 @@ package com.wenbo.piao.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -114,20 +112,12 @@ public class StationAdapter extends BaseAdapter implements Filterable {
 			resultsStations.clear();
 			if (constraint == null || constraint.length() == 0) {
 				synchronized (mLock) {
-					results.values = resultsStations;
-					results.count = resultsStations.size();
+					results.values = stations;
+					results.count = stations.size();
 				}
 			}else{
-				if(stations != null && !stations.isEmpty()){
-					for(Station station:stations){
-						if(StringUtils.startsWith(station.getSimplePinyingCode(),constraint.toString())
-								|| StringUtils.startsWith(station.getZhCode(),constraint.toString())){
-							resultsStations.add(station);
-						}
-					}
-				}
-				results.values = resultsStations;
-				results.count = resultsStations.size();
+				results.values = stations;
+				results.count = stations.size();
 			}
 			return results;
 		}

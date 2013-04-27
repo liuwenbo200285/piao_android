@@ -49,7 +49,7 @@ public class InitStationTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity,"初始化数据","正在初始化数据...",true,false);
+		progressDialog = ProgressDialog.show(activity,"初始化车站数据","正在初始化车站数据...",true,false);
 	}
 
 	@Override
