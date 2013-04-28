@@ -79,7 +79,7 @@ public class StationService {
 			QueryBuilder<Station,Integer> queryBuilder = stationDao.queryBuilder();
 			Where<Station,Integer> where = queryBuilder.where();
 			where.like("simplePinyingCode",station+"%");
-			where.or().like("zhCode", station+"%");
+//			where.or().like("zhCode", station+"%");
 			return queryBuilder.query();
 		} catch (Exception e) {
 			Log.e("StationService","findStationLike Station error!",e);

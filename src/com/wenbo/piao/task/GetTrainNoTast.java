@@ -13,14 +13,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.wenbo.piao.R;
-import com.wenbo.piao.dialog.LoginDialog;
-import com.wenbo.piao.domain.ConfigInfo;
-import com.wenbo.piao.enums.UrlEnum;
-import com.wenbo.piao.util.HttpClientUtil;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,6 +24,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.wenbo.piao.R;
+import com.wenbo.piao.dialog.LoginDialog;
+import com.wenbo.piao.domain.ConfigInfo;
+import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.util.HttpClientUtil;
 
 public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	
@@ -101,12 +101,14 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		builder.setTitle("选择车次");
 		AlertDialog dialog = builder.create();
 		dialog.show();
-//		WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-//		 params.x = 1500;
-//		 params.y = 100;
-//		 params.width = 1500;
-//		 params.height = 1000 ;
-//		 dialog.getWindow().setAttributes(params);
+//		Window window = dialog.getWindow();
+//        WindowManager.LayoutParams wl = window.getAttributes();
+//        wl.x = -100;
+//        wl.y = -300;
+//        window.setAttributes(wl);
+//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//        WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+//        window.setLayout(0,500);
 		super.onPostExecute(result);
 	}
 

@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -53,6 +55,23 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main); 
 		userNameText = (AutoCompleteTextView)findViewById(R.id.username);
+		userNameText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if(s.length() == 0){
+					userPassText.setText("");
+				}
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+				
+			}
+		});
 //		userNameText.setThreshold(2);
 //		userNameText.addTextChangedListener(new TextWatcher() {
 //			@Override
@@ -83,12 +102,6 @@ public class MainActivity extends Activity {
 		imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		accountService = SqlLiteUtil.getAccountService(this);
 //		stationService = new SqlliteHelper(this).getStationService();
-		Account account = accountService.queryLastLoginAccount();
-		if(account != null){
-			userNameText.setText(account.getName());
-			userPassText.setText(account.getPassword());
-			accounts = accountService.findAllAccounts();
-		}
 		ImageView imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		imageView.setOnClickListener(new OnClickListener() {
 			@Override
@@ -128,6 +141,14 @@ public class MainActivity extends Activity {
 		});
 		initDataStation();
 		getLoginRangeCode();
+		Account account = accountService.queryLastLoginAccount();
+		if(account != null){
+			userNameText.setText(account.getName());
+			userPassText.setText(account.getPassword());
+			rangCodeText.setText("");
+			rangCodeText.requestFocus();
+			accounts = accountService.findAllAccounts();
+		}
 		super.onStart();
 	}
 	

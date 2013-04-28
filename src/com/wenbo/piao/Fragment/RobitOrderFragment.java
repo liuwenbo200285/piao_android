@@ -121,6 +121,7 @@ public class RobitOrderFragment extends Fragment {
 					datePickerDialog = new DatePickerDialog(activity,
 							mDateSetListener, mYear, mMonth, mDay);
 					datePickerDialog.show();
+					closeSoftInput();
 				}
 			}
 		});
@@ -284,7 +285,6 @@ public class RobitOrderFragment extends Fragment {
 		});
 		selectTimeText = (EditText) activity.findViewById(R.id.timeText);
 		selectTimeText.setOnFocusChangeListener(new OnFocusChangeListener() {
-
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
@@ -310,6 +310,7 @@ public class RobitOrderFragment extends Fragment {
 				"com.wenbo.piao.robitService");
 		MyReceiver myReceiver = new MyReceiver();
 		activity.registerReceiver(myReceiver, intentFilter);
+		fromStation.requestFocus();
 		super.onActivityCreated(savedInstanceState);
 	}
 
