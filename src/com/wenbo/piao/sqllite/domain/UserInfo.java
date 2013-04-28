@@ -9,7 +9,7 @@ import com.j256.ormlite.field.DatabaseField;
  */
 public class UserInfo {
 	//序号，订票时需要用到
-	@DatabaseField(id = true)
+	@DatabaseField(canBeNull = false)
 	private Integer index;
 	
 	@DatabaseField(canBeNull = false)

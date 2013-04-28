@@ -21,7 +21,7 @@ public class UserInfoService {
 	
 	public void create(UserInfo userInfo){
 		try {
-			userinfoDao.createIfNotExists(userInfo);
+			userinfoDao.create(userInfo);
 		} catch (Exception e) {
 			Log.e("UserInfoService","create",e);
 		}

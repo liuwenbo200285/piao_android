@@ -24,9 +24,13 @@ import com.wenbo.piao.util.HttpClientUtil;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
@@ -82,16 +86,27 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 					@Override
 					public void onClick(DialogInterface dialog,
 							int which) {
-						String trainNo = StringUtils.split(result[which],"(")[0];
-						editText.setText(trainNo);
+						String info = result[which];
+						String trainNo = StringUtils.split(info,"(")[0];
+						editText.setText(info);
 						String code = trainCodeMap.get(trainNo.trim());
 						trainCode.setText(code);
+						InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
+						if (imm.isActive()) {
+							imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+						}
 						dialog.dismiss();
 					}
-				}).setIcon(android.R.drawable.btn_star);
-		builder.setTitle("选择车次类型");
+				}).setIcon(android.R.drawable.arrow_down_float);
+		builder.setTitle("选择车次");
 		AlertDialog dialog = builder.create();
 		dialog.show();
+//		WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+//		 params.x = 1500;
+//		 params.y = 100;
+//		 params.width = 1500;
+//		 params.height = 1000 ;
+//		 dialog.getWindow().setAttributes(params);
 		super.onPostExecute(result);
 	}
 

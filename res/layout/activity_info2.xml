@@ -45,18 +45,6 @@
     </EditText>
 
     <EditText
-        android:id="@+id/startTrainNo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/startTime"
-        android:layout_alignBottom="@+id/startTime"
-        android:layout_alignLeft="@+id/trainTypeText"
-        android:layout_alignParentRight="true"
-        android:ems="8"
-        android:hint="@string/startTrainNo"
-        android:inputType="none" />
-
-    <EditText
         android:id="@+id/timeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/timeText"
-        android:layout_alignRight="@+id/timeText"
+        android:layout_alignRight="@+id/endArea"
         android:layout_below="@+id/timeText"
         android:layout_marginTop="15dp"
         android:ems="6"
@@ -123,5 +111,17 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/startTrainNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startTime"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/startTime"
+        android:layout_marginTop="15dp"
+        android:ems="8"
+        android:hint="@string/startTrainNo"
+        android:inputType="none" />
 
 </RelativeLayout>

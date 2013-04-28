@@ -23,11 +23,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -116,13 +114,14 @@ public class RobitOrderFragment extends Fragment {
 		stationService = sqlliteHelper.getStationService();
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
-		trainDate.setOnTouchListener(new OnTouchListener() {
+		trainDate.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				datePickerDialog = new DatePickerDialog(activity,
-						mDateSetListener, mYear, mMonth, mDay);
-				datePickerDialog.show();
-				return false;
+			public void onFocusChange(View arg0, boolean focus) {
+				if(focus){
+					datePickerDialog = new DatePickerDialog(activity,
+							mDateSetListener, mYear, mMonth, mDay);
+					datePickerDialog.show();
+				}
 			}
 		});
 		final Calendar c = Calendar.getInstance();
@@ -182,9 +181,10 @@ public class RobitOrderFragment extends Fragment {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(hasFocus){
-					getConfigInfo();
-					GetTrainNoTast trainNoTast = new GetTrainNoTast(activity,configInfo);
-					trainNoTast.execute("");
+					if(getConfigInfo()){
+						GetTrainNoTast trainNoTast = new GetTrainNoTast(activity,configInfo);
+						trainNoTast.execute("");
+					}
 				}
 			}
 		});
@@ -213,7 +213,9 @@ public class RobitOrderFragment extends Fragment {
 				intent = new Intent();
 				intent.setClass(activity, RobitOrderService.class);
 				if (type == 0) {
-					getConfigInfo();
+					if(!getConfigInfo()){
+						return;
+					}
 					String code = trainCode.getText().toString();
 					configInfo.setTrainNo(code);
 					configInfo.setOrderPerson(orderPeople.getText().toString());
@@ -534,42 +536,13 @@ public class RobitOrderFragment extends Fragment {
 		}
 	}
 
-	// EditText中输入内容监视
-	// TextWatcher中重写的三个方法在EditText中每输入一个字符都执行一遍
-	TextWatcher watcher = new TextWatcher() {
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
-			// TODO Auto-generated method stub
-			Log.d("=================", "onTextChanged is called!");
-			// String selection = MydbHelper.WORD+" LIKE ?";
-			// String[] selectionArgs= new String[]{s.toString()+"%"};
-			// myQuery(selection,selectionArgs);
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void afterTextChanged(Editable s) {
-			// TODO Auto-generated method stub
-			Log.d("=================", "afterTextChanged is called!");
-			Log.d("=================",s.toString());
-			String str = s.toString();
-		}
-	};
-
 	private void getPersonInfo() {
 		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(
 				activity, userInfoMap, this);
 		getPersonConstanct.execute("");
 	}
 	
-	private void getConfigInfo(){
+	private boolean getConfigInfo(){
 		if(configInfo == null){
 			configInfo = new ConfigInfo();
 		}
@@ -577,7 +550,7 @@ public class RobitOrderFragment extends Fragment {
 		if(StringUtils.isBlank(from)){
 			LoginDialog.newInstance("请输入始发地！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		Station dbFromStation = null;
 		if(fromStations != null && !fromStations.isEmpty()){
@@ -593,14 +566,14 @@ public class RobitOrderFragment extends Fragment {
 		if(dbFromStation == null){
 			LoginDialog.newInstance("没有找到该始发地！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		configInfo.setFromStation(dbFromStation.getSimpleCode());
 		String to = toStation.getText().toString();
 		if(StringUtils.isBlank(to)){
 			LoginDialog.newInstance("请输入目的地！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		if(toStations != null && !toStations.isEmpty()){
 			for(Station station:toStations){
@@ -615,24 +588,25 @@ public class RobitOrderFragment extends Fragment {
 		if(dbFromStation == null){
 			LoginDialog.newInstance("没有找到该目的地！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		configInfo.setToStation(dbFromStation.getSimpleCode());
 		String date = trainDate.getText().toString();
 		if(StringUtils.isBlank(date)){
 			LoginDialog.newInstance("请选择乘车日期！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		configInfo.setOrderDate(date);
 		String time = selectTimeText.getText().toString();
 		if(StringUtils.isBlank(time)){
 			LoginDialog.newInstance("请选择出发时间！").show(
 					activity.getFragmentManager(), "dialog");
-			return;
+			return false;
 		}
 		configInfo.setOrderTime(time);
 		HttpClientUtil.setConfigInfo(configInfo);
+		return true;
 	}
 
 	public class MyReceiver extends BroadcastReceiver {
