@@ -243,14 +243,14 @@ public class MainActivity extends Activity {
 	 * 获取登录验证码
 	 */
 	private void initDataStation(){
-		SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
-		StationService stationService = sqlliteHelper.getStationService();
-//		stationService.delAll();
-		long num = stationService.countAllStation();
-		if(num == 0){
-			InitStationTask initStationTask = new InitStationTask(this);
-			initStationTask.execute("");
-		}
+//		SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
+//		StationService stationService = sqlliteHelper.getStationService();
+////		stationService.delAll();
+//		long num = stationService.countAllStation();
+//		if(num == 0){
+//			InitStationTask initStationTask = new InitStationTask(this);
+//			initStationTask.execute("");
+//		}
 	}
 
 }

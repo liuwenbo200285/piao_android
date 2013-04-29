@@ -1,11 +1,13 @@
 package com.wenbo.piao.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -21,22 +23,26 @@ public class UserActivity extends Activity {
 	
 	public ImageView rangcodeImageView;
 	
+	private Fragment currentFragment;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user);
 		rangcodeImageView = new ImageView(this);
+		getActionBar().setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
 		getActionBar().setTitle(R.string.app_name);
 		fm = getFragmentManager();
 		fm.addOnBackStackChangedListener(new OnBackStackChangedListener() {
 			@Override
 			public void onBackStackChanged() {
-				
+				Log.i("UserActivity","onBackStackChanged");
 			}
 		});
 		FragmentTransaction ft = fm.beginTransaction();
-		ft.add(R.id.details,new RobitOrderFragment(),"tab1");
+		currentFragment = new RobitOrderFragment();
+		ft.add(R.id.details,currentFragment,"tab1");
 		ft.commit();
 	}
 
@@ -51,26 +57,31 @@ public class UserActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment hideFragment = null;
+		ActionBar actionBar = getActionBar();
+		if(actionBar.getTabCount() > 0 && item.getItemId() != R.id.tab2){
+			actionBar.setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
+			actionBar.setDisplayShowTitleEnabled(true);
+		}
 		switch (item.getItemId()) {
 		case R.id.tab1:
-			hideFragment = fm.findFragmentByTag("tab2");
+			hideFragment = fm.findFragmentByTag("tab1");
 			if(hideFragment == null){
 				hideFragment = new RobitOrderFragment();
-				ft.add(hideFragment,"tab2");
+				ft.add(hideFragment,"tab1");
 			}
 			break;
 		case R.id.tab2:
-			hideFragment = fm.findFragmentByTag("tab3");
+			hideFragment = fm.findFragmentByTag("tab2");
 			if(hideFragment == null){
 				hideFragment = new OrderInfoFragment();
-				ft.add(hideFragment,"tab3");
+				ft.add(hideFragment,"tab2");
 			}
 			break;
 		case R.id.tab3:
-			hideFragment = fm.findFragmentByTag("tab4");
+			hideFragment = fm.findFragmentByTag("tab3");
 			if(hideFragment == null){
 				hideFragment = new ContactFragment();
-				ft.add(hideFragment,"tab4");
+				ft.add(hideFragment,"tab3");
 			}
 			break;
 		case R.id.action_settings:
@@ -79,9 +90,14 @@ public class UserActivity extends Activity {
 		default:
 			break;
 		}
-		ft.addToBackStack(null);
-		ft.replace(R.id.details,hideFragment);
-		ft.commit();
+		if(currentFragment != hideFragment){
+			ft.replace(R.id.details,hideFragment);
+			ft.addToBackStack(null);
+			ft.commit();
+			ft.hide(currentFragment);
+			ft.show(hideFragment);
+			currentFragment = hideFragment;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 
