@@ -33,7 +33,11 @@ public enum UrlEnum {
 	SEARCH_TICKET_INFO("order/confirmPassengerAction.do","application/json, text/javascript, */*","","",""),
 	//按出发和到达站查询车次
 	SEARCH_TRAINNO("order/querySingleAction.do?method=queryststrainall","application/json, text/javascript, */*","https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init",
-				"application/x-www-form-urlencoded","");
+				"application/x-www-form-urlencoded",""),
+	//未完成订单
+	NO_NOTCOMPLETE("order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=N","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+						"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=Y",
+						"",""),;
 	private String path;
 	
 	private String accept;

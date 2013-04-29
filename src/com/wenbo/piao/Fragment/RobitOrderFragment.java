@@ -50,7 +50,7 @@ import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.GetTrainNoTast;
 import com.wenbo.piao.util.HttpClientUtil;
 
-public class RobitOrderFragment extends Fragment {
+public class RobitOrderFragment extends Fragment implements OnFocusChangeListener {
 
 	private Activity activity;
 	private EditText trainDate;
@@ -114,17 +114,7 @@ public class RobitOrderFragment extends Fragment {
 		stationService = sqlliteHelper.getStationService();
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
-		trainDate.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View arg0, boolean focus) {
-				if(focus){
-					datePickerDialog = new DatePickerDialog(activity,
-							mDateSetListener, mYear, mMonth, mDay);
-					datePickerDialog.show();
-					closeSoftInput();
-				}
-			}
-		});
+		trainDate.setOnFocusChangeListener(this);
 		final Calendar c = Calendar.getInstance();
 		mYear = c.get(Calendar.YEAR);
 		mMonth = c.get(Calendar.MONTH);
@@ -142,7 +132,6 @@ public class RobitOrderFragment extends Fragment {
 				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,fromStations);
 				fromStation.setAdapter(adapter);
 			}
-			
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
@@ -173,40 +162,14 @@ public class RobitOrderFragment extends Fragment {
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
+				
 			}
 		});
 //		toStation.addTextChangedListener(watcher);
 		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
-		trainNo.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(hasFocus){
-					if(getConfigInfo()){
-						GetTrainNoTast trainNoTast = new GetTrainNoTast(activity,configInfo);
-						trainNoTast.execute("");
-					}
-				}
-			}
-		});
+		trainNo.setOnFocusChangeListener(this);
 		orderPeople = (EditText) activity.findViewById(R.id.orderPeople);
-		orderPeople.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					userInfoMap = HttpClientUtil.getUserInfoMap();
-					if (userInfoMap == null) {
-						userInfoMap = new HashMap<String, UserInfo>();
-						getPersonInfo();
-					} else {
-						if (userInfoMap.isEmpty()) {
-							getPersonInfo();
-						}
-						showDialog();
-					}
-				}
-			}
-		});
+		orderPeople.setOnFocusChangeListener(this);
 		orderButton = (Button) activity.findViewById(R.id.orderButton);
 		orderButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -275,35 +238,12 @@ public class RobitOrderFragment extends Fragment {
 			}
 		});
 		selectSeatText = (EditText) activity.findViewById(R.id.seatText);
-		selectSeatText.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showSeatDialog();
-				}
-			}
-		});
+		selectSeatText.setOnFocusChangeListener(this);
 		selectTimeText = (EditText) activity.findViewById(R.id.timeText);
-		selectTimeText.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showTimeDialog();
-				}
-			}
-		});
+		selectTimeText.setOnFocusChangeListener(this);
 		selectTimeText.setText("00:00--24:00");
-		selectTrainTypeText = (EditText) activity
-				.findViewById(R.id.trainTypeText);
-		selectTrainTypeText
-				.setOnFocusChangeListener(new OnFocusChangeListener() {
-					@Override
-					public void onFocusChange(View v, boolean hasFocus) {
-						if (hasFocus) {
-							showTrainTypeDialog();
-						}
-					}
-				});
+		selectTrainTypeText = (EditText) activity.findViewById(R.id.trainTypeText);
+		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
 		// 注册监听service
 		IntentFilter intentFilter = new IntentFilter(
@@ -455,7 +395,15 @@ public class RobitOrderFragment extends Fragment {
 								}
 							}).setIcon(android.R.drawable.btn_dropdown);
 			builder.setTitle("选择乘客坐席")
-					.setPositiveButton("取消", null)
+					.setPositiveButton("取消",new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							selectSeatText.clearFocus();
+							trainCode.requestFocus();
+							closeSoftInput();
+						}
+						
+					})
 					.setNegativeButton("确定",
 							new DialogInterface.OnClickListener() {
 								@Override
@@ -507,7 +455,15 @@ public class RobitOrderFragment extends Fragment {
 								}).setIcon(android.R.drawable.btn_dropdown);
 				builder.setTitle("选择订票乘客")
 						// 设置Dialog的标题
-						.setPositiveButton("取消", null)
+						.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								orderPeople.clearFocus();
+								trainCode.requestFocus();
+								closeSoftInput();
+							}
+							
+						})
 						.setNegativeButton("确定",
 								new DialogInterface.OnClickListener() {
 									@Override
@@ -551,6 +507,7 @@ public class RobitOrderFragment extends Fragment {
 		if(StringUtils.isBlank(from)){
 			LoginDialog.newInstance("请输入始发地！").show(
 					activity.getFragmentManager(), "dialog");
+			fromStation.requestFocus();
 			return false;
 		}
 		Station dbFromStation = null;
@@ -567,6 +524,7 @@ public class RobitOrderFragment extends Fragment {
 		if(dbFromStation == null){
 			LoginDialog.newInstance("没有找到该始发地！").show(
 					activity.getFragmentManager(), "dialog");
+			fromStation.requestFocus();
 			return false;
 		}
 		configInfo.setFromStation(dbFromStation.getSimpleCode());
@@ -574,6 +532,7 @@ public class RobitOrderFragment extends Fragment {
 		if(StringUtils.isBlank(to)){
 			LoginDialog.newInstance("请输入目的地！").show(
 					activity.getFragmentManager(), "dialog");
+			toStation.requestFocus();
 			return false;
 		}
 		if(toStations != null && !toStations.isEmpty()){
@@ -589,6 +548,7 @@ public class RobitOrderFragment extends Fragment {
 		if(dbFromStation == null){
 			LoginDialog.newInstance("没有找到该目的地！").show(
 					activity.getFragmentManager(), "dialog");
+			toStation.requestFocus();
 			return false;
 		}
 		configInfo.setToStation(dbFromStation.getSimpleCode());
@@ -721,5 +681,48 @@ public class RobitOrderFragment extends Fragment {
 		if (imm.isActive()) {
 			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
 		}
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		if(hasFocus){
+			switch (v.getId()) {
+			case R.id.startTime:
+				datePickerDialog = new DatePickerDialog(activity,
+						mDateSetListener, mYear, mMonth, mDay);
+				datePickerDialog.show();
+				break;
+			case R.id.startTrainNo:
+				if(getConfigInfo()){
+					GetTrainNoTast trainNoTast = new GetTrainNoTast(activity,configInfo);
+					trainNoTast.execute("");
+				}
+				break;
+			case R.id.orderPeople:
+				userInfoMap = HttpClientUtil.getUserInfoMap();
+				if (userInfoMap == null) {
+					userInfoMap = new HashMap<String, UserInfo>();
+					getPersonInfo();
+				} else {
+					if (userInfoMap.isEmpty()) {
+						getPersonInfo();
+					}
+					showDialog();
+				}
+				break;
+			case R.id.seatText:
+				showSeatDialog();
+				break;
+			case R.id.timeText:
+				showTimeDialog();
+				break;
+			case R.id.trainTypeText:
+				showTrainTypeDialog();
+				break;
+			default:
+				break;
+			}
+		}
+		
 	}
 }

@@ -1,9 +1,12 @@
 package com.wenbo.piao.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -17,6 +20,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+
+import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.domain.OrderInfo;
 
 import android.util.Log;
 
@@ -204,6 +210,95 @@ public class JsoupUtil {
 			}
 		}
 		return 0;
+	}
+	
+	/**
+	 * 获取未完成订单
+	 * @param inputStream
+	 * @return
+	 */
+	public static List<Order> getNoCompleteOrders(InputStream inputStream){
+		List<Order> orders = new ArrayList<Order>();
+		try {
+			Document document = getPageDocument(inputStream);
+			Elements elements = document.getElementsByClass("tab_conw");
+			Order order = null;
+			for(Element element:elements){
+				order = new Order();
+				Element element2 = element.getElementsByClass("jdan_tfont").get(0);
+				Elements elements2 = element2.getElementsByTag("li");
+				for(Element element3:elements2){
+					if(StringUtils.isBlank(order.getOrderDate())){
+						order.setOrderDate(StringUtils.split(element3.text(),"：")[1].trim());
+					}else{
+						order.setOrderNum(Integer.parseInt(StringUtils.split(element3.text(),"：")[1]));
+					}
+				}
+				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");
+				List<OrderInfo> orderInfos = new ArrayList<OrderInfo>();
+				for(int i = 0; i < elements3.size(); i++){
+					Element element3 = elements3.get(i);
+					if(i !=0 && i != elements3.size()-1){
+						Element element4 = element3.getElementById("checkbox_pay");
+						if(StringUtils.isBlank(order.getOrderNo())){
+							order.setOrderNo(StringUtils.split(element4.attr("name"),"_")[2]);
+						}
+						OrderInfo orderInfo = new OrderInfo();
+						orderInfo.setOrderNo(element4.attr("value"));
+						orderInfo.setInfo(element3.text());
+						orderInfos.add(orderInfo);
+					}
+				}
+				order.setOrderInfos(orderInfos);
+				orders.add(order);
+			}
+		} catch (Exception e) {
+			Log.e("getNoCompleteOrders","解析未完成订单出错!",e);
+		}finally{
+			IOUtils.closeQuietly(inputStream);
+		}
+		return orders;
+	}
+	
+	/**
+	 * 获取已经完成订单
+	 * @param inputStream
+	 * @return
+	 */
+	public static List<Order> myOrders(InputStream inputStream){
+		List<Order> orders = new ArrayList<Order>();
+		try {
+			inputStream = new FileInputStream(new File("C://Noname6.txt"));
+			Document document = getPageDocument(inputStream);
+			Elements elements = document.getElementsByAttributeValueStarting("id","form_all_");
+			for(Element element:elements){
+				Order order = new Order();
+				Element element2 = element.getElementsByClass("jdan_tfont").get(0);
+				Elements elements2 = element2.getElementsByTag("li");
+				if(elements2 == null){
+					continue;
+				}
+				order.setOrderNo(StringUtils.split(elements2.get(0).text(),"：")[1]);
+				order.setOrderDate(StringUtils.split(elements2.get(1).text(),"：")[1]);
+				order.setOrderNum(Integer.parseInt(StringUtils.split(elements2.get(2).text(),"：")[1]));
+				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");
+				List<OrderInfo> orderInfos = new ArrayList<OrderInfo>();
+				for(int i = 0; i < elements3.size(); i++){
+					Element element3 = elements3.get(i);
+					if(i !=0 && i != elements3.size()-1){
+						OrderInfo orderInfo = new OrderInfo();
+						orderInfo.setInfo(element3.text());
+						orderInfos.add(orderInfo);
+					}
+				}
+				order.setOrderInfos(orderInfos);
+				orders.add(order);
+			}
+		} catch (Exception e) {
+			Log.e("myOrders","解析已完成订单出错!",e);
+		}
+		IOUtils.closeQuietly(inputStream);
+		return orders;
 	}
 
 }

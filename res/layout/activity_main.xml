@@ -59,8 +59,9 @@
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:layout_alignLeft="@+id/rangcode"
+        android:layout_alignRight="@+id/rangCodeImg"
         android:layout_below="@+id/rangcode"
         android:layout_marginTop="14dp"
         android:text="@string/login_button" />
