@@ -13,7 +13,9 @@ public class Order {
 	
 	private String orderDate;
 	
-	private int orderNum;
+	private String trainInfo;
+	
+	private String orderNum;
 	
 	private List<OrderInfo> orderInfos;
 
@@ -33,11 +35,11 @@ public class Order {
 		this.orderDate = orderDate;
 	}
 
-	public int getOrderNum() {
+	public String getOrderNum() {
 		return orderNum;
 	}
 
-	public void setOrderNum(int orderNum) {
+	public void setOrderNum(String orderNum) {
 		this.orderNum = orderNum;
 	}
 
@@ -47,5 +49,13 @@ public class Order {
 
 	public void setOrderInfos(List<OrderInfo> orderInfos) {
 		this.orderInfos = orderInfos;
+	}
+
+	public String getTrainInfo() {
+		return trainInfo;
+	}
+
+	public void setTrainInfo(String trainInfo) {
+		this.trainInfo = trainInfo;
 	}
 }

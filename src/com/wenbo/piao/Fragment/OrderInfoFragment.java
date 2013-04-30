@@ -13,6 +13,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
@@ -40,7 +42,9 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 	
 	private ListView listView;
 	
+	private List<Order> noCompletedOrders;
 	
+	private FragmentTransaction ft;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -120,44 +124,63 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 	}
 
 	@Override
-	public void onTabSelected(Tab tab,final FragmentTransaction ft) {
+	public void onTabSelected(Tab tab,FragmentTransaction ft) {
 		Log.i("OrderInfoFragment","onTabSelected:"+tab.getText());
+		this.ft = ft;
 		if(tab == noCompletedTab){
-			progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
-			new Thread(new Runnable() {
+			new AsyncTask<Integer,Integer,Integer>() {
 				@Override
-				public void run() {
+				protected Integer doInBackground(Integer... params) {
 					HttpResponse response = null;
 					try {
 						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
 						response = HttpClientUtil.getHttpClient().execute(httpGet);
 						if (response.getStatusLine().getStatusCode() == 200) {
-							List<Order> orders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-							if(orders.isEmpty()){
-								LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
-								return;
-							}
-							ListView listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
-							OrderAdapter adapter = new OrderAdapter(activity,0,orders);
-							listView.setAdapter(adapter);
-							ft.add(R.id.details,OrderInfoFragment.this,null);
+							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
 						}
 					} catch (Exception e) {
-						Log.i("GetNoCompletedOrder","error!", e);
+						Log.e("GetNoCompletedOrder","error!", e);
 					} finally {
-						progressDialog.dismiss();
+						
 					}
+					return null;
 				}
-			}).start();
+
+				@Override
+				protected void onPostExecute(Integer result) {
+					showView();
+					super.onPostExecute(result);
+				}
+
+				@Override
+				protected void onPreExecute() {
+					// TODO Auto-generated method stub
+					progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
+					super.onPreExecute();
+				}
+			}.execute(0);
 		}else if(tab == completedTab){
 			
 		}
 	}
+	
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 		Log.i("OrderInfoFragment","onTabUnselected:"+tab.getText());
 	}
+    
+    public void showView(){
+    	if(noCompletedOrders.isEmpty()){
+			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
+			return;
+		}
+    	listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
+		OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+		listView.setAdapter(adapter);
+		ft.add(R.id.details,OrderInfoFragment.this,null);
+		progressDialog.dismiss();
+    }
 	
 	private class OrderAdapter extends ArrayAdapter<Order> {
 
@@ -182,8 +205,12 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 						.findViewById(R.id.orderTextView);
 				TextView comment = (TextView) view
 						.findViewById(R.id.orderInfoTextView);
-				title.setText("测试未完成订单");
-				comment.setText("测试未完成订单测试未完成订单测试未完成订单\n测试未完成订单测试未完成订单测试未完成订单\n测试未完成订单测试未完成订单测试未完成订单");
+				title.setText(order.getTrainInfo()+"开");
+				StringBuilder sBuilder = new StringBuilder();
+				for(OrderInfo orderInfo:order.getOrderInfos()){
+					sBuilder.append(orderInfo.getInfo()+"\n");
+				}
+				comment.setText(sBuilder.toString());
 			}
 			return view;
 		}

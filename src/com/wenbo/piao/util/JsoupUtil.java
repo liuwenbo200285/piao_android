@@ -229,9 +229,9 @@ public class JsoupUtil {
 				Elements elements2 = element2.getElementsByTag("li");
 				for(Element element3:elements2){
 					if(StringUtils.isBlank(order.getOrderDate())){
-						order.setOrderDate(StringUtils.split(element3.text(),"：")[1].trim());
+						order.setOrderDate(element3.text());
 					}else{
-						order.setOrderNum(Integer.parseInt(StringUtils.split(element3.text(),"：")[1]));
+						order.setOrderNum(element3.text());
 					}
 				}
 				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");
@@ -245,7 +245,9 @@ public class JsoupUtil {
 						}
 						OrderInfo orderInfo = new OrderInfo();
 						orderInfo.setOrderNo(element4.attr("value"));
-						orderInfo.setInfo(element3.text());
+						String [] infos = StringUtils.split(element3.text(),"开");
+						order.setTrainInfo(infos[0]);
+						orderInfo.setInfo(infos[1]);
 						orderInfos.add(orderInfo);
 					}
 				}
@@ -278,9 +280,9 @@ public class JsoupUtil {
 				if(elements2 == null){
 					continue;
 				}
-				order.setOrderNo(StringUtils.split(elements2.get(0).text(),"：")[1]);
-				order.setOrderDate(StringUtils.split(elements2.get(1).text(),"：")[1]);
-				order.setOrderNum(Integer.parseInt(StringUtils.split(elements2.get(2).text(),"：")[1]));
+				order.setOrderNo(elements2.get(0).text());
+				order.setOrderDate(elements2.get(1).text());
+				order.setOrderNum(elements2.get(2).text());
 				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");
 				List<OrderInfo> orderInfos = new ArrayList<OrderInfo>();
 				for(int i = 0; i < elements3.size(); i++){
@@ -295,7 +297,7 @@ public class JsoupUtil {
 				orders.add(order);
 			}
 		} catch (Exception e) {
-			Log.e("myOrders","解析已完成订单出错!",e);
+			e.printStackTrace();
 		}
 		IOUtils.closeQuietly(inputStream);
 		return orders;

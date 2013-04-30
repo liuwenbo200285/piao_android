@@ -65,5 +65,4 @@
         android:layout_below="@+id/rangcode"
         android:layout_marginTop="14dp"
         android:text="@string/login_button" />
-
 </RelativeLayout>

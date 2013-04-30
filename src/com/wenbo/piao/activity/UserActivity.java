@@ -2,12 +2,13 @@ package com.wenbo.piao.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -34,12 +35,6 @@ public class UserActivity extends Activity {
 		getActionBar().setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
 		getActionBar().setTitle(R.string.app_name);
 		fm = getFragmentManager();
-		fm.addOnBackStackChangedListener(new OnBackStackChangedListener() {
-			@Override
-			public void onBackStackChanged() {
-				Log.i("UserActivity","onBackStackChanged");
-			}
-		});
 		FragmentTransaction ft = fm.beginTransaction();
 		currentFragment = new RobitOrderFragment();
 		ft.add(R.id.details,currentFragment,"tab1");
@@ -100,5 +95,37 @@ public class UserActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
+	            dialog(); 
+	            return true; 
+	        } 
+	        return false; 
+	}
+	
+	protected void dialog() { 
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this); 
+        builder.setMessage("确定要退出吗?"); 
+        builder.setTitle("提示"); 
+        builder.setPositiveButton("确认", 
+                new android.content.DialogInterface.OnClickListener() { 
+                    @Override 
+                    public void onClick(DialogInterface dialog, int which) { 
+                        dialog.dismiss(); 
+                        UserActivity.this.finish(); 
+                    } 
+                }); 
+        builder.setNegativeButton("取消", 
+                new android.content.DialogInterface.OnClickListener() { 
+                    @Override 
+                    public void onClick(DialogInterface dialog, int which) { 
+                        dialog.dismiss(); 
+                    } 
+                }); 
+        builder.create().show(); 
+    } 
 
 }
