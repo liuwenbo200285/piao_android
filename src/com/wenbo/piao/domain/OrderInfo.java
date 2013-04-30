@@ -7,24 +7,44 @@ package com.wenbo.piao.domain;
  */
 public class OrderInfo {
 
-	private String orderNo;
+	private String trainInfo;
 	
-	private String info;
+	private String seatInfo;
+	
+	private String passengersInfo;
+	
+	private String statusInfo;
 
-	public String getOrderNo() {
-		return orderNo;
+	public String getTrainInfo() {
+		return trainInfo;
 	}
 
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
+	public void setTrainInfo(String trainInfo) {
+		this.trainInfo = trainInfo;
 	}
 
-	public String getInfo() {
-		return info;
+	public String getSeatInfo() {
+		return seatInfo;
 	}
 
-	public void setInfo(String info) {
-		this.info = info;
+	public void setSeatInfo(String seatInfo) {
+		this.seatInfo = seatInfo;
+	}
+
+	public String getPassengersInfo() {
+		return passengersInfo;
+	}
+
+	public void setPassengersInfo(String passengersInfo) {
+		this.passengersInfo = passengersInfo;
+	}
+
+	public String getStatusInfo() {
+		return statusInfo;
+	}
+
+	public void setStatusInfo(String statusInfo) {
+		this.statusInfo = statusInfo;
 	}
 	
 }

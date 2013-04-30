@@ -332,8 +332,7 @@ public class RobitOrderService extends Service {
 				}
 				element = document.getElementById("passenger_1_seat");
 				if (element != null) {
-					TrainSeatEnum trainSeatEnum = HttpClientUtil
-							.getSeatEnum(ticketType);
+					TrainSeatEnum trainSeatEnum = HttpClientUtil.getSeatEnum(ticketType);
 					if (trainSeatEnum == null) {
 						Log.w("orderTicket","预订坐席填写不正确，请重新填写!");
 						sendStatus(StatusCodeEnum.ORDER_SEAT_ERROR.getCode());

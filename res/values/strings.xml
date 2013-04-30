@@ -61,4 +61,8 @@
 	<string name="orderCode">验证码</string>
 	<string name="beginOrder">开始抢票</string>
 	<string name="syncUser">同步联系人</string>
+	<string name="trainInfo">车次信息</string>
+	<string name="seatInfo">座位信息</string>
+	<string name="passengersInfo">旅客信息</string>
+	<string name="statusInfo">车票状态</string>
 </resources>

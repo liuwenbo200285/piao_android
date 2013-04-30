@@ -108,10 +108,8 @@ public class JsoupUtil {
 			    				if((index = StringUtils.indexOf(type, n+",")) != -1){
 //			    					logger.info(trainNo+"有票:"+nn+"张!");
 			    					max = compare(max,index);
-			    					if(max == 0){
+			    					if(max != 10000000){
 			    						return n;
-			    					}else if(max == index){
-			    						maxType = index;
 			    					}
 			    				}
 			    				n++;
@@ -124,10 +122,8 @@ public class JsoupUtil {
 			    	if((index = StringUtils.indexOf(type, n+",")) != -1){
 //			    		logger.info(trainNo+"有大量的票!");
 			    		max = compare(max,index);
-			    		if(max == 0){
+			    		if(max != 10000000){
     						return n;
-    					}else if(max == index){
-    						maxType = index;
     					}
 			    	}
 			    	n++;
@@ -244,10 +240,24 @@ public class JsoupUtil {
 							order.setOrderNo(StringUtils.split(element4.attr("name"),"_")[2]);
 						}
 						OrderInfo orderInfo = new OrderInfo();
-						orderInfo.setOrderNo(element4.attr("value"));
-						String [] infos = StringUtils.split(element3.text(),"开");
-						order.setTrainInfo(infos[0]);
-						orderInfo.setInfo(infos[1]);
+						String [] infos = StringUtils.split(element3.text()," ");
+						StringBuilder sbBuilder = new StringBuilder();
+						for(int n = 0; n < infos.length;n++){
+							sbBuilder.append(infos[n]+"\n");
+							if(n == 3){
+								orderInfo.setTrainInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 8){
+								orderInfo.setSeatInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 10){
+								orderInfo.setPassengersInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 11){
+								orderInfo.setStatusInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}
+						}
 						orderInfos.add(orderInfo);
 					}
 				}
@@ -289,7 +299,7 @@ public class JsoupUtil {
 					Element element3 = elements3.get(i);
 					if(i !=0 && i != elements3.size()-1){
 						OrderInfo orderInfo = new OrderInfo();
-						orderInfo.setInfo(element3.text());
+//						orderInfo.setInfo(element3.text());
 						orderInfos.add(orderInfo);
 					}
 				}

@@ -6,18 +6,97 @@
     android:minHeight="?android:attr/listPreferredItemHeight" 
     android:paddingLeft="6dip" android:paddingBottom="6dip"
     >
-<TextView 
-	android:id="@+id/orderTextView"
-    android:layout_height="wrap_content"   
-    android:layout_width="fill_parent"
-    android:textSize="21sp"
-    android:textIsSelectable="true"/>
 <TextView
-    android:id="@+id/orderInfoTextView"
-    android:layout_height="wrap_content"   
-    android:layout_width="fill_parent" 
-    android:textSize="16sp"   
-    android:layout_below="@+id/orderTextView"   
-    android:textIsSelectable="true" 
+    android:id="@+id/orderTextView"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:textIsSelectable="true"
+    android:textSize="20sp" 
+    android:textColor="@color/dark"
     />
+
+<TextView
+    android:id="@+id/textView1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_below="@+id/orderTextView"
+    android:gravity="center"
+    android:textSize="16sp"
+    android:text="@string/trainInfo" />
+
+<TextView
+    android:id="@+id/textView2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/textView1"
+    android:layout_alignBottom="@+id/textView1"
+    android:layout_marginLeft="18dp"
+    android:layout_toRightOf="@+id/trainInfoTextView"
+    android:textSize="16sp"
+    android:text="@string/seatInfo" />
+
+<TextView
+    android:id="@+id/textView4"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentRight="true"
+    android:layout_marginLeft="20dp"
+    android:layout_below="@+id/orderTextView"
+    android:layout_toRightOf="@+id/textView3"
+    android:textSize="16sp"
+    android:text="@string/statusInfo" />
+
+<TextView
+    android:id="@+id/trainInfoTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignLeft="@+id/textView1"
+    android:layout_below="@+id/textView1" 
+    android:textIsSelectable="true"
+    android:text="04月05日\nK1206\n昆明—深圳东\n08:49开"
+    />
+
+<TextView
+    android:id="@+id/seatInfoTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/trainInfoTextView"
+    android:layout_alignLeft="@+id/textView2"
+    android:layout_below="@+id/textView2"
+    android:text="13车厢\n06号中铺\n硬卧\n成人票:365.00元"
+    android:textIsSelectable="true" />
+
+<TextView
+    android:id="@+id/passengersInfoTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/seatInfoTextView"
+    android:layout_alignLeft="@+id/textView3"
+    android:layout_below="@+id/textView3"
+    android:text="李娜\n二代身份证"
+    android:textIsSelectable="true" />
+
+<TextView
+    android:id="@+id/statusInfoTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/passengersInfoTextView"
+    android:layout_alignLeft="@+id/textView4"
+    android:layout_below="@+id/textView4"
+    android:layout_alignParentRight="true"
+    android:text="已出票"
+    android:textIsSelectable="true" />
+
+<TextView
+    android:id="@+id/textView3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/orderTextView"
+    android:layout_marginLeft="16dp"
+    android:layout_toRightOf="@+id/textView2"
+    android:gravity="center"
+    android:text="@string/passengersInfo"
+    android:textSize="16sp" />
+
 </RelativeLayout>

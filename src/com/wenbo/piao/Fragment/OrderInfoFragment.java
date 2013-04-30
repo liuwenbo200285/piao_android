@@ -1,5 +1,6 @@
 package com.wenbo.piao.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -133,11 +134,12 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 				protected Integer doInBackground(Integer... params) {
 					HttpResponse response = null;
 					try {
-						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
-						response = HttpClientUtil.getHttpClient().execute(httpGet);
-						if (response.getStatusLine().getStatusCode() == 200) {
-							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-						}
+//						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
+//						response = HttpClientUtil.getHttpClient().execute(httpGet);
+//						if (response.getStatusLine().getStatusCode() == 200) {
+//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+//						}
+						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
 					} catch (Exception e) {
 						Log.e("GetNoCompletedOrder","error!", e);
 					} finally {
@@ -171,6 +173,7 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 	}
     
     public void showView(){
+    	progressDialog.dismiss();
     	if(noCompletedOrders.isEmpty()){
 			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
 			return;
@@ -179,7 +182,6 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 		OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
 		listView.setAdapter(adapter);
 		ft.add(R.id.details,OrderInfoFragment.this,null);
-		progressDialog.dismiss();
     }
 	
 	private class OrderAdapter extends ArrayAdapter<Order> {
@@ -201,16 +203,23 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 			}
 			Order order = items.get(position);
 			if (order != null) {
-				TextView title = (TextView) view
+				TextView orderInfo = (TextView) view
 						.findViewById(R.id.orderTextView);
-				TextView comment = (TextView) view
-						.findViewById(R.id.orderInfoTextView);
-				title.setText(order.getTrainInfo()+"开");
-				StringBuilder sBuilder = new StringBuilder();
-				for(OrderInfo orderInfo:order.getOrderInfos()){
-					sBuilder.append(orderInfo.getInfo()+"\n");
+				orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n"+order.getOrderNo());
+				for(OrderInfo info:order.getOrderInfos()){
+					TextView trainInfo = (TextView) view
+							.findViewById(R.id.trainInfoTextView);
+					trainInfo.setText(info.getTrainInfo());
+					TextView seatInfo = (TextView) view
+							.findViewById(R.id.seatInfoTextView);
+					seatInfo.setText(info.getSeatInfo());
+					TextView passengersInfo = (TextView) view
+							.findViewById(R.id.passengersInfoTextView);
+					passengersInfo.setText(info.getPassengersInfo());
+					TextView statusInfo = (TextView) view
+							.findViewById(R.id.statusInfoTextView);
+					statusInfo.setText(info.getStatusInfo());
 				}
-				comment.setText(sBuilder.toString());
 			}
 			return view;
 		}
