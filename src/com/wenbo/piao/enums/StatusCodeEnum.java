@@ -6,6 +6,8 @@ package com.wenbo.piao.enums;
  *
  */
 public enum StatusCodeEnum {
+	//取消次数过多，今日将不能继续受理您的订票请求！
+	CANCEL_ORDER_MANY(13),
 	//输入验证码
 	INPUT_ORDERCODE(12),
 	//订票成功

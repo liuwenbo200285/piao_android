@@ -640,27 +640,32 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 				rangeCode = (EditText) orderCodeView
 						.findViewById(R.id.orderCode);
-				new AlertDialog.Builder(activity)
-						.setTitle("请输入验证码！")
-						.setIcon(android.R.drawable.ic_dialog_info)
-						.setView(orderCodeView)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										progressDialog.show();
-										intent.putExtra(
-												ParameterEnum.ROBIT_STATE
-														.getValue(), status);
-										intent.putExtra(ParameterEnum.RANGECODE
-												.getValue(), rangeCode
-												.getText().toString());
-										activity.startService(intent);
-										type = 1;
-										orderButton.setText("停止抢票");
-									}
-								}).setNegativeButton("取消", null).show();
+				AlertDialog.Builder orderCodeBuilder = new AlertDialog.Builder(activity);
+				orderCodeBuilder.setTitle("请输入验证码！")
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setView(orderCodeView)
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								progressDialog.show();
+								intent.putExtra(
+										ParameterEnum.ROBIT_STATE
+												.getValue(), status);
+								intent.putExtra(ParameterEnum.RANGECODE
+										.getValue(), rangeCode
+										.getText().toString());
+								activity.startService(intent);
+								type = 1;
+								orderButton.setText("停止抢票");
+							}
+						}).setNegativeButton("取消", null);
+				orderCodeBuilder.show();
+				break;
+			case 13:
+				LoginDialog.newInstance("今日将不能继续受理您的订票请求！").show(
+						activity.getFragmentManager(), "dialog");
 				break;
 			default:
 				break;

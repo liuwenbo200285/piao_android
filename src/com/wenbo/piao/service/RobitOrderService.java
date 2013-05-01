@@ -479,6 +479,10 @@ public class RobitOrderService extends Service {
 						&& "Y".equals(jsonObject.getString("errMsg"))) {
 					String msg = jsonObject.getString("msg");
 					if (StringUtils.isNotEmpty(msg)) {
+						if(StringUtils.contains(msg,"由于您取消次数过多")){
+							sendStatus(StatusCodeEnum.CANCEL_ORDER_MANY.getCode());
+							return;
+						}
 						Log.i("checkOrderInfo",msg);
 					} else {
 						checkTicket(ticketNo, seatNum, token, date,orderCode);
