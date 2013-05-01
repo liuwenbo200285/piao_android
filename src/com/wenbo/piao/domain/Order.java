@@ -17,6 +17,8 @@ public class Order {
 	
 	private String orderNum;
 	
+	private OrderInfo orderInfo;
+	
 	private List<OrderInfo> orderInfos;
 
 	public String getOrderNo() {
@@ -57,5 +59,13 @@ public class Order {
 
 	public void setTrainInfo(String trainInfo) {
 		this.trainInfo = trainInfo;
+	}
+
+	public OrderInfo getOrderInfo() {
+		return orderInfo;
+	}
+
+	public void setOrderInfo(OrderInfo orderInfo) {
+		this.orderInfo = orderInfo;
 	}
 }

@@ -100,8 +100,8 @@ public class RobitOrderService extends Service {
 						try {
 							searchTicket(configInfo.getOrderDate());
 						} catch (Exception e) {
-							e.printStackTrace();
 							isBegin = false;
+							Log.e("RobitOrderService","onStartCommand",e);
 						}
 					}
 				}
@@ -118,8 +118,8 @@ public class RobitOrderService extends Service {
 						try {
 							checkOrderInfo(ticketNo, seatNum, token,configInfo.getOrderDate());
 						} catch (Exception e) {
-							e.printStackTrace();
 							isBegin = false;
+							Log.e("RobitOrderService","onStartCommand",e);
 						}
 					}
 				}

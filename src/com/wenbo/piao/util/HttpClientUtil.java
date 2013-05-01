@@ -150,7 +150,6 @@ public class HttpClientUtil {
         		httpClient.setReuseStrategy(new ConnectionReuseStrategy() {                
 					@Override
 					public boolean keepAlive(HttpResponse response, HttpContext context) {
-						System.out.println(response);
 						return true;
 					}
     		});

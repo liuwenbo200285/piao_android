@@ -1,8 +1,10 @@
 package com.wenbo.piao.Fragment;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
@@ -134,14 +136,37 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 				protected Integer doInBackground(Integer... params) {
 					HttpResponse response = null;
 					try {
-//						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
-//						response = HttpClientUtil.getHttpClient().execute(httpGet);
-//						if (response.getStatusLine().getStatusCode() == 200) {
-//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-//						}
-						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
+						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
+						response = HttpClientUtil.getHttpClient().execute(httpGet);
+						if (response.getStatusLine().getStatusCode() == 200) {
+							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+							if(!noCompletedOrders.isEmpty()){
+								Iterator<Order> iterator = noCompletedOrders.iterator();
+						    	List<Order> turnOrders = new ArrayList<Order>();
+						    	while(iterator.hasNext()){
+						    		Order order = iterator.next();
+						    		int n = 0;
+						    		if(order.getOrderInfos() != null && !order.getOrderInfos().isEmpty()){
+						    			for(OrderInfo orderInfo:order.getOrderInfos()){
+						    				if(n == 0){
+						    					order.setOrderInfo(orderInfo);
+						    					turnOrders.add(order);
+						    				}else{
+						    					Order order2 = new Order();
+						    					order2.setOrderInfo(orderInfo);
+						    					turnOrders.add(order2);
+						    				}
+						    				n++;
+						    			}
+						    		}
+						    	}
+						    	noCompletedOrders = null;
+						    	noCompletedOrders = turnOrders;
+							}
+						}
+//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
 					} catch (Exception e) {
-						Log.e("GetNoCompletedOrder","error!", e);
+						Log.e("GetNoCompletedOrder","onTabSelected", e);
 					} finally {
 						
 					}
@@ -175,6 +200,7 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
     public void showView(){
     	progressDialog.dismiss();
     	if(noCompletedOrders.isEmpty()){
+    		noCompletedOrders = null;
 			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
 			return;
 		}
@@ -203,10 +229,13 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 			}
 			Order order = items.get(position);
 			if (order != null) {
-				TextView orderInfo = (TextView) view
-						.findViewById(R.id.orderTextView);
-				orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n"+order.getOrderNo());
-				for(OrderInfo info:order.getOrderInfos()){
+				if(StringUtils.isNotBlank(order.getOrderDate())){
+					TextView orderInfo = (TextView) view
+							.findViewById(R.id.orderTextView);
+					orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n订  单  号："+order.getOrderNo());
+				}
+				OrderInfo info = order.getOrderInfo();
+				if(info != null){
 					TextView trainInfo = (TextView) view
 							.findViewById(R.id.trainInfoTextView);
 					trainInfo.setText(info.getTrainInfo());
