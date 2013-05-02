@@ -31,7 +31,9 @@ public enum StatusCodeEnum {
 	//查询到有票
 	HAVE_TICKET(2),
 	//系统维护中
-	SYSTEM_MAINTENANCE(1);
+	SYSTEM_MAINTENANCE(1),
+	//网络异常
+	NET_ERROR(0);
 
 	private int code;
 	

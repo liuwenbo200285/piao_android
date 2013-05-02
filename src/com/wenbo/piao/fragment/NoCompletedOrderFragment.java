@@ -1,4 +1,4 @@
-package com.wenbo.piao.Fragment;
+package com.wenbo.piao.fragment;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
@@ -49,6 +50,7 @@ public class NoCompletedOrderFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		activity = getActivity();
+//		closeSoftInput();
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
@@ -204,6 +206,13 @@ public class NoCompletedOrderFragment extends Fragment {
 				}
 			}
 			return view;
+		}
+	}
+	
+	public void closeSoftInput(){
+		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
+		if (imm.isActive()) {
+			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
 		}
 	}
 }

@@ -1,11 +1,13 @@
-package com.wenbo.piao.Fragment;
+package com.wenbo.piao.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.wenbo.piao.R;
 
@@ -23,6 +25,7 @@ public class CompletedOrderFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		activity = getActivity();
+//		closeSoftInput();
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -66,5 +69,12 @@ public class CompletedOrderFragment extends Fragment {
 	public void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+	}
+	
+	public void closeSoftInput(){
+		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
+		if (imm.isActive()) {
+			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+		}
 	}
 }

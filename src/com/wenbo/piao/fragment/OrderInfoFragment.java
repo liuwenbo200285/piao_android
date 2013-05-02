@@ -1,4 +1,4 @@
-package com.wenbo.piao.Fragment;
+package com.wenbo.piao.fragment;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -6,11 +6,13 @@ import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.wenbo.piao.R;
 
@@ -38,6 +40,7 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		Log.i("OrderInfoFragment","onActivityCreated");
 		activity = getActivity();
+//		closeSoftInput();
 		ActionBar actionBar = activity.getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -110,14 +113,18 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 		if(tab == noCompletedTab){
 			if(noCompletedOrderFragment == null){
 				noCompletedOrderFragment = new NoCompletedOrderFragment();
+				ft.replace(R.id.details,noCompletedOrderFragment,"noCompleted");
+			}else{
+				ft.replace(R.id.details,noCompletedOrderFragment);
 			}
-			ft.replace(R.id.details,noCompletedOrderFragment);
 		}else if(tab == completedTab){
 			if(currentFragment == this){
 				if(completedOrderFragment == null){
 					completedOrderFragment = new CompletedOrderFragment();
+					ft.replace(R.id.details,completedOrderFragment,"completed");
+				}else{
+					ft.replace(R.id.details,completedOrderFragment);
 				}
-				ft.replace(R.id.details,completedOrderFragment);
 			}
 		}
 	}
@@ -126,6 +133,13 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 		Log.i("OrderInfoFragment","onTabUnselected:"+tab.getText());
+	}
+	
+	public void closeSoftInput(){
+		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
+		if (imm.isActive()) {
+			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+		}
 	}
     
     public void showView(){

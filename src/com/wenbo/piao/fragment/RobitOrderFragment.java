@@ -1,4 +1,4 @@
-package com.wenbo.piao.Fragment;
+package com.wenbo.piao.fragment;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -94,21 +94,22 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		Log.i("onCreate", "onCreate");
+		Log.i("RobitOrderFragment", "onCreate");
 		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	public void onStart() {
 		// TODO Auto-generated method stub
-		Log.i("onStart", "onStart");
+		Log.i("RobitOrderFragment", "onStart");
+//		closeSoftInput();
 		super.onStart();
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		Log.i("onActivityCreated", "onActivityCreated");
+		Log.i("RobitOrderFragment", "onActivityCreated");
 		activity = getActivity();
 		SqlliteHelper sqlliteHelper = new SqlliteHelper(activity);
 		stationService = sqlliteHelper.getStationService();
@@ -250,49 +251,51 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				"com.wenbo.piao.robitService");
 		MyReceiver myReceiver = new MyReceiver();
 		activity.registerReceiver(myReceiver, intentFilter);
-		fromStation.requestFocus();
+//		if(StringUtils.isBlank(fromStation.getText().toString())){
+//			fromStation.requestFocus();
+//		}
 		super.onActivityCreated(savedInstanceState);
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
-		Log.i("onAttach", "onAttach");
+		Log.i("RobitOrderFragment", "onAttach");
 		super.onAttach(activity);
 	}
 
 	@Override
 	public void onDetach() {
 		// TODO Auto-generated method stub
-		Log.i("onDetach", "onDetach");
+		Log.i("RobitOrderFragment", "onDetach");
 		super.onDetach();
 	}
 
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		Log.i("onPause", "onPause");
+		Log.i("RobitOrderFragment", "onPause");
 		super.onPause();
 	}
 
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
-		Log.i("onResume", "onResume");
+		Log.i("RobitOrderFragment", "onResume");
 		super.onResume();
 	}
 
 	@Override
 	public void onStop() {
 		// TODO Auto-generated method stub
-		Log.i("onStop", "onStop");
+		Log.i("RobitOrderFragment", "onStop");
 		super.onStop();
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		Log.i("onViewCreated", "onViewCreated");
+		Log.i("RobitOrderFragment", "onViewCreated");
 		super.onViewCreated(view, savedInstanceState);
 	}
 
@@ -311,11 +314,16 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	 * 更新日期显示
 	 */
 	private void updateDateDisplay() {
-		trainDate.setText(new StringBuilder().append(mYear).append("-")
+		String oldDate = trainDate.getText().toString().trim();
+		String newDate = new StringBuilder().append(mYear).append("-")
 				.append((mMonth + 1) < 10 ? "0" + (mMonth + 1) : (mMonth + 1))
-				.append("-").append((mDay < 10) ? "0" + mDay : mDay));
-		trainDate.clearFocus();
-		trainCode.requestFocus();
+				.append("-").append((mDay < 10) ? "0" + mDay : mDay).toString().trim();
+		if(!oldDate.equals(newDate)){
+			trainDate.setText(newDate);
+//			trainDate.clearFocus();
+//			trainCode.requestFocus();
+//			closeSoftInput();
+		}
 	}
 
 	/**
@@ -328,6 +336,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			mMonth = monthOfYear;
 			mDay = dayOfMonth;
 			updateDateDisplay();
+			closeSoftInput();
 		}
 	};
 
@@ -575,6 +584,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		// 自定义一个广播接收器
 		@Override
 		public void onReceive(Context context, Intent receiveIntent) {
+			activity.stopService(intent);
 			Bundle bundle = receiveIntent.getExtras();
 			status = bundle.getInt("status");
 			// progressDialog.dismiss();
@@ -660,7 +670,12 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								type = 1;
 								orderButton.setText("停止抢票");
 							}
-						}).setNegativeButton("取消", null);
+						}).setNegativeButton("取消",new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								status = 0;
+							}
+						});
 				orderCodeBuilder.show();
 				break;
 			case 13:
@@ -670,8 +685,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			default:
 				break;
 			}
-			Log.i("onReceive", status + "");
-			activity.stopService(intent);
+			Log.i("RobitOrderFragment:onReceive", status + "");
 			orderButton.setText("开始抢票");
 			type = 0;
 			progressDialog.dismiss();

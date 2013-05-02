@@ -13,7 +13,7 @@
         android:layout_marginLeft="1dp"
         android:ems="8"
         android:hint="@string/startArea"
-        android:inputType="text"
+        android:inputType="textCapCharacters"
         android:focusable="true" 
 		android:focusableInTouchMode="true"
         android:completionThreshold="2">
@@ -29,7 +29,7 @@
         android:layout_toRightOf="@+id/startArea"
         android:ems="8"
         android:hint="@string/endArea"
-        android:inputType="text"
+        android:inputType="textCapCharacters"
         android:completionThreshold="2" />
 
     <EditText
@@ -41,7 +41,6 @@
         android:ems="10"
         android:hint="@string/selectTrainType"
         android:inputType="none" >
-
     </EditText>
 
     <EditText
