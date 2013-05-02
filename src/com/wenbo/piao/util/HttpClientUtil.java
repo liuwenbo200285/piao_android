@@ -5,6 +5,7 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -47,6 +48,7 @@ import org.apache.http.protocol.HttpContext;
 import android.util.Log;
 
 import com.wenbo.piao.domain.ConfigInfo;
+import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.Account;
@@ -74,6 +76,8 @@ public class HttpClientUtil {
 	public static Map<String,String> seatMap;
 	
 	public static Map<String,String> trainTypeMap;
+	
+	public static List<Order> myOrders;
 	
 	
 	public static  DefaultHttpClient getHttpClient(){
@@ -313,6 +317,14 @@ public class HttpClientUtil {
 			trainTypeMap.put("其他","QT");
 		}
 		return trainTypeMap;
+	}
+
+	public static List<Order> getMyOrders() {
+		return myOrders;
+	}
+
+	public static void setMyOrders(List<Order> myOrders) {
+		HttpClientUtil.myOrders = myOrders;
 	}
 	
 }

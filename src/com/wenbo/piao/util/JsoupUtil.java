@@ -1,7 +1,5 @@
 package com.wenbo.piao.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,10 +19,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import android.util.Log;
+
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
-
-import android.util.Log;
 
 public class JsoupUtil {
 
@@ -39,6 +37,7 @@ public class JsoupUtil {
 //		String str = "0,<span id='id_6c000G601108' class='base_txtdiv' onmouseover=javascript:onStopHover('6c000G601108#CWQ#IOQ') onmouseout='onStopOut()'>G6011</span>,<img src='/otsweb/images/tips/first.gif'>&nbsp;&nbsp;&nbsp;&nbsp;长沙南&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;07:00,<img src='/otsweb/images/tips/last.gif'>&nbsp;&nbsp;&nbsp;&nbsp;深圳北&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;10:20,03:20,--,<font color='darkgray'>无</font>,<font color='darkgray'>无</font>,4,--,--,--,--,--,--,--,<a name='btn130_2' class='btn130_2' style='text-decoration:none;' onclick=javascript:getSelected('G6011#03:20#07:00#6c000G601108#CWQ#IOQ#10:20#长沙南#深圳北#01#07#O*****0005M*****0000P*****0000#35EB8F56585E40AB3F341A1C908FA836604716C818826A3EF5E0601F#Q6')>预&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订</a>";
 //		IOUtils.closeQuietly(bufferedReader);
 //		IOUtils.closeQuietly(inputStream);
+		myOrders(null);
 	}
 	
 	
@@ -272,6 +271,7 @@ public class JsoupUtil {
 		return orders;
 	}
 	
+	
 	/**
 	 * 获取已经完成订单
 	 * @param inputStream
@@ -280,11 +280,13 @@ public class JsoupUtil {
 	public static List<Order> myOrders(InputStream inputStream){
 		List<Order> orders = new ArrayList<Order>();
 		try {
-			inputStream = new FileInputStream(new File("C://Noname6.txt"));
 			Document document = getPageDocument(inputStream);
+			Element tokenElement = document.getElementById("myOrderForm");
+			String token = tokenElement.getElementsByTag("input").get(0).attr("value");
 			Elements elements = document.getElementsByAttributeValueStarting("id","form_all_");
 			for(Element element:elements){
 				Order order = new Order();
+				order.setToken(token);
 				Element element2 = element.getElementsByClass("jdan_tfont").get(0);
 				Elements elements2 = element2.getElementsByTag("li");
 				if(elements2 == null){
@@ -299,7 +301,24 @@ public class JsoupUtil {
 					Element element3 = elements3.get(i);
 					if(i !=0 && i != elements3.size()-1){
 						OrderInfo orderInfo = new OrderInfo();
-//						orderInfo.setInfo(element3.text());
+						String [] infos = StringUtils.split(element3.text()," ");
+						StringBuilder sbBuilder = new StringBuilder();
+						for(int n = 0; n < infos.length;n++){
+							sbBuilder.append(infos[n]+"\n");
+							if(n == 3){
+								orderInfo.setTrainInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 8){
+								orderInfo.setSeatInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 10){
+								orderInfo.setPassengersInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}else if(n == 11){
+								orderInfo.setStatusInfo(sbBuilder.toString());
+								sbBuilder.delete(0,sbBuilder.length());
+							}
+						}
 						orderInfos.add(orderInfo);
 					}
 				}
@@ -311,6 +330,25 @@ public class JsoupUtil {
 		}
 		IOUtils.closeQuietly(inputStream);
 		return orders;
+	}
+	
+	/**
+	 * 获取token
+	 * @param inputStream
+	 * @return
+	 */
+	public static String getMyOrderInit(InputStream inputStream,int type){
+		Document document = getPageDocument(inputStream);
+		if(document != null){
+			Element element = null;
+			if(type == 1){
+				element = document.getElementById("myOrderForm");
+			}else if(type == 2){
+				element = document.getElementById("transferForm");
+			}
+			return element.getElementsByTag("input").get(0).attr("value");
+		}
+		return null;
 	}
 
 }

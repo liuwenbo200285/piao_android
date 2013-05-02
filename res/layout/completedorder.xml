@@ -6,7 +6,7 @@
     >
 
     <CheckBox
-        android:id="@+id/checkBox1"
+        android:id="@+id/orderTimeCheckBox"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -15,80 +15,81 @@
         android:text="@string/orderTimeSearch" />
     
     <CheckBox
-        android:id="@+id/checkBox2"
+        android:id="@+id/takeTrainTimeCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editText1"
+        android:layout_above="@+id/orderTimeText"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/checkBox1"
+        android:layout_toRightOf="@+id/orderTimeCheckBox"
         android:text="@string/takeTrainTimeSearch" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/orderTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/checkBox1"
-        android:layout_below="@+id/checkBox1"
+        android:layout_alignRight="@+id/orderTimeCheckBox"
+        android:layout_below="@+id/orderTimeCheckBox"
         android:layout_marginTop="15dp"
         android:inputType="date"
         android:hint="@string/beginTimeSearch"
         android:ems="10" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/endTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editText1"
-        android:layout_alignBottom="@+id/editText1"
-        android:layout_alignLeft="@+id/checkBox2"
-        android:layout_alignRight="@+id/checkBox2"
+        android:layout_alignBaseline="@+id/orderTimeText"
+        android:layout_alignBottom="@+id/orderTimeText"
+        android:layout_alignLeft="@+id/takeTrainTimeCheckBox"
+        android:layout_alignRight="@+id/takeTrainTimeCheckBox"
         android:inputType="date"
          android:hint="@string/endTimeSearch"
         android:ems="10" >
     </EditText>
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/orderNoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText1"
+        android:layout_below="@+id/orderTimeText"
         android:layout_marginTop="15dp"
-        android:layout_toLeftOf="@+id/editText2"
+        android:layout_toLeftOf="@+id/endTimeText"
         android:inputType="textCapCharacters"
         android:hint="@string/orderNoSearch"
         android:ems="10" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/trainNoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editText3"
-        android:layout_alignBottom="@+id/editText3"
-        android:layout_alignLeft="@+id/editText2"
+        android:layout_alignBaseline="@+id/orderNoText"
+        android:layout_alignBottom="@+id/orderNoText"
+        android:layout_alignLeft="@+id/endTimeText"
         android:inputType="textCapCharacters"
         android:hint="@string/trainNoSearch"
         android:ems="10" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/passengersNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/editText3"
+        android:layout_below="@+id/orderNoText"
         android:layout_marginTop="15dp"
         android:inputType="text"
         android:hint="@string/passengersNameSearch"
         android:ems="10" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/orderSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/passengersNameText"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="57dp"
         android:text="@string/search" />
 
 </RelativeLayout>

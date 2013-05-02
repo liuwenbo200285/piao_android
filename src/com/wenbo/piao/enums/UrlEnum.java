@@ -37,7 +37,13 @@ public enum UrlEnum {
 	//未完成订单
 	NO_NOTCOMPLETE("order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=N","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 						"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=Y",
-						"",""),;
+						"",""),
+	SEARCH_COMPLETED_ORDER_INIT("order/myOrderAction.do?method=init&showMessage=Y","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+								"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=init&showMessage=Y","",""),
+	SEARCH_COMPLETED_ORDER("order/myOrderAction.do","","https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrder",
+								"application/x-www-form-urlencoded",""),
+	CANCEL_ORDER("order/orderAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+								"https://dynamic.12306.cn/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess","application/x-www-form-urlencoded","");
 	private String path;
 	
 	private String accept;

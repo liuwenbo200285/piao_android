@@ -56,16 +56,19 @@ public class ContactFragment extends Fragment {
 		}
 		if(userInfos != null && !userInfos.isEmpty()){
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			Map<String,UserInfo> userinfoMap = new HashMap<String, UserInfo>();
 			for(UserInfo userInfo:userInfos){
 				Map<String,Object> map = new HashMap<String, Object>();
 				map.put("name",userInfo.getPassenger_name());
 				map.put("info",userInfo.getSex_name()+" "+userInfo.getPassenger_id_type_name()
 						+" "+userInfo.getPassenger_id_no());
 				list.add(map);
+				userinfoMap.put(userInfo.getPassenger_name(), userInfo);
 			}
 			SimpleAdapter adapter = new SimpleAdapter(activity,list,R.layout.listview,new String[]{"name","info"},
 					new int[]{R.id.textView1,R.id.textView2});
 			listView.setAdapter(adapter);
+			HttpClientUtil.setUserInfoMap(userinfoMap);
 		}else{
 			LoginDialog.newInstance( "此账号还没有添加联系人！").show(activity.getFragmentManager(),"dialog"); 
 		}
