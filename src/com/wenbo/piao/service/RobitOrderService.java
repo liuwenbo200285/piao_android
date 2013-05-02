@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -297,8 +296,7 @@ public class RobitOrderService extends Service {
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 302) {
-				Header locationHeader = response.getFirstHeader("Location");
-				Log.i("orderTicket",locationHeader.getValue());
+//				Header locationHeader = response.getFirstHeader("Location");
 			} else if (response.getStatusLine().getStatusCode() == 200) {
 				HttpEntity httpEntity = response.getEntity();
 				Document document = JsoupUtil.getPageDocument(httpEntity
@@ -307,7 +305,7 @@ public class RobitOrderService extends Service {
 				if (element != null) {
 					ticketNo = element.attr("value");
 					HttpClientUtil.setTicketNo(ticketNo);
-					Log.i("orderTicket",ticketNo);
+					Log.i("orderTicket:orderTicket",ticketNo);
 				} else {
 					sendStatus(StatusCodeEnum.HAVA_NO_DETAIL_ORDER);
 					return;
@@ -325,7 +323,7 @@ public class RobitOrderService extends Service {
 									.getName());
 					seatNum = elements.get(0).attr("value");
 					HttpClientUtil.setSeatNum(seatNum);
-					Log.i("orderTicket",seatNum);
+					Log.i("orderTicket:seatNum",seatNum);
 				}
 				Elements elements = document.getElementsByAttributeValue(
 						"name", "org.apache.struts.taglib.html.TOKEN");
@@ -667,6 +665,7 @@ public class RobitOrderService extends Service {
 	}
 	
 	private void sendStatus(StatusCodeEnum statusCodeEnum){
+		Log.i("sendStatus",""+statusCodeEnum.getCode());
 		Thread.interrupted();
 		status = statusCodeEnum.getCode();
 		isBegin = false;

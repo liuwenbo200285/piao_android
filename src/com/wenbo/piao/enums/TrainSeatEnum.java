@@ -16,7 +16,7 @@ public enum TrainSeatEnum {
 	HARDSLEEPER(7,"硬卧"),
 	SOFTSLEEPER(8,"软座"),
 	HARDSEAT(9,"硬座"),
-	NOSEAT(10,"无座");
+	NOSEAT(10,"硬座");
 	
 	private int code;
 	

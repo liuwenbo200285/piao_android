@@ -292,7 +292,7 @@ public class JsoupUtil {
 				if(elements2 == null){
 					continue;
 				}
-				order.setOrderNo(elements2.get(0).text());
+				order.setOrderNo(StringUtils.split(elements2.get(0).text(),"：")[1]);
 				order.setOrderDate(elements2.get(1).text());
 				order.setOrderNum(elements2.get(2).text());
 				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");

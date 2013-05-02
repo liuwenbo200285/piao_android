@@ -12,10 +12,10 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.fragment.AboutFargment;
+import com.wenbo.piao.fragment.CompletedOrderListFragment;
 import com.wenbo.piao.fragment.ContactFragment;
 import com.wenbo.piao.fragment.OrderInfoFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
@@ -23,9 +23,7 @@ import com.wenbo.piao.util.HttpClientUtil;
 
 public class UserActivity extends Activity {
 	
-	public static FragmentManager fm;
-	
-	public ImageView rangcodeImageView;
+	private static FragmentManager fm;
 	
 	private Fragment currentFragment;
 	
@@ -34,7 +32,6 @@ public class UserActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user);
-		rangcodeImageView = new ImageView(this);
 		getActionBar().setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
 		getActionBar().setTitle(R.string.app_name);
 		fm = getFragmentManager();
@@ -45,6 +42,8 @@ public class UserActivity extends Activity {
 		ft.addToBackStack(null);
 		ft.commit();
 	}
+	
+	
 
 	
 	@Override
@@ -93,6 +92,8 @@ public class UserActivity extends Activity {
 			Intent intent = new Intent();
             intent.setClass(this,MainActivity.class);
 			startActivity(intent);
+			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
+            robitOrderFragment.unRegisterService();
 			finish();
 			HttpClientUtil.setConfigInfo(null);
 			HttpClientUtil.setParams(null);
@@ -130,10 +131,19 @@ public class UserActivity extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
-	            dialog(); 
-	            return true; 
+			    if(currentFragment != null && currentFragment.getClass() != CompletedOrderListFragment.class){
+			    	dialog(); 
+		            return true;
+			    }else{
+			    	currentFragment = null;
+			    	fm.popBackStack();
+			    }
 	        } 
 	        return false; 
+	}
+	
+	public void setCurrentFragment(Fragment fragment){
+		this.currentFragment = fragment;
 	}
 	
 	protected void dialog() { 
@@ -145,6 +155,8 @@ public class UserActivity extends Activity {
                     @Override 
                     public void onClick(DialogInterface dialog, int which) { 
                         dialog.dismiss(); 
+                        RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
+                        robitOrderFragment.unRegisterService();
                         UserActivity.this.finish(); 
                     } 
                 }); 

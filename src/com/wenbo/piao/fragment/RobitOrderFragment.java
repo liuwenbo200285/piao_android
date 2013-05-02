@@ -83,6 +83,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private List<Station> fromStations;
 	private List<Station> toStations;
 	private EditText trainCode;
+	private MyReceiver myReceiver;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -247,10 +248,12 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
 		// 注册监听service
-		IntentFilter intentFilter = new IntentFilter(
-				"com.wenbo.piao.robitService");
-		MyReceiver myReceiver = new MyReceiver();
-		activity.registerReceiver(myReceiver, intentFilter);
+		if(myReceiver == null){
+			IntentFilter intentFilter = new IntentFilter(
+					"com.wenbo.piao.robitService");
+			myReceiver = new RobitOrderFragment.MyReceiver();
+			activity.registerReceiver(myReceiver, intentFilter);
+		}
 //		if(StringUtils.isBlank(fromStation.getText().toString())){
 //			fromStation.requestFocus();
 //		}
@@ -584,7 +587,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		// 自定义一个广播接收器
 		@Override
 		public void onReceive(Context context, Intent receiveIntent) {
-			activity.stopService(intent);
 			Bundle bundle = receiveIntent.getExtras();
 			status = bundle.getInt("status");
 			// progressDialog.dismiss();
@@ -689,6 +691,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			orderButton.setText("开始抢票");
 			type = 0;
 			progressDialog.dismiss();
+			activity.stopService(intent);
 			// pb.setProgress(a);
 			// tv.setText(String.valueOf(a));
 			// 处理接收到的内容
@@ -699,6 +702,12 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
 		if (imm.isActive()) {
 			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+		}
+	}
+	
+	public void unRegisterService(){
+		if(myReceiver != null){
+			activity.unregisterReceiver(myReceiver);
 		}
 	}
 

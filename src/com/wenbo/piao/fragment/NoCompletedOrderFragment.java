@@ -187,7 +187,7 @@ public class NoCompletedOrderFragment extends Fragment {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
 					TextView orderInfo = (TextView) view
 							.findViewById(R.id.orderTextView);
-					orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n订  单  号："+order.getOrderNo());
+					orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n订  单  号： "+order.getOrderNo());
 				}
 				OrderInfo info = order.getOrderInfo();
 				if(info != null){

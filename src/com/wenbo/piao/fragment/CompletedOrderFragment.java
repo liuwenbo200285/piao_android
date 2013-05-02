@@ -13,7 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
@@ -39,6 +38,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
@@ -50,7 +50,7 @@ import com.wenbo.piao.util.JsoupUtil;
 
 public class CompletedOrderFragment extends Fragment implements OnCheckedChangeListener,OnFocusChangeListener,
 OnClickListener,android.view.View.OnClickListener {
-	private Activity activity;
+	private UserActivity activity;
 	private CheckBox orderTimeCheckBox;
 	private CheckBox takeTrainTimeCheckBox;
 	private EditText orderTimeText;
@@ -69,6 +69,7 @@ OnClickListener,android.view.View.OnClickListener {
 	private String[] contacts;
 	private ProgressDialog progressDialog;
 	private FragmentManager fm;
+	private int flag = 1;
 	
 	
 	@Override
@@ -79,22 +80,18 @@ OnClickListener,android.view.View.OnClickListener {
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		activity = getActivity();
+		activity = (UserActivity)getActivity();
 		fm = activity.getFragmentManager();
-		final Calendar c = Calendar.getInstance();
-		mYear = c.get(Calendar.YEAR);
-		mMonth = c.get(Calendar.MONTH);
-		mDay = c.get(Calendar.DAY_OF_MONTH);
 		orderTimeCheckBox = (CheckBox)activity.findViewById(R.id.orderTimeCheckBox);
 		orderTimeCheckBox.setOnCheckedChangeListener(this);
 		takeTrainTimeCheckBox = (CheckBox)activity.findViewById(R.id.takeTrainTimeCheckBox);
 		takeTrainTimeCheckBox.setOnCheckedChangeListener(this);
 		orderTimeText = (EditText)activity.findViewById(R.id.orderTimeText);
 		endTimeText = (EditText)activity.findViewById(R.id.endTimeText);
-		orderTimeText.setOnFocusChangeListener(this);
-		endTimeText.setOnFocusChangeListener(this);
 		setDateTime(orderTimeText);
 		setDateTime(endTimeText);
+		orderTimeText.setOnFocusChangeListener(this);
+		endTimeText.setOnFocusChangeListener(this);
 		orderNoText = (EditText)activity.findViewById(R.id.orderNoText);
 		trainNoText = (EditText)activity.findViewById(R.id.trainNoText);
 		passengersNameText = (EditText)activity.findViewById(R.id.passengersNameText);
@@ -158,8 +155,10 @@ OnClickListener,android.view.View.OnClickListener {
 		if(isChecked){
 			if(buttonView == orderTimeCheckBox){
 				takeTrainTimeCheckBox.setChecked(false);
+				flag = 1;
 			}else{
 				orderTimeCheckBox.setChecked(false);
+				flag = 2;
 			}
 		}
 	}
@@ -172,6 +171,9 @@ OnClickListener,android.view.View.OnClickListener {
 		mYear = c.get(Calendar.YEAR);
 		mMonth = c.get(Calendar.MONTH);
 		mDay = c.get(Calendar.DAY_OF_MONTH);
+		if(editText == orderTimeText){
+			mMonth--;
+		}
 		updateDateDisplay(editText);
 	}
 	
@@ -179,7 +181,7 @@ OnClickListener,android.view.View.OnClickListener {
 	 * 更新日期显示
 	 */
 	private void updateDateDisplay(EditText editText) {
-		String oldDate = editText.getText().toString().trim();
+		String oldDate = editText.getText().toString();
 		String newDate = new StringBuilder().append(mYear).append("-")
 				.append((mMonth + 1) < 10 ? "0" + (mMonth + 1) : (mMonth + 1))
 				.append("-").append((mDay < 10) ? "0" + mDay : mDay).toString().trim();
@@ -225,14 +227,13 @@ OnClickListener,android.view.View.OnClickListener {
 						parameters.add(new BasicNameValuePair("org.apache.struts.taglib.html.TOKEN",token));
 						parameters.add(new BasicNameValuePair("queryOrderDTO.location_code",""));
 						parameters.add(new BasicNameValuePair("leftmenu","Y"));
-						parameters.add(new BasicNameValuePair("queryDataFlag","1"));
+						parameters.add(new BasicNameValuePair("queryDataFlag",""+flag));
 						parameters.add(new BasicNameValuePair("queryOrderDTO.from_order_date",orderTimeText.getText().toString()));
 						parameters.add(new BasicNameValuePair("queryOrderDTO.to_order_date",endTimeText.getText().toString()));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.sequence_no",""));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.train_code",""));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.name",""));
-						UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-								"UTF-8");
+						parameters.add(new BasicNameValuePair("queryOrderDTO.sequence_no",orderNoText.getText().toString()));
+						parameters.add(new BasicNameValuePair("queryOrderDTO.train_code",trainNoText.getText().toString()));
+						parameters.add(new BasicNameValuePair("queryOrderDTO.name",passengersNameText.getText().toString()));
+						UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
 						HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.SEARCH_COMPLETED_ORDER);
 						httpPost.setEntity(uef);
 						response = HttpClientUtil.getHttpClient().execute(httpPost);
@@ -255,6 +256,7 @@ OnClickListener,android.view.View.OnClickListener {
 						    				}
 						    				n++;
 						    			}
+						    			orders = null;
 						    		}
 						    	}
 							}
@@ -287,6 +289,7 @@ OnClickListener,android.view.View.OnClickListener {
 				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
 				ft.addToBackStack(null);
 				ft.commit();
+				activity.setCurrentFragment(listFragment);
 				super.onPostExecute(orders);
 			}
 
