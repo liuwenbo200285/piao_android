@@ -135,7 +135,7 @@ public class UserActivity extends Activity {
 			    	dialog(); 
 		            return true;
 			    }else{
-			    	currentFragment = null;
+			    	currentFragment = fm.findFragmentByTag("tab2");
 			    	fm.popBackStack();
 			    }
 	        } 
