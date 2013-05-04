@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.adapter.StationAdapter;
@@ -84,6 +85,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private List<Station> toStations;
 	private EditText trainCode;
 	private MyReceiver myReceiver;
+	private TextView dialogTextView;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -184,13 +186,25 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					}
 					String code = trainCode.getText().toString();
 					configInfo.setTrainNo(code);
-					configInfo.setOrderPerson(orderPeople.getText().toString());
-					Bundle bundle = new Bundle();
-					if ("全部".equals(selectTrainTypeText.getText().toString())) {
+					String orderPerson = orderPeople.getText().toString();
+					if(StringUtils.isBlank(orderPerson)){
+						LoginDialog.newInstance("请选择订票乘客！").show(
+								activity.getFragmentManager(), "dialog");
+						return;
+					}
+					String trainType = selectTrainTypeText.getText().toString();
+					if(StringUtils.isBlank(trainType)){
+						LoginDialog.newInstance("请选择坐席！").show(
+								activity.getFragmentManager(), "dialog");
+						return;
+					}
+					configInfo.setOrderPerson(trainType);
+					if ("全部".equals(trainType)) {
 						configInfo.setTrainClass("QB#D#Z#T#K#QT#");
 					} else {
 						configInfo.setTrainClass(HttpClientUtil.getTrainTypeMap().get(selectTrainTypeText.getText().toString())+ "#");
 					}
+					Bundle bundle = new Bundle();
 					StringBuilder sbBuilder = new StringBuilder();
 					String[] seats = StringUtils.split(selectSeatText.getText()
 							.toString(), ",");
@@ -213,9 +227,15 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	                // 设置进度条风格，风格为圆形，旋转的
 					progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	                // 设置ProgressDialog 标题
-					progressDialog.setTitle("订票中");
+//					progressDialog.setTitle("订票中");
 	                // 设置ProgressDialog 提示信息
 					progressDialog.setMessage("正在努力抢票...");
+					dialogTextView = new TextView(activity);
+					dialogTextView.setText("            订票中");
+					dialogTextView.setTextSize(20);
+//					dialogTextView.set
+					progressDialog.setCustomTitle(dialogTextView);
+//					progressDialog.setContentView(dialogTextView);
 	                // 设置ProgressDialog 标题图标
 	                // 设置ProgressDialog 的进度条是否不明确
 					progressDialog.setIndeterminate(false);
@@ -407,27 +427,27 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								}
 							}).setIcon(android.R.drawable.btn_dropdown);
 			builder.setTitle("选择乘客坐席")
-					.setPositiveButton("取消",new DialogInterface.OnClickListener() {
+					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							StringBuilder sbBuilder = new StringBuilder();
+							for (int i = 0; i < selectSeats.length; i++) {
+								if (selectSeats[i]) {
+									sbBuilder.append(seats[i] + ",");
+								}
+							}
+							selectSeatText.setText(sbBuilder.toString());
 							selectSeatText.clearFocus();
 							trainCode.requestFocus();
 							closeSoftInput();
 						}
 						
 					})
-					.setNegativeButton("确定",
+					.setNegativeButton("取消",
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									StringBuilder sbBuilder = new StringBuilder();
-									for (int i = 0; i < selectSeats.length; i++) {
-										if (selectSeats[i]) {
-											sbBuilder.append(seats[i] + ",");
-										}
-									}
-									selectSeatText.setText(sbBuilder.toString());
 									selectSeatText.clearFocus();
 									trainCode.requestFocus();
 									closeSoftInput();
@@ -467,28 +487,28 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								}).setIcon(android.R.drawable.btn_dropdown);
 				builder.setTitle("选择订票乘客")
 						// 设置Dialog的标题
-						.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
+								StringBuilder sbBuilder = new StringBuilder();
+								for (int i = 0; i < checkedItems.length; i++) {
+									if (checkedItems[i]) {
+										sbBuilder.append(contacts[i]
+												+ ",");
+									}
+								}
+								orderPeople.setText(sbBuilder.toString());
 								orderPeople.clearFocus();
 								trainCode.requestFocus();
 								closeSoftInput();
 							}
 							
 						})
-						.setNegativeButton("确定",
+						.setNegativeButton("取消",
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										StringBuilder sbBuilder = new StringBuilder();
-										for (int i = 0; i < checkedItems.length; i++) {
-											if (checkedItems[i]) {
-												sbBuilder.append(contacts[i]
-														+ ",");
-											}
-										}
-										orderPeople.setText(sbBuilder.toString());
 										orderPeople.clearFocus();
 										trainCode.requestFocus();
 										closeSoftInput();
@@ -589,7 +609,11 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		public void onReceive(Context context, Intent receiveIntent) {
 			Bundle bundle = receiveIntent.getExtras();
 			status = bundle.getInt("status");
-			// progressDialog.dismiss();
+			if(status >= 1000){
+			    String info = bundle.getString("tips");
+			    dialogTextView.setText("   "+info);
+				return;
+			}
 			switch (status) {
 			case 1:
 				LoginDialog.newInstance("系统维护中！").show(
@@ -661,6 +685,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
+								dialogTextView.setText("正在确认订票！");
 								progressDialog.show();
 								intent.putExtra(
 										ParameterEnum.ROBIT_STATE
@@ -692,9 +717,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			type = 0;
 			progressDialog.dismiss();
 			activity.stopService(intent);
-			// pb.setProgress(a);
-			// tv.setText(String.valueOf(a));
-			// 处理接收到的内容
 		}
 	}
 	

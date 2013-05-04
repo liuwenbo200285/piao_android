@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
+import com.wenbo.piao.service.RobitOrderService;
 
 public class JsoupUtil {
 
@@ -39,6 +40,8 @@ public class JsoupUtil {
 //		IOUtils.closeQuietly(inputStream);
 		myOrders(null);
 	}
+	
+	private static RobitOrderService robitOrderService;
 	
 	
 	
@@ -78,7 +81,7 @@ public class JsoupUtil {
 	/**
 	 * 检测有没有票
 	 */
-	public static int checkHaveTicket(Document document,String type){
+	public static int checkHaveTicket(Document document,String type,RobitOrderService robitOrderService){
 		int max = 10000000;
 		Integer maxType = 0;
 		String trainNo = null;
@@ -105,7 +108,8 @@ public class JsoupUtil {
 			    				n++;
 			    			}else if(StringUtils.isNumeric(nn)){
 			    				if((index = StringUtils.indexOf(type, n+",")) != -1){
-//			    					logger.info(trainNo+"有票:"+nn+"张!");
+			    					Log.i("JsoupUtil:checkHaveTicket",trainNo+"有票:"+nn+"张!");
+			    					robitOrderService.sendInfo(trainNo+"有票:"+nn+"张!");
 			    					max = compare(max,index);
 			    					if(max != 10000000){
 			    						return n;
@@ -120,6 +124,7 @@ public class JsoupUtil {
 			    }else if("#008800".equals(node.attr("color"))){
 			    	if((index = StringUtils.indexOf(type, n+",")) != -1){
 //			    		logger.info(trainNo+"有大量的票!");
+			    		robitOrderService.sendInfo(trainNo+"有大量的票!");
 			    		max = compare(max,index);
 			    		if(max != 10000000){
     						return n;
@@ -131,6 +136,7 @@ public class JsoupUtil {
 					int bengin = StringUtils.indexOf(info,"点起售");
 					if(bengin != -1){
 						Log.i("JsoupUtil.checkHaveTicket",trainNo+":"+info);
+						robitOrderService.sendInfo(trainNo+":"+info);
 						String clo = StringUtils.substring(info,0,bengin);
 						if(StringUtils.isNumeric(clo)){
 							int hour = Integer.valueOf(clo);
@@ -157,6 +163,7 @@ public class JsoupUtil {
 			Log.i("JsoupUtil.checkHaveTicket",trainNo+"有票!");
 		}else{
 			Log.i("JsoupUtil.checkHaveTicket",trainNo+"没有票!");
+			robitOrderService.sendInfo(trainNo+"没有票!");
 		}
 		return maxType;
 	}

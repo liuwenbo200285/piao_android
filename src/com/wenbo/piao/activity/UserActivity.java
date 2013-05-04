@@ -158,6 +158,14 @@ public class UserActivity extends Activity {
                         RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
                         robitOrderFragment.unRegisterService();
                         UserActivity.this.finish(); 
+                        HttpClientUtil.setAccount(null);
+                        HttpClientUtil.setConfigInfo(null);
+                        HttpClientUtil.setMyOrders(null);
+                        HttpClientUtil.setParams(null);
+                        HttpClientUtil.setSeatNum(null);
+                        HttpClientUtil.setTicketNo(null);
+                        HttpClientUtil.setToken(null);
+                        HttpClientUtil.setUserInfoMap(null);
                     } 
                 }); 
         builder.setNegativeButton("取消", 
