@@ -73,4 +73,6 @@
 	<string name="trainNoSearch">车次</string>
 	<string name="passengersNameSearch">乘客姓名</string>
 	<string name="search">查询</string>
+	<string name="refundButton">退票</string>
+	<string name="payButton">付款</string>
 </resources>

@@ -230,7 +230,7 @@ public class JsoupUtil {
 					if(StringUtils.isBlank(order.getOrderDate())){
 						order.setOrderDate(element3.text());
 					}else{
-						order.setOrderNum(element3.text());
+						order.setOrderNum(StringUtils.split(element3.text(),"：")[1]);
 					}
 				}
 				Elements elements3 = element.getElementsByTag("tbody").get(0).getElementsByTag("tr");
@@ -249,6 +249,7 @@ public class JsoupUtil {
 							sbBuilder.append(infos[n]+"\n");
 							if(n == 3){
 								orderInfo.setTrainInfo(sbBuilder.toString());
+								order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 8){
 								orderInfo.setSeatInfo(sbBuilder.toString());
@@ -311,6 +312,7 @@ public class JsoupUtil {
 							sbBuilder.append(infos[n]+"\n");
 							if(n == 3){
 								orderInfo.setTrainInfo(sbBuilder.toString());
+								order.setTrainInfo(orderInfo.getTrainInfo());
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 8){
 								orderInfo.setSeatInfo(sbBuilder.toString());
