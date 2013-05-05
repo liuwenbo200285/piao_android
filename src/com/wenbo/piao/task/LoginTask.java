@@ -1,6 +1,5 @@
 package com.wenbo.piao.task;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +21,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
@@ -105,12 +103,14 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			EditText editText = (EditText)activity.findViewById(R.id.rangcode);
 			editText.setText("");
 			editText.requestFocus();
-			ImageView imageView = (ImageView)activity.findViewById(R.id.rangCodeImg);
-			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(imageView,1);
+			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,null,1);
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			break;
-		default:
+		case 4:
 			LoginDialog.newInstance("系统错误！").show(activity.getFragmentManager(),"dialog"); 
+			break;
+		default:
+			LoginDialog.newInstance("请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 
 			break;
 		}
 	}
@@ -147,7 +147,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			}
 		} catch (Exception e) {
 			Log.e("Login","获取登录随机码失败!",e);
-			return 4;
+			return 5;
 		} finally {
 
 		}
@@ -195,6 +195,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			}
 		}catch (Exception e) {
 			Log.i("Login","登录出错!",e);
+			return 5;
 		}
 		return 4;
 	}

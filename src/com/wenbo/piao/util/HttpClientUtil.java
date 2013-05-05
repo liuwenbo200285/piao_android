@@ -127,9 +127,9 @@ public class HttpClientUtil {
                 ConnManagerParams.setTimeout(params, 1000);
                 
                 //设置连接超时
-                HttpConnectionParams.setConnectionTimeout(params, 5000);
+                HttpConnectionParams.setConnectionTimeout(params,5000);
                 //设置Socket超时
-                HttpConnectionParams.setSoTimeout(params, 10000);
+                HttpConnectionParams.setSoTimeout(params,5000);
                 SSLContext ctx = SSLContext.getInstance("TLS");
                 X509TrustManager tm = new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() {

@@ -192,13 +192,13 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								activity.getFragmentManager(), "dialog");
 						return;
 					}
+					configInfo.setOrderPerson(orderPerson);
 					String trainType = selectTrainTypeText.getText().toString();
 					if(StringUtils.isBlank(trainType)){
 						LoginDialog.newInstance("请选择坐席！").show(
 								activity.getFragmentManager(), "dialog");
 						return;
 					}
-					configInfo.setOrderPerson(trainType);
 					if ("全部".equals(trainType)) {
 						configInfo.setTrainClass("QB#D#Z#T#K#QT#");
 					} else {
@@ -660,18 +660,16 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			case 12:
 				LayoutInflater li = LayoutInflater.from(activity);
 				View orderCodeView = li.inflate(R.layout.rangcodeview, null);
-				ImageView imageView = (ImageView) orderCodeView
-						.findViewById(R.id.orderCodeImg);
+				final ImageView imageView = (ImageView) orderCodeView.findViewById(R.id.orderCodeImg);
 				imageView.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View view) {
-						GetRandCodeTask getRandCode = new GetRandCodeTask(
-								(ImageView) view, 2);
+						GetRandCodeTask getRandCode = new GetRandCodeTask(activity,imageView,2);
 						getRandCode.execute(UrlEnum.DO_MAIN.getPath()
 								+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 					}
 				});
-				GetRandCodeTask getRandCode = new GetRandCodeTask(imageView, 2);
+				GetRandCodeTask getRandCode = new GetRandCodeTask(activity,imageView,2);
 				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
 						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 				rangeCode = (EditText) orderCodeView

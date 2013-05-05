@@ -39,10 +39,7 @@ public class JsoupUtil {
 //		IOUtils.closeQuietly(bufferedReader);
 //		IOUtils.closeQuietly(inputStream);
 		myOrders(null);
-	}
-	
-	private static RobitOrderService robitOrderService;
-	
+	}	
 	
 	
 	/**
@@ -136,7 +133,6 @@ public class JsoupUtil {
 					int bengin = StringUtils.indexOf(info,"点起售");
 					if(bengin != -1){
 						Log.i("JsoupUtil.checkHaveTicket",trainNo+":"+info);
-						robitOrderService.sendInfo(trainNo+":"+info);
 						String clo = StringUtils.substring(info,0,bengin);
 						if(StringUtils.isNumeric(clo)){
 							int hour = Integer.valueOf(clo);
@@ -150,6 +146,7 @@ public class JsoupUtil {
 							if(waitTime > 10*1000){
 								waitTime = waitTime-5*1000;
 								Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
 								Thread.sleep(waitTime);
 							}
 						}

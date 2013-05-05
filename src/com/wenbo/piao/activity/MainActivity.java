@@ -102,7 +102,6 @@ public class MainActivity extends Activity {
 		imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		accountService = SqlLiteUtil.getAccountService(this);
 //		stationService = new SqlliteHelper(this).getStationService();
-		ImageView imageView = (ImageView)findViewById(R.id.rangCodeImg);
 		imageView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -235,7 +234,7 @@ public class MainActivity extends Activity {
 	 * 获取登录验证码
 	 */
 	private void getLoginRangeCode(){
-		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(imageView,1);
+		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,null,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 	}
 	
