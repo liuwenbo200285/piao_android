@@ -43,6 +43,7 @@ public class ContactFragment extends Fragment {
 			Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.activity_info4, container, false);
 		listView = (ListView) view.findViewById(R.id.listview);
+		listView.setItemsCanFocus(true);
 		return view;
 	}
 	

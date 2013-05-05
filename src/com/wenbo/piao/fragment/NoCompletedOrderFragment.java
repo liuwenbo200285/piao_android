@@ -1,7 +1,5 @@
 package com.wenbo.piao.fragment;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,18 +15,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
-import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
@@ -52,14 +52,6 @@ public class NoCompletedOrderFragment extends Fragment {
 		activity = getActivity();
 //		closeSoftInput();
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
-		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				LoginDialog.newInstance( "长按了未付款订单！").show(activity.getFragmentManager(),"dialog"); 
-				return false;
-			}
-		});
 		new AsyncTask<Integer,Integer,Integer>() {
 			@Override
 			protected Integer doInBackground(Integer... params) {
@@ -68,30 +60,8 @@ public class NoCompletedOrderFragment extends Fragment {
 					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
 					response = HttpClientUtil.getHttpClient().execute(httpGet);
 					if (response.getStatusLine().getStatusCode() == 200) {
-						noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
-						if(!noCompletedOrders.isEmpty()){
-							Iterator<Order> iterator = noCompletedOrders.iterator();
-					    	List<Order> turnOrders = new ArrayList<Order>();
-					    	while(iterator.hasNext()){
-					    		Order order = iterator.next();
-					    		int n = 0;
-					    		if(order.getOrderInfos() != null && !order.getOrderInfos().isEmpty()){
-					    			for(OrderInfo orderInfo:order.getOrderInfos()){
-					    				if(n == 0){
-					    					order.setOrderInfo(orderInfo);
-					    					turnOrders.add(order);
-					    				}else{
-					    					Order order2 = new Order();
-					    					order2.setOrderInfo(orderInfo);
-					    					turnOrders.add(order2);
-					    				}
-					    				n++;
-					    			}
-					    		}
-					    	}
-					    	noCompletedOrders = turnOrders;
-						}
+//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
 					}
 				} catch (Exception e) {
 					Log.e("GetNoCompletedOrder","onTabSelected", e);
@@ -120,6 +90,15 @@ public class NoCompletedOrderFragment extends Fragment {
 				super.onPreExecute();
 			}
 		}.execute(0);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Toast.makeText(activity,  
+                        "你选择了第"+arg2+"个Item", 
+                        Toast.LENGTH_SHORT).show();
+			}
+		});
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -180,29 +159,15 @@ public class NoCompletedOrderFragment extends Fragment {
 			View view = convertView;
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.nocompeletedorderview, null);
+				view = inflater.inflate(R.layout.nocompeletedorderdetail, null);
 			}
 			Order order = items.get(position);
 			if (order != null) {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
 					TextView orderInfo = (TextView) view
 							.findViewById(R.id.orderTextView);
-					orderInfo.setText(order.getOrderDate()+"      "+order.getOrderNum()+"\n订  单  号： "+order.getOrderNo());
-				}
-				OrderInfo info = order.getOrderInfo();
-				if(info != null){
-					TextView trainInfo = (TextView) view
-							.findViewById(R.id.trainInfoTextView);
-					trainInfo.setText(info.getTrainInfo());
-					TextView seatInfo = (TextView) view
-							.findViewById(R.id.seatInfoTextView);
-					seatInfo.setText(info.getSeatInfo());
-					TextView passengersInfo = (TextView) view
-							.findViewById(R.id.passengersInfoTextView);
-					passengersInfo.setText(info.getPassengersInfo());
-					TextView statusInfo = (TextView) view
-							.findViewById(R.id.statusInfoTextView);
-					statusInfo.setText(info.getStatusInfo());
+					orderInfo.setText(order.getOrderDate()+"\n订  单  号： "+order.getOrderNo()+"\n车次信息： "+order.getTrainInfo().trim()
+							+"\n总  张  数： "+order.getOrderNum()+"张");
 				}
 			}
 			return view;
