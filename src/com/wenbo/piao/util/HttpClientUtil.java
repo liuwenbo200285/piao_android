@@ -79,6 +79,9 @@ public class HttpClientUtil {
 	
 	public static List<Order> myOrders;
 	
+	public static Order selectOrder;
+	
+	public static List<Order> noCompletedOrders;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -325,6 +328,22 @@ public class HttpClientUtil {
 
 	public static void setMyOrders(List<Order> myOrders) {
 		HttpClientUtil.myOrders = myOrders;
+	}
+
+	public static Order getSelectOrder() {
+		return selectOrder;
+	}
+
+	public static void setSelectOrder(Order selectOrder) {
+		HttpClientUtil.selectOrder = selectOrder;
+	}
+
+	public static List<Order> getNoCompletedOrders() {
+		return noCompletedOrders;
+	}
+
+	public static void setNoCompletedOrders(List<Order> noCompletedOrders) {
+		HttpClientUtil.noCompletedOrders = noCompletedOrders;
 	}
 	
 }

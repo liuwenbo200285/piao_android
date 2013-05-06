@@ -6,8 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,18 +16,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.enums.UrlEnum;
@@ -34,7 +33,7 @@ import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
 
 public class NoCompletedOrderFragment extends Fragment {
-	private Activity activity;
+	private UserActivity activity;
 	
 	private List<Order> noCompletedOrders;
 	
@@ -49,57 +48,76 @@ public class NoCompletedOrderFragment extends Fragment {
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		activity = getActivity();
-//		closeSoftInput();
+		activity = (UserActivity)getActivity();
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
-		new AsyncTask<Integer,Integer,Integer>() {
-			@Override
-			protected Integer doInBackground(Integer... params) {
-				HttpResponse response = null;
-				try {
-					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
-					response = HttpClientUtil.getHttpClient().execute(httpGet);
-					if (response.getStatusLine().getStatusCode() == 200) {
-//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
-					}
-				} catch (Exception e) {
-					Log.e("GetNoCompletedOrder","onTabSelected", e);
-				} finally {
-					
-				}
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Integer result) {
-				progressDialog.dismiss();
-		    	if(noCompletedOrders.isEmpty()){
-		    		noCompletedOrders = null;
-					LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
-					return;
-				}
-				OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
-				listView.setAdapter(adapter);
-				super.onPostExecute(result);
-			}
-
-			@Override
-			protected void onPreExecute() {
-				progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
-				super.onPreExecute();
-			}
-		}.execute(0);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Toast.makeText(activity,  
-                        "你选择了第"+arg2+"个Item", 
-                        Toast.LENGTH_SHORT).show();
+				HttpClientUtil.setSelectOrder(noCompletedOrders.get(arg2));
+				FragmentManager fm = activity.getFragmentManager();
+				FragmentTransaction ft = fm.beginTransaction();
+		    	Fragment listFragment = null;
+		    	listFragment = fm.findFragmentByTag("orderDetail");
+		    	if(listFragment == null){
+		    		listFragment = new OrderDetailFragment();
+		    	}
+				ft.replace(R.id.details,listFragment,"orderDetail");
+				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+				ft.addToBackStack(null);
+				ft.commit();
+				activity.setCurrentFragment(listFragment);
 			}
 		});
+		noCompletedOrders = HttpClientUtil.getNoCompletedOrders();
+		if(noCompletedOrders == null || noCompletedOrders.isEmpty()){
+			new AsyncTask<Integer,Integer,Integer>() {
+				@Override
+				protected Integer doInBackground(Integer... params) {
+					HttpResponse response = null;
+					try {
+						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
+						response = HttpClientUtil.getHttpClient().execute(httpGet);
+						if (response.getStatusLine().getStatusCode() == 200) {
+//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+							noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
+							HttpClientUtil.setNoCompletedOrders(noCompletedOrders);
+						}
+					} catch (Exception e) {
+						Log.e("GetNoCompletedOrder","onTabSelected", e);
+					} finally {
+						
+					}
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Integer result) {
+					progressDialog.dismiss();
+					showView();
+					super.onPostExecute(result);
+				}
+
+				@Override
+				protected void onPreExecute() {
+					progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
+					super.onPreExecute();
+				}
+			}.execute(0);
+		}else{
+			showView();
+		}
 		super.onActivityCreated(savedInstanceState);
+	}
+	
+	private void showView(){
+		if(noCompletedOrders.isEmpty()){
+    		noCompletedOrders = null;
+			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
+			return;
+		}
+		OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+		listView.setAdapter(adapter);
 	}
 
 

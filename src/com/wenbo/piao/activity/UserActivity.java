@@ -17,6 +17,7 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.fragment.AboutFargment;
 import com.wenbo.piao.fragment.CompletedOrderListFragment;
 import com.wenbo.piao.fragment.ContactFragment;
+import com.wenbo.piao.fragment.OrderDetailFragment;
 import com.wenbo.piao.fragment.OrderInfoFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -131,7 +132,9 @@ public class UserActivity extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
-			    if(currentFragment != null && currentFragment.getClass() != CompletedOrderListFragment.class){
+			    if(currentFragment != null 
+			    		&& currentFragment.getClass() != CompletedOrderListFragment.class
+			    		&& currentFragment.getClass() != OrderDetailFragment.class){
 			    	dialog(); 
 		            return true;
 			    }else{
