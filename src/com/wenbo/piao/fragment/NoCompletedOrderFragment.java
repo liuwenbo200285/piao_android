@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -79,8 +80,8 @@ public class NoCompletedOrderFragment extends Fragment {
 						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
 						response = HttpClientUtil.getHttpClient().execute(httpGet);
 						if (response.getStatusLine().getStatusCode() == 200) {
-//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-							noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
+							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
 							HttpClientUtil.setNoCompletedOrders(noCompletedOrders);
 						}
 					} catch (Exception e) {
@@ -182,10 +183,20 @@ public class NoCompletedOrderFragment extends Fragment {
 			Order order = items.get(position);
 			if (order != null) {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
-					TextView orderInfo = (TextView) view
-							.findViewById(R.id.orderTextView);
-					orderInfo.setText(order.getOrderDate()+"\n订  单  号： "+order.getOrderNo()+"\n车次信息： "+order.getTrainInfo().trim()
-							+"\n总  张  数： "+order.getOrderNum()+"张");
+					TextView orderInfo = (TextView) view.findViewById(R.id.orderTextView);
+					StringBuilder sbBuilder = new StringBuilder();
+					sbBuilder.append(order.getOrderDate());
+					if(StringUtils.isEmpty(order.getOrderNo())){
+						Button refundButton = (Button)view.findViewById(R.id.refund);
+						refundButton.setVisibility(View.INVISIBLE);
+						Button payButton = (Button)view.findViewById(R.id.pay);
+						payButton.setVisibility(View.INVISIBLE);
+					}else{
+						sbBuilder.append("\n订  单  号： "+order.getOrderNo());
+					}
+					sbBuilder.append("\n车次信息： "+order.getTrainInfo()
+							+"\n总  张  数： "+order.getOrderNum()+"张\n订单状态： "+order.getOrderStatus());
+					orderInfo.setText(sbBuilder.toString());
 				}
 			}
 			return view;

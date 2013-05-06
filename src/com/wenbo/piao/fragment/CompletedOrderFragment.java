@@ -3,10 +3,10 @@ package com.wenbo.piao.fragment;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -41,7 +41,6 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
-import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.task.GetPersonConstanct;
@@ -216,7 +215,7 @@ OnClickListener,android.view.View.OnClickListener {
 			@Override
 			protected List<Order> doInBackground(Integer... params) {
 				HttpResponse response = null;
-				List<Order> turnOrders = new ArrayList<Order>();
+				List<Order> orders = null;
 				try {
 					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_COMPLETED_ORDER_INIT);
 					response = HttpClientUtil.getHttpClient().execute(httpGet);
@@ -238,28 +237,7 @@ OnClickListener,android.view.View.OnClickListener {
 						httpPost.setEntity(uef);
 						response = HttpClientUtil.getHttpClient().execute(httpPost);
 						if (response.getStatusLine().getStatusCode() == 200) {
-							List<Order> orders = JsoupUtil.myOrders(response.getEntity().getContent());
-							if(!orders.isEmpty()){
-								Iterator<Order> iterator = orders.iterator();
-						    	while(iterator.hasNext()){
-						    		Order order = iterator.next();
-						    		int n = 0;
-						    		if(order.getOrderInfos() != null && !order.getOrderInfos().isEmpty()){
-						    			for(OrderInfo orderInfo:order.getOrderInfos()){
-						    				if(n == 0){
-						    					order.setOrderInfo(orderInfo);
-						    					turnOrders.add(order);
-						    				}else{
-						    					Order order2 = new Order();
-						    					order2.setOrderInfo(orderInfo);
-						    					turnOrders.add(order2);
-						    				}
-						    				n++;
-						    			}
-						    			orders = null;
-						    		}
-						    	}
-							}
+							orders = JsoupUtil.myOrders(activity.getAssets().open("Noname6.txt"));
 						}
 					}
 				} catch (Exception e) {
@@ -267,7 +245,7 @@ OnClickListener,android.view.View.OnClickListener {
 				} finally {
 //					HttpClientUtils.closeQuietly(response);
 				}
-				return turnOrders;
+				return orders;
 			}
 
 			@Override
@@ -356,8 +334,9 @@ OnClickListener,android.view.View.OnClickListener {
 			currentEditText = (EditText)v;
 			switch (v.getId()) {
 			case R.id.orderTimeText:
-				datePickerDialog = new DatePickerDialog(activity,
-						mDateSetListener, mYear, mMonth, mDay);
+				String[] str = StringUtils.split(orderTimeText.getText().toString(),"-");
+				datePickerDialog = new DatePickerDialog(activity,mDateSetListener,Integer.parseInt(str[0]), 
+						Integer.parseInt(str[1]), Integer.parseInt(str[2]));
 				datePickerDialog.show();
 				break;
 			case R.id.endTimeText:

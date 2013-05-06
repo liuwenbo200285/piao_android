@@ -17,6 +17,8 @@ public class Order {
 	
 	private String orderNum;
 	
+	private String orderStatus;
+	
 	private OrderInfo orderInfo;
 	
 	private List<OrderInfo> orderInfos;
@@ -77,5 +79,13 @@ public class Order {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public String getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
 	}
 }

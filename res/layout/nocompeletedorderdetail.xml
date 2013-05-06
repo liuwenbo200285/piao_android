@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout     
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent" 
-    android:layout_height="fill_parent" 
+    android:layout_width="fill_parent" android:layout_height="fill_parent" 
     android:orientation="vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight"  
+    android:minHeight="?android:attr/listPreferredItemHeight" 
     android:paddingLeft="6dip" 
-    android:paddingBottom="6dip"
-    android:descendantFocusability="blocksDescendants">
+    android:paddingBottom="6dip">
     <TextView
         android:id="@+id/orderTextView"
         android:layout_width="fill_parent"
@@ -17,13 +15,14 @@
         android:layout_alignParentTop="true"
         android:textIsSelectable="false"
         android:textColor="@color/dark"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/refund"
         android:layout_width="150dp"
         android:layout_height="60dp"
         android:layout_alignParentRight="true"
+        android:focusable="false"
         android:layout_below="@+id/orderTextView"
         android:text="@string/refundButton" />
     
@@ -32,8 +31,10 @@
         android:id="@+id/pay"
         android:layout_width="150dp"
         android:layout_height="60dp"
+        android:focusable="false"
         android:layout_alignBaseline="@+id/refund"
         android:layout_alignBottom="@+id/refund"
         android:layout_toLeftOf="@+id/refund"
         android:text="@string/payButton" />
+    
 </RelativeLayout>

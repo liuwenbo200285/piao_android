@@ -9,6 +9,7 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -169,6 +170,7 @@ public class UserActivity extends Activity {
                         HttpClientUtil.setTicketNo(null);
                         HttpClientUtil.setToken(null);
                         HttpClientUtil.setUserInfoMap(null);
+                        HttpClientUtil.setNoCompletedOrders(null);
                     } 
                 }); 
         builder.setNegativeButton("取消", 
@@ -179,6 +181,50 @@ public class UserActivity extends Activity {
                     } 
                 }); 
         builder.create().show(); 
-    } 
+    }
+
+
+	@Override
+	protected void onDestroy() {
+		Log.i("UserActivity","onDestroy");
+		super.onDestroy();
+	}
+
+
+	@Override
+	protected void onPause() {
+		Log.i("UserActivity","onPause");
+		super.onPause();
+	}
+
+
+	@Override
+	protected void onRestart() {
+		Log.i("UserActivity","onRestart");
+		//检测是否已经在登录
+		
+		super.onRestart();
+	}
+
+
+	@Override
+	protected void onResume() {
+		Log.i("UserActivity","onResume");
+		super.onResume();
+	}
+
+	@Override
+	protected void onStart() {
+		Log.i("UserActivity","onStart");
+		super.onStart();
+	}
+
+	@Override
+	protected void onStop() {
+		Log.i("UserActivity","onStop");
+		super.onStop();
+	} 
+	
+	
 
 }
