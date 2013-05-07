@@ -96,12 +96,7 @@ public class UserActivity extends Activity {
 			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
             robitOrderFragment.unRegisterService();
 			finish();
-			HttpClientUtil.setConfigInfo(null);
-			HttpClientUtil.setParams(null);
-			HttpClientUtil.setSeatNum(null);
-			HttpClientUtil.setTicketNo(null);
-			HttpClientUtil.setToken(null);
-			HttpClientUtil.setUserInfoMap(null);
+			cleanInfo();
 			break;
 		case R.id.tab5:
 			hideFragment = fm.findFragmentByTag("tab4");
@@ -147,6 +142,18 @@ public class UserActivity extends Activity {
 	
 	public void setCurrentFragment(Fragment fragment){
 		this.currentFragment = fragment;
+	}
+	
+	/**
+	 * 登出清楚状态
+	 */
+	public void cleanInfo(){
+		HttpClientUtil.setConfigInfo(null);
+		HttpClientUtil.setParams(null);
+		HttpClientUtil.setSeatNum(null);
+		HttpClientUtil.setTicketNo(null);
+		HttpClientUtil.setToken(null);
+		HttpClientUtil.setUserInfoMap(null);
 	}
 	
 	protected void dialog() { 
