@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
+import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.service.RobitOrderService;
 
 public class JsoupUtil {
@@ -247,6 +248,7 @@ public class JsoupUtil {
 							order.setOrderNo(StringUtils.split(element4.attr("name"),"_")[2]);
 						}
 						OrderInfo orderInfo = new OrderInfo();
+						orderInfo.setTicketNo(element4.attr("value"));
 						String [] infos = StringUtils.split(element3.text()," ");
 						StringBuilder sbBuilder = new StringBuilder();
 						if(order.getOrderNo() == null){
@@ -398,6 +400,46 @@ public class JsoupUtil {
 				element = document.getElementById("transferForm");
 			}
 			return element.getElementsByTag("input").get(0).attr("value");
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取点击付款按钮后的信息
+	 * @param inputStream
+	 */
+	public static PayInfo getPayInitParam(InputStream inputStream){
+		try {
+			Document document = getPageDocument(inputStream);
+			if(document != null){
+				Element timElement = document.getElementsByClass("f_blue").get(0);
+//				Log.i("getPayInitParam","剩余分钟数"+timElement.childNode(1).childNode(0).toString());
+				Element element = document.getElementById("epayForm");
+				if(element != null){
+					PayInfo payInfo = new PayInfo();
+					payInfo.setLastTime(timElement.childNode(1).childNode(0).toString());
+					payInfo.setPayUrl(element.attr("action"));
+					List<Node> nodes =  element.childNodes();
+					for(Node node:nodes){
+						if("interfaceName".equals(node.attr("name"))){
+							payInfo.setInterfaceName(node.attr("value"));
+						}else if("interfaceVersion".equals(node.attr("name"))){
+							payInfo.setInterfaceVersion(node.attr("value"));
+						}else if("tranData".equals(node.attr("name"))){
+							payInfo.setTranData(node.attr("value"));
+						}else if("merSignMsg".equals(node.attr("name"))){
+							payInfo.setMerSignMsg(node.attr("value"));
+						}else if("appId".equals(node.attr("name"))){
+							payInfo.setAppId(node.attr("value"));
+						}else if("transType".equals(node.attr("name"))){
+							payInfo.setTransType(node.attr("value"));
+						}
+					}
+					return payInfo;
+				}
+			}
+		} catch (Exception e) {
+			Log.e("JsoupUtil","getPayInitParam",e);
 		}
 		return null;
 	}

@@ -19,7 +19,7 @@
 
     <Button
         android:id="@+id/refund"
-        android:layout_width="150dp"
+        android:layout_width="100dp"
         android:layout_height="60dp"
         android:layout_alignParentRight="true"
         android:focusable="false"
@@ -29,12 +29,20 @@
 
     <Button
         android:id="@+id/pay"
-        android:layout_width="150dp"
+        android:layout_width="100dp"
         android:layout_height="60dp"
         android:focusable="false"
         android:layout_alignBaseline="@+id/refund"
         android:layout_alignBottom="@+id/refund"
         android:layout_toLeftOf="@+id/refund"
         android:text="@string/payButton" />
+
+    <Button
+        android:id="@+id/lastTimeButton"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_alignBottom="@+id/pay"
+        android:layout_toLeftOf="@+id/pay"
+        android:text="@string/lastTime" />
     
 </RelativeLayout>

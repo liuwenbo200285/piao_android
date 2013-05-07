@@ -32,6 +32,7 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
@@ -198,9 +199,11 @@ public class NoCompletedOrderFragment extends Fragment {
 					sbBuilder.append(order.getOrderDate());
 					Button refundButton = (Button)view.findViewById(R.id.refund);
 					Button payButton = (Button)view.findViewById(R.id.pay);
+					Button lastTimeButton = (Button)view.findViewById(R.id.lastTimeButton);
 					if(StringUtils.isEmpty(order.getOrderNo())){
 						refundButton.setVisibility(View.INVISIBLE);
 						payButton.setVisibility(View.INVISIBLE);
+						lastTimeButton.setVisibility(View.INVISIBLE);
 					}else{
 						sbBuilder.append("\n订  单  号： "+order.getOrderNo());
 						refundButton.setOnClickListener(new OnClickListener() {
@@ -260,7 +263,75 @@ public class NoCompletedOrderFragment extends Fragment {
 						payButton.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								
+								AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+								.setIcon(android.R.drawable.btn_dropdown)
+								.setTitle("订单号："+order.getOrderNo())
+								.setMessage("您确认要付款吗？")
+								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										new AsyncTask<String,Integer,PayInfo>(){
+											private ProgressDialog progressDialog;
+											@Override
+											protected PayInfo doInBackground(
+													String... params) {
+												return OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
+														order.getOrderInfos().get(0).getTicketNo());
+											}
+
+											@Override
+											protected void onPostExecute(
+													PayInfo result) {
+												progressDialog.dismiss();
+												super.onPostExecute(result);
+											}
+
+											@Override
+											protected void onPreExecute() {
+												progressDialog = ProgressDialog.show(activity,"付款信息","正在获取付款信息...",true,false);
+												super.onPreExecute();
+											}
+										}.execute("");
+									}
+								})
+								.setNegativeButton("取消",
+										new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog,
+													int which) {
+												cancelDialog.hide();
+											}
+										});
+								cancelDialog = builder.create();
+								cancelDialog.show();
+							}
+						});
+						lastTimeButton.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								new AsyncTask<String,Integer,String>(){
+									private ProgressDialog progressDialog;
+									@Override
+									protected String doInBackground(
+											String... params) {
+										return OperationUtil.getLastTime(order.getOrderNo(),order.getToken(),
+												order.getOrderInfos().get(0).getTicketNo());
+									}
+
+									@Override
+									protected void onPostExecute(
+											String result) {
+										progressDialog.dismiss();
+										LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
+										super.onPostExecute(result);
+									}
+
+									@Override
+									protected void onPreExecute() {
+										progressDialog = ProgressDialog.show(activity,"剩余付款时间","正在查询剩余付款时间...",true,false);
+										super.onPreExecute();
+									}
+								}.execute("");
 							}
 						});
 					}

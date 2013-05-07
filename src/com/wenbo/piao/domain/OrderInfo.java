@@ -14,6 +14,8 @@ public class OrderInfo {
 	private String passengersInfo;
 	
 	private String statusInfo;
+	
+	private String ticketNo;
 
 	public String getTrainInfo() {
 		return trainInfo;
@@ -46,5 +48,12 @@ public class OrderInfo {
 	public void setStatusInfo(String statusInfo) {
 		this.statusInfo = statusInfo;
 	}
-	
+
+	public String getTicketNo() {
+		return ticketNo;
+	}
+
+	public void setTicketNo(String ticketNo) {
+		this.ticketNo = ticketNo;
+	}
 }
