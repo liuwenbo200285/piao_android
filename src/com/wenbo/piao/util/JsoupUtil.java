@@ -239,27 +239,68 @@ public class JsoupUtil {
 					Element element3 = elements3.get(i);
 					if(i !=0 && i != elements3.size()-1){
 						Element element4 = element3.getElementById("checkbox_pay");
-						if(StringUtils.isBlank(order.getOrderNo())){
+						if(StringUtils.isBlank(order.getOrderNo())
+								&& element4 != null){
 							order.setOrderNo(StringUtils.split(element4.attr("name"),"_")[2]);
 						}
 						OrderInfo orderInfo = new OrderInfo();
 						String [] infos = StringUtils.split(element3.text()," ");
 						StringBuilder sbBuilder = new StringBuilder();
-						for(int n = 0; n < infos.length;n++){
-							sbBuilder.append(infos[n]+"\n");
-							if(n == 3){
-								orderInfo.setTrainInfo(sbBuilder.toString());
-								order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
-								sbBuilder.delete(0,sbBuilder.length());
-							}else if(n == 8){
-								orderInfo.setSeatInfo(sbBuilder.toString());
-								sbBuilder.delete(0,sbBuilder.length());
-							}else if(n == 10){
-								orderInfo.setPassengersInfo(sbBuilder.toString());
-								sbBuilder.delete(0,sbBuilder.length());
-							}else if(n == 11){
-								orderInfo.setStatusInfo(sbBuilder.toString());
-								sbBuilder.delete(0,sbBuilder.length());
+						if(order.getOrderNo() == null){
+							if(i == 1){
+								for(int n = 0; n < infos.length;n++){
+									sbBuilder.append(infos[n]+"\n");
+									if(n == 3){
+										orderInfo.setTrainInfo(sbBuilder.toString());
+										order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
+										sbBuilder.delete(0,sbBuilder.length());
+									}
+									if(n == 5){
+										orderInfo.setSeatInfo(sbBuilder.toString());
+										sbBuilder.delete(0,sbBuilder.length());
+									}else if(n == 7){
+										orderInfo.setPassengersInfo(sbBuilder.toString());
+										sbBuilder.delete(0,sbBuilder.length());
+									}else if(n == 9){
+										orderInfo.setStatusInfo(sbBuilder.toString());
+										order.setOrderStatus(orderInfo.getStatusInfo());
+										sbBuilder.delete(0,sbBuilder.length());
+									}
+								}
+							}else{
+								for(int n = 0; n < infos.length;n++){
+									orderInfo.setStatusInfo(order.getOrderStatus());
+									orderInfo.setTrainInfo(StringUtils.replace(order.getTrainInfo()," ","\n"));
+									sbBuilder.append(infos[n]+"\n");
+									if(n == 1){
+										orderInfo.setSeatInfo(sbBuilder.toString());
+										sbBuilder.delete(0,sbBuilder.length());
+									}else if(n == 3){
+										orderInfo.setPassengersInfo(sbBuilder.toString());
+										sbBuilder.delete(0,sbBuilder.length());
+									}
+								}
+							}
+							order.setOrderStatus(StringUtils.replace(order.getOrderStatus(),"\n","，"));
+						}else{
+							for(int n = 0; n < infos.length;n++){
+								sbBuilder.append(infos[n]+"\n");
+								if(n == 3){
+									orderInfo.setTrainInfo(sbBuilder.toString());
+									order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
+									sbBuilder.delete(0,sbBuilder.length());
+								}
+								if(n == 8){
+									orderInfo.setSeatInfo(sbBuilder.toString());
+									sbBuilder.delete(0,sbBuilder.length());
+								}else if(n == 10){
+									orderInfo.setPassengersInfo(sbBuilder.toString());
+									sbBuilder.delete(0,sbBuilder.length());
+								}else if(n == 11){
+									orderInfo.setStatusInfo(sbBuilder.toString());
+									order.setOrderStatus(orderInfo.getStatusInfo());
+									sbBuilder.delete(0,sbBuilder.length());
+								}
 							}
 						}
 						orderInfos.add(orderInfo);
@@ -312,7 +353,7 @@ public class JsoupUtil {
 							sbBuilder.append(infos[n]+"\n");
 							if(n == 3){
 								orderInfo.setTrainInfo(sbBuilder.toString());
-								order.setTrainInfo(orderInfo.getTrainInfo());
+								order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 8){
 								orderInfo.setSeatInfo(sbBuilder.toString());
@@ -322,6 +363,7 @@ public class JsoupUtil {
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 11){
 								orderInfo.setStatusInfo(sbBuilder.toString());
+								order.setOrderStatus(orderInfo.getStatusInfo());
 								sbBuilder.delete(0,sbBuilder.length());
 							}
 						}

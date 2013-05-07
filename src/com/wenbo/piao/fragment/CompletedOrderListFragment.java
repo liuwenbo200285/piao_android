@@ -4,25 +4,29 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.wenbo.piao.R;
-import com.wenbo.piao.domain.Order;
-import com.wenbo.piao.domain.OrderInfo;
-import com.wenbo.piao.util.HttpClientUtil;
-
-import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.wenbo.piao.R;
+import com.wenbo.piao.activity.UserActivity;
+import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.util.HttpClientUtil;
+
 public class CompletedOrderListFragment extends Fragment {
 	
-	private Activity activity;
+	private UserActivity activity;
 	
 	private ListView listView;
 	
@@ -35,11 +39,30 @@ public class CompletedOrderListFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		activity = getActivity();
+		activity = (UserActivity)getActivity();
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
-		List<Order> orders = HttpClientUtil.getMyOrders();
+		final List<Order> orders = HttpClientUtil.getMyOrders();
 		OrderAdapter adapter = new OrderAdapter(activity,0,orders);
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				HttpClientUtil.setSelectOrder(orders.get(arg2));
+				FragmentManager fm = activity.getFragmentManager();
+				FragmentTransaction ft = fm.beginTransaction();
+		    	Fragment listFragment = null;
+		    	listFragment = fm.findFragmentByTag("orderDetail");
+		    	if(listFragment == null){
+		    		listFragment = new OrderDetailFragment();
+		    	}
+				ft.replace(R.id.details,listFragment,"orderDetail");
+				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+				ft.addToBackStack(null);
+				ft.commit();
+				activity.setCurrentFragment(listFragment);
+			}
+		});
 		super.onActivityCreated(savedInstanceState);
 	}
 
@@ -94,29 +117,19 @@ public class CompletedOrderListFragment extends Fragment {
 			View view = convertView;
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.nocompeletedorderview, null);
+				view = inflater.inflate(R.layout.nocompeletedorderdetail, null);
 			}
 			Order order = items.get(position);
 			if (order != null) {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
+					Button refundButton = (Button)view.findViewById(R.id.refund);
+					Button payButton = (Button)view.findViewById(R.id.pay);
+					payButton.setVisibility(View.INVISIBLE);
+					refundButton.setText("退票");
 					TextView orderInfo = (TextView) view
 							.findViewById(R.id.orderTextView);
-					orderInfo.setText(order.getOrderDate().trim()+"      "+order.getOrderNum()+"\n订  单  号： "+order.getOrderNo());
-				}
-				OrderInfo info = order.getOrderInfo();
-				if(info != null){
-					TextView trainInfo = (TextView) view
-							.findViewById(R.id.trainInfoTextView);
-					trainInfo.setText(info.getTrainInfo());
-					TextView seatInfo = (TextView) view
-							.findViewById(R.id.seatInfoTextView);
-					seatInfo.setText(info.getSeatInfo());
-					TextView passengersInfo = (TextView) view
-							.findViewById(R.id.passengersInfoTextView);
-					passengersInfo.setText(info.getPassengersInfo());
-					TextView statusInfo = (TextView) view
-							.findViewById(R.id.statusInfoTextView);
-					statusInfo.setText(info.getStatusInfo());
+					orderInfo.setText(order.getOrderDate()+"\n订  单  号： "+order.getOrderNo()+"\n车次信息： "+order.getTrainInfo().trim()
+							+"\n总  张  数： "+order.getOrderNum()+"张\n订单状态： "+order.getOrderStatus());
 				}
 			}
 			return view;

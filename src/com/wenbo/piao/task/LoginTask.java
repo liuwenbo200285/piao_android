@@ -107,7 +107,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 			break;
 		case 4:
-			LoginDialog.newInstance("系统错误！").show(activity.getFragmentManager(),"dialog"); 
+			LoginDialog.newInstance("系统维护中！").show(activity.getFragmentManager(),"dialog"); 
 			break;
 		default:
 			LoginDialog.newInstance("请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 

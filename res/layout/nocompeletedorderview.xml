@@ -7,21 +7,13 @@
     android:paddingLeft="6dip" android:paddingBottom="6dip"
     >
 <TextView
-    android:id="@+id/orderTextView"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textIsSelectable="true"
-    android:textSize="20sp" 
-    android:textColor="@color/dark"/>
-
-<TextView
     android:id="@+id/textView1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
-    android:layout_below="@+id/orderTextView"
     android:gravity="center"
     android:textSize="16sp"
+    android:textColor="@color/dark"
     android:text="@string/trainInfo" />
 
 <TextView
@@ -31,9 +23,21 @@
     android:layout_alignBaseline="@+id/textView1"
     android:layout_alignBottom="@+id/textView1"
     android:layout_marginLeft="18dp"
+    android:textColor="@color/dark"
     android:layout_toRightOf="@+id/trainInfoTextView"
     android:textSize="16sp"
     android:text="@string/seatInfo" />
+
+<TextView
+    android:id="@+id/textView3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="16dp"
+    android:layout_toRightOf="@+id/textView2"
+    android:gravity="center"
+    android:text="@string/passengersInfo"
+    android:textColor="@color/dark"
+    android:textSize="16sp" />
 
 <TextView
     android:id="@+id/textView4"
@@ -41,9 +45,9 @@
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
     android:layout_marginLeft="20dp"
-    android:layout_below="@+id/orderTextView"
     android:layout_toRightOf="@+id/textView3"
     android:textSize="16sp"
+    android:textColor="@color/dark"
     android:text="@string/statusInfo" />
 
 <TextView
@@ -87,15 +91,5 @@
     android:text="已出票"
     android:textIsSelectable="true" />
 
-<TextView
-    android:id="@+id/textView3"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/orderTextView"
-    android:layout_marginLeft="16dp"
-    android:layout_toRightOf="@+id/textView2"
-    android:gravity="center"
-    android:text="@string/passengersInfo"
-    android:textSize="16sp" />
 
 </RelativeLayout>
