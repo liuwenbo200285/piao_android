@@ -6,16 +6,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -32,6 +35,7 @@ import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
+import com.wenbo.piao.util.OperationUtil;
 
 public class NoCompletedOrderFragment extends Fragment {
 	private UserActivity activity;
@@ -41,6 +45,8 @@ public class NoCompletedOrderFragment extends Fragment {
 	private ProgressDialog progressDialog;
 	
 	private ListView listView;
+	
+	private AlertDialog cancelDialog;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -71,6 +77,11 @@ public class NoCompletedOrderFragment extends Fragment {
 			}
 		});
 		noCompletedOrders = HttpClientUtil.getNoCompletedOrders();
+		getOrder();
+		super.onActivityCreated(savedInstanceState);
+	}
+	
+	private void getOrder(){
 		if(noCompletedOrders == null || noCompletedOrders.isEmpty()){
 			new AsyncTask<Integer,Integer,Integer>() {
 				@Override
@@ -108,7 +119,6 @@ public class NoCompletedOrderFragment extends Fragment {
 		}else{
 			showView();
 		}
-		super.onActivityCreated(savedInstanceState);
 	}
 	
 	private void showView(){
@@ -180,19 +190,79 @@ public class NoCompletedOrderFragment extends Fragment {
 				LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				view = inflater.inflate(R.layout.nocompeletedorderdetail, null);
 			}
-			Order order = items.get(position);
+			final Order order = items.get(position);
 			if (order != null) {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
 					TextView orderInfo = (TextView) view.findViewById(R.id.orderTextView);
 					StringBuilder sbBuilder = new StringBuilder();
 					sbBuilder.append(order.getOrderDate());
+					Button refundButton = (Button)view.findViewById(R.id.refund);
+					Button payButton = (Button)view.findViewById(R.id.pay);
 					if(StringUtils.isEmpty(order.getOrderNo())){
-						Button refundButton = (Button)view.findViewById(R.id.refund);
 						refundButton.setVisibility(View.INVISIBLE);
-						Button payButton = (Button)view.findViewById(R.id.pay);
 						payButton.setVisibility(View.INVISIBLE);
 					}else{
 						sbBuilder.append("\n订  单  号： "+order.getOrderNo());
+						refundButton.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+								.setIcon(android.R.drawable.btn_dropdown)
+								.setTitle("订单号："+order.getOrderNo())
+								.setMessage("您确认要取消该订单吗？")
+								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										new AsyncTask<String,Integer,String>(){
+											private ProgressDialog progressDialog;
+											@Override
+											protected String doInBackground(
+													String... params) {
+												return OperationUtil.canelOrder(order.getOrderNo(),order.getToken());
+											}
+
+											@Override
+											protected void onPostExecute(
+													String result) {
+												progressDialog.dismiss();
+												if(result.equals(OperationUtil.OPERATION_SUCCESS)){
+													LoginDialog.newInstance( "取消订单成功！").show(activity.getFragmentManager(),"dialog");
+													HttpClientUtil.setNoCompletedOrders(null);
+													noCompletedOrders.clear();
+													OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+													listView.setAdapter(adapter);
+												}else{
+													LoginDialog.newInstance( "取消订单失败！").show(activity.getFragmentManager(),"dialog"); 
+												}
+												super.onPostExecute(result);
+											}
+
+											@Override
+											protected void onPreExecute() {
+												progressDialog = ProgressDialog.show(activity,"取消订单","正在取消订单...",true,false);
+												super.onPreExecute();
+											}
+										}.execute("");
+									}
+								})
+								.setNegativeButton("取消",
+										new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog,
+													int which) {
+												cancelDialog.hide();
+											}
+										});
+								cancelDialog = builder.create();
+								cancelDialog.show();
+							}
+						});
+						payButton.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								
+							}
+						});
 					}
 					sbBuilder.append("\n车次信息： "+order.getTrainInfo()
 							+"\n总  张  数： "+order.getOrderNum()+"张\n订单状态： "+order.getOrderStatus());

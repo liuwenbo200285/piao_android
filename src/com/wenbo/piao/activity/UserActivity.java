@@ -149,12 +149,15 @@ public class UserActivity extends Activity {
 	 * 登出清楚状态
 	 */
 	public void cleanInfo(){
-		HttpClientUtil.setConfigInfo(null);
-		HttpClientUtil.setParams(null);
-		HttpClientUtil.setSeatNum(null);
-		HttpClientUtil.setTicketNo(null);
-		HttpClientUtil.setToken(null);
-		HttpClientUtil.setUserInfoMap(null);
+		 HttpClientUtil.setAccount(null);
+         HttpClientUtil.setConfigInfo(null);
+         HttpClientUtil.setMyOrders(null);
+         HttpClientUtil.setParams(null);
+         HttpClientUtil.setSeatNum(null);
+         HttpClientUtil.setTicketNo(null);
+         HttpClientUtil.setToken(null);
+         HttpClientUtil.setUserInfoMap(null);
+         HttpClientUtil.setNoCompletedOrders(null);
 	}
 	
 	protected void dialog() { 
@@ -169,15 +172,7 @@ public class UserActivity extends Activity {
                         RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
                         robitOrderFragment.unRegisterService();
                         UserActivity.this.finish(); 
-                        HttpClientUtil.setAccount(null);
-                        HttpClientUtil.setConfigInfo(null);
-                        HttpClientUtil.setMyOrders(null);
-                        HttpClientUtil.setParams(null);
-                        HttpClientUtil.setSeatNum(null);
-                        HttpClientUtil.setTicketNo(null);
-                        HttpClientUtil.setToken(null);
-                        HttpClientUtil.setUserInfoMap(null);
-                        HttpClientUtil.setNoCompletedOrders(null);
+                        cleanInfo();
                     } 
                 }); 
         builder.setNegativeButton("取消", 

@@ -106,7 +106,7 @@ public class JsoupUtil {
 			    			}else if(StringUtils.isNumeric(nn)){
 			    				if((index = StringUtils.indexOf(type, n+",")) != -1){
 			    					Log.i("JsoupUtil:checkHaveTicket",trainNo+"有票:"+nn+"张!");
-			    					robitOrderService.sendInfo(trainNo+"有票:"+nn+"张!");
+			    					robitOrderService.sendInfo(trainNo+"有"+HttpClientUtil.getSeatTypeMap(n)+"票:"+nn+"张!");
 			    					max = compare(max,index);
 			    					if(max != 10000000){
 			    						return n;
@@ -121,7 +121,7 @@ public class JsoupUtil {
 			    }else if("#008800".equals(node.attr("color"))){
 			    	if((index = StringUtils.indexOf(type, n+",")) != -1){
 //			    		logger.info(trainNo+"有大量的票!");
-			    		robitOrderService.sendInfo(trainNo+"有大量的票!");
+			    		robitOrderService.sendInfo(trainNo+"有大量的"+HttpClientUtil.getSeatTypeMap(n)+"票!");
 			    		max = compare(max,index);
 			    		if(max != 10000000){
     						return n;
@@ -220,10 +220,13 @@ public class JsoupUtil {
 		List<Order> orders = new ArrayList<Order>();
 		try {
 			Document document = getPageDocument(inputStream);
+			Element tokenElement = document.getElementById("myOrderForm");
+			String token = tokenElement.getElementsByTag("input").get(0).attr("value");
 			Elements elements = document.getElementsByClass("tab_conw");
 			Order order = null;
 			for(Element element:elements){
 				order = new Order();
+				order.setToken(token);
 				Element element2 = element.getElementsByClass("jdan_tfont").get(0);
 				Elements elements2 = element2.getElementsByTag("li");
 				for(Element element3:elements2){

@@ -191,6 +191,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 						LoginDialog.newInstance("请选择订票乘客！").show(
 								activity.getFragmentManager(), "dialog");
 						return;
+					}else if(StringUtils.split(orderPerson,",").length > 5){
+						LoginDialog.newInstance("一个账号最多只能预定5张火车票！").show(
+								activity.getFragmentManager(), "dialog");
+						return;
 					}
 					configInfo.setOrderPerson(orderPerson);
 					String trainType = selectTrainTypeText.getText().toString();

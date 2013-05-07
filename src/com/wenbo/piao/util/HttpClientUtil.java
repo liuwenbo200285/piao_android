@@ -45,6 +45,7 @@ import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.wenbo.piao.domain.ConfigInfo;
@@ -74,6 +75,8 @@ public class HttpClientUtil {
 	private static String ticketNo;
 	
 	public static Map<String,String> seatMap;
+	
+	public static String[] seatTypeArray = {"商务座","特等座","一等座","二等座","高级软卧","软卧","硬卧","软座","硬座","无座"};
 	
 	public static Map<String,String> trainTypeMap;
 	
@@ -307,6 +310,10 @@ public class HttpClientUtil {
 			seatMap.put("无座","10");
 		}
 		return seatMap;
+	}
+	
+	public static String getSeatTypeMap(int n){
+		return seatTypeArray[n-1];
 	}
 
 	public static Map<String, String> getTrainTypeMap() {

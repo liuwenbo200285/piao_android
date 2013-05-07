@@ -221,6 +221,7 @@ OnClickListener,android.view.View.OnClickListener {
 					response = HttpClientUtil.getHttpClient().execute(httpGet);
 					if (response.getStatusLine().getStatusCode() == 200) {
 						String token = JsoupUtil.getMyOrderInit(response.getEntity().getContent(),1);
+						HttpClientUtil.setToken(token);
 						List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 						parameters.add(new BasicNameValuePair("method","queryMyOrder"));
 						parameters.add(new BasicNameValuePair("org.apache.struts.taglib.html.TOKEN",token));
