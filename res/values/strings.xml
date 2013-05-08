@@ -76,4 +76,5 @@
 	<string name="refundButton">退票</string>
 	<string name="payButton">付款</string>
 	<string name="lastTime">剩余时间</string>
+	<string name="desc">描述</string>
 </resources>

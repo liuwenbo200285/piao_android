@@ -17,6 +17,14 @@ public class PayInfo {
 	private String transType;
 	
 	private String lastTime;
+	
+	private String merCustomIp;
+	
+	private String orderTimeoutDate;
+	
+	private String bankId;
+	
+	private String payMoney;
 
 	public String getPayUrl() {
 		return payUrl;
@@ -80,5 +88,37 @@ public class PayInfo {
 
 	public void setLastTime(String lastTime) {
 		this.lastTime = lastTime;
+	}
+
+	public String getMerCustomIp() {
+		return merCustomIp;
+	}
+
+	public void setMerCustomIp(String merCustomIp) {
+		this.merCustomIp = merCustomIp;
+	}
+
+	public String getOrderTimeoutDate() {
+		return orderTimeoutDate;
+	}
+
+	public void setOrderTimeoutDate(String orderTimeoutDate) {
+		this.orderTimeoutDate = orderTimeoutDate;
+	}
+
+	public String getBankId() {
+		return bankId;
+	}
+
+	public void setBankId(String bankId) {
+		this.bankId = bankId;
+	}
+
+	public String getPayMoney() {
+		return payMoney;
+	}
+
+	public void setPayMoney(String payMoney) {
+		this.payMoney = payMoney;
 	}
 }

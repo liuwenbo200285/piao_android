@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TextView
+        android:id="@+id/payInfoText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:textIsSelectable="true"
+        android:textColor="@color/dark"
+        android:textSize="18sp"
+        android:layout_alignParentTop="true"/>
+
+    <ImageView
+        android:id="@+id/bocImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/ccbImage"
+        android:layout_alignTop="@+id/abcImage"
+        android:scaleType="fitXY"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_zgyh2" />
+
+    <ImageView
+        android:id="@+id/cmbcImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignLeft="@+id/bocImage"
+        android:layout_alignTop="@+id/unionPayImage"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_zsyh2" />
+
+    <ImageView
+        android:id="@+id/abcImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignLeft="@+id/icbcImage"
+        android:layout_below="@+id/icbcImage"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_nyyh2" />
+
+    <ImageView
+        android:id="@+id/unionPayImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignLeft="@+id/abcImage"
+        android:layout_below="@+id/abcImage"
+        android:layout_marginTop="20dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_zgyl" />
+
+    <ImageView
+        android:id="@+id/ccbImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_above="@+id/abcImage"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_jsyh2" />
+
+    <ImageView
+        android:id="@+id/baikeImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/unionPayImage"
+        android:layout_marginTop="20dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_ztytk" />
+
+    <ImageView
+        android:id="@+id/icbcImage"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/payInfoText"
+        android:layout_marginTop="30dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/bank_gsyh2" />
+
+</RelativeLayout>

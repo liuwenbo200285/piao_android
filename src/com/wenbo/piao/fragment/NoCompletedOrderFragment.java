@@ -48,6 +48,8 @@ public class NoCompletedOrderFragment extends Fragment {
 	private ListView listView;
 	
 	private AlertDialog cancelDialog;
+	
+	private FragmentManager fm;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -57,13 +59,13 @@ public class NoCompletedOrderFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		activity = (UserActivity)getActivity();
+		fm = activity.getFragmentManager();
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				HttpClientUtil.setSelectOrder(noCompletedOrders.get(arg2));
-				FragmentManager fm = activity.getFragmentManager();
 				FragmentTransaction ft = fm.beginTransaction();
 		    	Fragment listFragment = null;
 		    	listFragment = fm.findFragmentByTag("orderDetail");
@@ -270,28 +272,44 @@ public class NoCompletedOrderFragment extends Fragment {
 								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										new AsyncTask<String,Integer,String>(){
+										new AsyncTask<String,Integer,PayInfo>(){
 											private ProgressDialog progressDialog;
 											@Override
-											protected String doInBackground(
+											protected PayInfo doInBackground(
 													String... params) {
 												PayInfo payInfo = OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
 														order.getOrderInfos().get(0).getTicketNo());
 												if(payInfo == null){
 													return null;
 												}
-												return OperationUtil.toPaySubmit(payInfo);
+												payInfo = OperationUtil.toPaySubmit(payInfo);
+												if(payInfo == null){
+													return null;
+												}
+												return payInfo;
 											}
 
 											@Override
 											protected void onPostExecute(
-													String result) {
+													PayInfo result) {
 												progressDialog.dismiss();
 												if(result == null){
 													LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+													OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+													listView.setAdapter(adapter);
 													return;
 												}
-												Log.i("NoCompletedOrderFragment:getView", result);
+												HttpClientUtil.setPayInfo(result);
+												FragmentTransaction ft = fm.beginTransaction();
+										    	 Fragment selectBankFragment = fm.findFragmentByTag("selectBankFragment");
+										    	if(selectBankFragment == null){
+										    		selectBankFragment = new SelectBankFragment();
+										    	}
+												ft.replace(R.id.details,selectBankFragment,"selectBankFragment");
+												ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+												ft.addToBackStack(null);
+												ft.commit();
+												activity.setCurrentFragment(selectBankFragment);
 												super.onPostExecute(result);
 											}
 
@@ -333,6 +351,8 @@ public class NoCompletedOrderFragment extends Fragment {
 										progressDialog.dismiss();
 										if(result == null){
 											LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+											OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+											listView.setAdapter(adapter);
 										}else{
 											LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
 										}

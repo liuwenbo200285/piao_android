@@ -21,6 +21,7 @@ import com.wenbo.piao.fragment.ContactFragment;
 import com.wenbo.piao.fragment.OrderDetailFragment;
 import com.wenbo.piao.fragment.OrderInfoFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
+import com.wenbo.piao.fragment.SelectBankFragment;
 import com.wenbo.piao.util.HttpClientUtil;
 
 public class UserActivity extends Activity {
@@ -130,7 +131,8 @@ public class UserActivity extends Activity {
 		 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
 			    if(currentFragment != null 
 			    		&& currentFragment.getClass() != CompletedOrderListFragment.class
-			    		&& currentFragment.getClass() != OrderDetailFragment.class){
+			    		&& currentFragment.getClass() != OrderDetailFragment.class
+			    		&& currentFragment.getClass() != SelectBankFragment.class){
 			    	dialog(); 
 		            return true;
 			    }else{
@@ -158,6 +160,8 @@ public class UserActivity extends Activity {
          HttpClientUtil.setToken(null);
          HttpClientUtil.setUserInfoMap(null);
          HttpClientUtil.setNoCompletedOrders(null);
+         HttpClientUtil.setPayInfo(null);
+         HttpClientUtil.setSelectOrder(null);
 	}
 	
 	protected void dialog() { 

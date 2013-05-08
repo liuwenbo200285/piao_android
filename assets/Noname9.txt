@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <title>中国铁路电子支付平台</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+  <link href="pages/web/css/bank.css" rel="stylesheet" type="text/css" /> 
+  <link rel="shortcut icon" href="http://www.12306.cn/mormhweb/images/favicon.ico" /> 
+  <link rel="bookmark" href="http://www.12306.cn/mormhweb/images/favicon.ico" /> 
+  <script type="text/javascript">
+var issubmit=false;
+document.oncontextmenu=function(){return false;}
+function formsubmit(bankId){
+	//if(!issubmit){
+		issubmit=true;
+		document.getElementsByName("bankId")[0].value=bankId;
+		document.getElementsByName("myform")[0].submit();
+	//}
+}
+</script> 
+ </head> 
+ <body> 
+  <div class="box1"> 
+   <iframe marginheight="0" src="pages/web/mb.html" frameborder="0" width="100%" scrolling="no" height="147"></iframe> 
+  </div> 
+  <div class="box1"> 
+   <div class="nav1"> 
+    <div class="nav3">
+     <span class="nav3_1">&gt;&gt; 应付金额：</span>
+     <span class="nav3_5">212.5元</span>
+    </div> 
+    <div class="nav5">
+     请选择网上银行
+    </div> 
+   </div> 
+   <div class="nav1"> 
+    <div class="bank1"> 
+     <form action="/pay/webBusiness" method="post" name="myform"> 
+      <input type="hidden" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iR0JLIj8+CjxQYXlSZXE+PGludGVyZmFjZU5h
+bWU+UEFZX1NFUlZMRVQ8L2ludGVyZmFjZU5hbWU+PGludGVyZmFjZVZlcnNpb24+MS4wPC9pbnRl
+cmZhY2VWZXJzaW9uPjxvcmRlckRhdGU+MjAxMzA1MDkxMjM5NTY8L29yZGVyRGF0ZT48b3JkZXJU
+aW1lb3V0RGF0ZT4yMDEzMDUwOTEzMjQzOTwvb3JkZXJUaW1lb3V0RGF0ZT48b3JkZXJJZD4xRTQx
+MTk0NzUzNjAwMTAwMTEyMzk1NjM2MDwvb3JkZXJJZD48YW1vdW50PjIxMjUwPC9hbW91bnQ+PGFw
+cElkPjAwMDE8L2FwcElkPjxjdXJUeXBlPjE1NjwvY3VyVHlwZT48b3JkZXJSZW1hcmsvPjxtZXJV
+Ukw+aHR0cDovL2R5bmFtaWMuMTIzMDYuY24vb3RzcGF5Ly9vcmRlci9lTm90aWZ5QWN0aW9uLmRv
+P21ldGhvZD1lcGF5U3RhdHVzJmFtcDt1c2VyX25hbWU9YkdsMWQyVnVZbTh5TURFeU1ERT0mYW1w
+O3NlcXVlbmNlX25vPVJUUXhNVGswTnpVek5nPT0mYW1wO3BheU9yZGVySUQ9TVVVME1URTVORGMx
+TXpZd01ERXdNREV4TWpNNU5UWXpOakE9JmFtcDtyZWRpcmVjdFVSTD1hSFIwY0hNNkx5OWtlVzVo
+YldsakxqRXlNekEyTG1OdUwyOTBjM2RsWWk4dmIzSmtaWEl2WlU1dmRHbG1lVUZqZEdsdmJpNWti
+ejl0DQpaWFJvYjJROWNYVmxjbmxOZVU5eVpHVnlVM1JoZEdsakpuTmxjWFZsYm1ObFgyNXZQVVUw
+TVRFNU5EYzFNelk9JmFtcDtwYXlTdGFydD1NUT09JmFtcDtiYXRjaF9ubz1NU009JmFtcDtsb2dp
+bl9pZD1SRk4wYkRGU1FXa3dPRGc0VlU1SE1rcHNTVEZtZEZScWFEQk1hWGhQJmFtcDt0b3VyX2Zs
+YWc9Wm1NPSZhbXA7cmV0dXJuX3RvdGFsPSZhbXA7cmV0dXJuX2Nvc3Q9JmFtcDtvbGRfdGlja2V0
+X3ByaWNlPSZhbXA7cGF5X21vZGU9JmFtcDtjaGFubmVsPVJRPT08L21lclVSTD48YXBwVVJMPmh0
+dHBzOi8vMTAuMS4yMTQuMTM1OjQ0My9vdHNwYXkvb3JkZXIvZU5vdGlmeUFjdGlvbi5kbz9tZXRo
+b2Q9ZXBheU5vdGlmeTwvYXBwVVJMPjxpbm5lclVSTD5odHRwOi8vMTAuMS4xOTkuMTA2OjgyMDAv
+b3Rzd3MvcGF5Q2FsbEJhY2s8L2lubmVyVVJMPjxtZXJWQVI+YkdsMWQyVnVZbTh5TURFeU1ERTZS
+Rk4wYkRGU1FXa3dPRGc0VlU1SE1rcHNTVEZtZEZScWFEQk1hWGhQT2tVME1URTVORGMxTXpZNg0K
+TVNNNk1Ub3hPRFl3TmpVeU1UQTFPVG82T2pvNk9qbzZabU02UlE9PTwvbWVyVkFSPjx0cmFuc1R5
+cGU+MDE8L3RyYW5zVHlwZT48L1BheVJlcT4=" name="tranData" /> 
+      <input type="hidden" value="01" name="transType" /> 
+      <input type="hidden" value="1" name="channelId" /> 
+      <input type="hidden" value="0001" name="appId" /> 
+      <input type="hidden" value="ZjY7z/spINdPoIma0ikHFK+mG5tUpCyLPRgbSbOU2XMQQx4s1HN4b3gwTu30xWcYhDEyM56rx9l3
+n7nZTx6QbZ7HNT3LJxmlODEBzOdZo+4N1uRU+qG4uYVosvRZkre42U6hRjlG0GtvueKPsx81646X
+MpUkTIGYEHxPDB7iFPs=" name="merSignMsg" /> 
+      <input type="hidden" value="218.17.158.13" name="merCustomIp" /> 
+      <input type="hidden" value="20130509132439" name="orderTimeoutDate" /> 
+      <input type="hidden" name="bankId" /> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_gsyh2.gif" width="130" height="52" title="工商银行" onclick="javascript:formsubmit('01020000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_nyyh2.gif" width="130" height="52" title="农业银行" onclick="javascript:formsubmit('01030000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_zgyh2.gif" width="130" height="52" title="中国银行" onclick="javascript:formsubmit('01040000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_zsyh2.gif" width="130" height="52" title="招商银行" onclick="javascript:formsubmit('03080000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_zgyl.gif" width="130" height="52" title="中国银联" onclick="javascript:formsubmit('00011000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_ztytk.gif" width="130" height="52" title="中铁银通卡" onclick="javascript:formsubmit('00011001');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+      <div class="bank3"> 
+       <div class="bank3_5"> 
+        <img src="pages/web/images/bank_jsyh2.gif" width="130" height="52" title="建设银行" onclick="javascript:formsubmit('01050000');" style="cursor:pointer;" /> 
+       </div>
+      </div> 
+     </form> 
+    </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    <marquee width="550" onmouseout="this.start()" onmouseover="this.stop()" scrollamount="4" scrolldelay="100"> 
+    </marquee> 
+   </div> 
+   <!-- div class="nav1">
+    <div class="btn1"></div>
+    <div class="btn3"><a href="#" onclick="formsubmit();"><img src="pages/web/img/btn3.gif" /></a></div>
+  </div--> 
+  </div> 
+  <div class="box1"> 
+   <div class="footer1"> 
+    <div class="f_desc"> 
+     <ul> 
+      <li>请您选择支付银行。建议使用中国工商银行、中国农业银行、中国银行、招商银行、中国建设银行的银行卡，支付请直接点击相应银行的按钮；如果您使用其他银行的银行卡，请点击“中国银联”按钮。</li> 
+      <li>您点击支付银行后，将进入银行页面。请遵守相关银行规定进行操作。您在银行页面上进行的任何操作及其产生的任何法律后果，将按照您与银行之间签订的合同处理。本网站不承担任何责任。</li> 
+     </ul> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="box1"> 
+   <div class="f_ver">
+    <br /> 
+    <a target="_blank" href="http://www.12306.cn/mormhweb/gljd/gywm/">关于我们</a> | 
+    <a target="_blank" href="http://www.12306.cn/mormhweb/gljd/wzls/">网站声明</a>
+    <br /> 版权所有 &copy; 2008-2015 铁道部信息技术中心 中国铁道科学研究院
+    <br /> 
+    <a href="http://www.miibeian.gov.cn/" target="_blank">京ICP备10009636号</a>
+   </div> 
+  </div>  
+ </body>
+</html>
