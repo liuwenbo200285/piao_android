@@ -159,7 +159,7 @@ public class OperationUtil {
 	 * @param inputStream
 	 * @return
 	 */
-    public static String toPaySubmit(PayInfo payInfo){
+    public static PayInfo toPaySubmit(PayInfo payInfo){
     	HttpResponse response = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
@@ -171,19 +171,19 @@ public class OperationUtil {
 			parameters.add(new BasicNameValuePair("transType",payInfo.getTransType()));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
 			HttpPost httpPost = new HttpPost(UrlEnum.TO_PAY.getPath());
-			httpPost.addHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-			httpPost.addHeader("Cache-Control","max-age=0");
-			httpPost.addHeader("Connection","keep-alive");
-			httpPost.addHeader("Origin","https://dynamic.12306.cn");
-			httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
-			httpPost.addHeader("Host","dynamic.12306.cn");
 			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
-			Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
 			if (response.getStatusLine().getStatusCode() == 200) {
-				String info = EntityUtils.toString(response.getEntity());
-				Log.i("toPaySubmit", info);
+				Document document = JsoupUtil.getPageDocument(response.getEntity().getContent());
+				Element element = document.getElementsByAttributeValue("name","merCustomIp").get(0);
+				payInfo.setMerCustomIp(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","orderTimeoutDate").get(0);
+				payInfo.setOrderTimeoutDate(element.attr("value"));
+				payInfo.setPayMoney(document.getElementsByClass("nav3_5").get(0).text());
+				return payInfo;
+			}else{
+				Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
 			}
 		} catch (Exception e) {
 			Log.e("OperationUtil","canelOrder",e);

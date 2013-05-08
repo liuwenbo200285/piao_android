@@ -50,6 +50,7 @@ import android.util.Log;
 
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.Account;
@@ -85,6 +86,8 @@ public class HttpClientUtil {
 	public static Order selectOrder;
 	
 	public static List<Order> noCompletedOrders;
+	
+	public static PayInfo payInfo;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -352,5 +355,12 @@ public class HttpClientUtil {
 	public static void setNoCompletedOrders(List<Order> noCompletedOrders) {
 		HttpClientUtil.noCompletedOrders = noCompletedOrders;
 	}
-	
+
+	public static PayInfo getPayInfo() {
+		return payInfo;
+	}
+
+	public static void setPayInfo(PayInfo payInfo) {
+		HttpClientUtil.payInfo = payInfo;
+	}
 }
