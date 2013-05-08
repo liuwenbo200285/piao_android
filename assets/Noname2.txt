@@ -1,0 +1,678 @@
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=7" />
+<meta name="Robots"   content="none"/>
+<meta http-equiv="Expires" content="0"/>
+<meta http-equiv="Cache-Control"  content="no-cache"/> 
+<meta http-equiv="pragma"  content="no-cache"/> 
+<title>车票预订</title>
+
+<link  href="/otsweb/css/style.css" rel="stylesheet"  type="text/css"/>
+<link  href="/otsweb/css/newsty.css" rel="stylesheet"  type="text/css"/>
+<link  href="/otsweb/css/contact.css" rel="stylesheet"  type="text/css"/>
+<link href="/otsweb/css/validation.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/otsweb/css/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="/otsweb/css/suggest.css"/>
+<link href="/otsweb/css/cupertino/jquery-ui-1.8.2.custom.css" rel="stylesheet" type="text/css" />
+<link href="/otsweb/css/ots_common.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="http://www.12306.cn/mormhweb/images/favicon.ico"/>
+<script type="text/javascript" src="/otsweb/js/common/iepngfix_tilebg.js?version=5.75"></script>
+<script src="/otsweb/js/common/jquery-1.4.2.min.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/autoHeight.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/jquery.bgiframe.min.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/jquery.easyui.min.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/jquery.form.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/datepicker/WdatePicker.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/j.suggest.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/school_display1.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/school_suggest1.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/city_name_suggest.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/trainCodeSuggest.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/date.js?version=5.75" type="text/javascript"></script>
+<script src="/otsweb/js/common/sidetag.js?version=5.75" type="text/javascript"></script>
+
+
+<script>
+   $(document).ready(function(){
+	   if(parent.notLogin==undefined) {
+		   parent.location='/otsweb' + '/main.jsp';
+		   return;
+		   }
+	        var isHide = "";
+	        if (isHide == "true") {
+		        if(parent.hideMenu){
+		        	//parent.hideMenu();
+			    }
+		     } else {
+		    	 if(parent.showMenu){
+		    		 parent.showMenu();
+				 }
+			 }
+			 var clicktitle = '车票预订';
+			 if(parent.clickMenu&&clicktitle!==''){
+				 parent.clickMenu('车票预订');
+		     }
+
+			 
+			 var isLogin= true
+			 var u_name = '阳茜';
+			 if (isLogin) {
+			  parent.hasLogin(u_name);
+	  	     }else{
+	  	  	  parent.notLogin();
+	      	 }
+	 });
+</script>
+</head>
+<body>
+<script src="/otsweb/js/common/time_count_down.js?version=5.75"
+	type="text/javascript"></script>
+<script src="/otsweb/js/common/jquery.validate.min.js?version=5.75"
+	type="text/javascript"></script>
+<script>
+	var ctx = '/otsweb';
+	var member_id = '*';
+	//订单失效时间，用于倒计时
+	var residueTime="0";
+	var loseTime = "1367984761000";
+	var beginTime = "1367982070949";
+	var epayurl = 'https://epay.12306.cn/pay/payGateway';
+	var payfunction = function() {
+		var form = document.getElementById("epayForm");
+		if (form.action == "") {
+			form.action = epayurl;
+		}
+		form.target = "_blank";
+		form.submit();
+	};
+	//取消订单
+	function cancel() {
+		var form = document.getElementById("cancelForm");
+		form.submit();
+	}
+	//确认取消订单
+	function confirmCancel(formId) {
+		if (confirm("您确认取消订单吗?\r\n一天内3次申请车票成功后取消订单，当日将不能在网站购票！")) {
+			if ($("#" + formId).valid()) {
+				$(":button").attr("disabled", true);
+				$(":button").addClass("long_button_x");
+			}
+			cancel();
+		}
+	}
+	//重新选择
+	function cancelOrderToQuery() {
+		var form = document.getElementById("cancelForm");
+		form.action = "payConfirmOnlineSingleAction.do?method=cancelOrderToQuery";
+		form.submit();
+	}
+	//确认重新选择
+	function confirmSelect(formId) {
+		if (confirm("重新购票将取消您的订单，是否继续?\r\n一天内3次申请车票成功后取消订单，当日将不能在网站购票！")) {
+			if ($("#" + formId).valid()) {
+				$(":button").attr("disabled", true);
+				$(":button").addClass("long_button_x");
+			}
+			cancelOrderToQuery();
+		}
+	}
+	//支付成功的的动作处理
+	var successfunc = function success() {
+		var form = document.getElementById("epaySuccessForm");
+		$("#epaySuccess_isSendMsgId").val($(":radio[checked=true]").val());
+		form.target = "_self";
+		form.submit();
+	};
+
+	//支付出现问题的动作处理
+	var failfunc = function() {
+		//window.location ="/otsweb/order/pay_question.jsp";
+		var form = document.getElementById("epayFailureForm");
+		$("#epayFailure_isSendMsgId").val($(":radio[checked=true]").val());
+		form.target = "_self";
+		form.submit();
+	};
+
+	var requiredNum = "4";
+	var successTicketNum = "4";
+</script>
+<script
+	src="/otsweb/js/order/pay_confirm_online_common.js?version=5.75"
+	type="text/javascript"></script>
+<script src="/otsweb/js/integration/integration_pay.js?version=5.75"
+	type="text/javascript"></script>
+<div class="conWrap">
+	<div class="enter_w">
+		<!--title -->
+		<div class="wc_titlew">
+			<div class="wc_titleleft">
+				<img src="/otsweb/images/er/title_font7.gif" />
+				
+				
+				
+			</div>
+			<div class="wc_titler">
+				<ul>
+					<li><img src="/otsweb/images/er/jc_off.gif" />完成</li>
+					<li><img src="/otsweb/images/er/jc_on.gif" />确认</li>
+					<li><img src="/otsweb/images/er/jc_on.gif" />预订</li>
+					<li><img src="/otsweb/images/er/jc_on.gif" />查询</li>
+				</ul>
+			</div>
+		</div>
+		<!--title end-->
+		<div class="box-wrap">
+			<div class="box-top"></div>
+			<div class="box-mid textindent" style="text-align: left;">
+				<div class="wc_fontn">
+					<img src="/otsweb/images/er/wxts.gif" alt="" />
+					<p class="f_blue">
+						席位已成功锁定，请在<b>45</b>分钟内完成网上支付，否则系统将自动取消本次交易。
+					</p>
+					
+					<span class="datenew" style="color: yellow;" id="ShowTime"></span>
+				</div>
+			</div>
+			<div class="box-bottom"></div>
+		</div>
+
+		<table width="100%" border="0" cellspacing="1" cellpadding="0"
+			class="table_list">
+			<colgroup style="width: 8%">
+			</colgroup>
+			<colgroup style="width: 8%">
+			</colgroup>
+			<colgroup style="width: 17%">
+			</colgroup>
+			<colgroup style="width: 12%">
+			</colgroup>
+			<colgroup style="width: 8%">
+			</colgroup>
+			<colgroup style="width: 8%">
+			</colgroup>
+			<colgroup style="width: 8%">
+			</colgroup>
+			<colgroup style="width: 6%">
+			</colgroup>
+			<colgroup style="width: 6%">
+			</colgroup>
+			<colgroup style="width: 4%">
+			</colgroup>
+			<colgroup style="width: 7%">
+			</colgroup>
+			<colgroup style="width: 8%">
+			</colgroup>
+			<tr>
+				<th colspan="12" scope="col">订单信息</th>
+			</tr>
+			<tr class="table_th2">
+				<td>姓名</td>
+				<td>证件类型</td>
+				<td>证件号</td>
+				<td>发车日期</td>
+				<td>出发地</td>
+				<td>目的地</td>
+				<td>票种</td>
+				<td>车次</td>
+				<td>席别</td>
+				<td>车厢</td>
+				<td>席位号</td>
+				<td>票价（元）</td>
+			</tr>
+			
+
+				
+					<tr>
+
+						
+							<td rowspan="1">刘丽</td>
+							<td rowspan="1">二代身份证</td>
+							<td rowspan="1">430181198406030024</td>
+						
+						<td>2013年05月08日</td>
+						<td><p>深圳东</p>
+							<p>
+								13:30
+								开
+							</p></td>
+						<td><p>杭州南</p>
+							<p>
+								11:07
+								到
+							</p></td>
+						<td>成人票</td>
+						
+						<td>K2056</td>
+						<td>硬卧</td>
+						<td>12</td>
+						
+							
+							
+								<td>21号上铺</td>
+							
+						
+
+						<td> 355.50元</td>
+
+					</tr>
+				
+			
+
+				
+					<tr>
+
+						
+							<td rowspan="1">阳茜</td>
+							<td rowspan="1">二代身份证</td>
+							<td rowspan="1">430981198707050022</td>
+						
+						<td>2013年05月08日</td>
+						<td><p>深圳东</p>
+							<p>
+								13:30
+								开
+							</p></td>
+						<td><p>杭州南</p>
+							<p>
+								11:07
+								到
+							</p></td>
+						<td>成人票</td>
+						
+						<td>K2056</td>
+						<td>硬卧</td>
+						<td>12</td>
+						
+							
+							
+								<td>22号上铺</td>
+							
+						
+
+						<td> 355.50元</td>
+
+					</tr>
+				
+			
+
+				
+					<tr>
+
+						
+							<td rowspan="1">刘文波</td>
+							<td rowspan="1">二代身份证</td>
+							<td rowspan="1">430981198702272830</td>
+						
+						<td>2013年05月08日</td>
+						<td><p>深圳东</p>
+							<p>
+								13:30
+								开
+							</p></td>
+						<td><p>杭州南</p>
+							<p>
+								11:07
+								到
+							</p></td>
+						<td>成人票</td>
+						
+						<td>K2056</td>
+						<td>硬卧</td>
+						<td>12</td>
+						
+							
+							
+								<td>20号上铺</td>
+							
+						
+
+						<td> 355.50元</td>
+
+					</tr>
+				
+			
+
+				
+					<tr>
+
+						
+							<td rowspan="1">李生斌</td>
+							<td rowspan="1">二代身份证</td>
+							<td rowspan="1">340221198211230015</td>
+						
+						<td>2013年05月08日</td>
+						<td><p>深圳东</p>
+							<p>
+								13:30
+								开
+							</p></td>
+						<td><p>杭州南</p>
+							<p>
+								11:07
+								到
+							</p></td>
+						<td>成人票</td>
+						
+						<td>K2056</td>
+						<td>硬卧</td>
+						<td>12</td>
+						
+							
+							
+								<td>19号上铺</td>
+							
+						
+
+						<td> 355.50元</td>
+
+					</tr>
+				
+			
+			<tr class="table_zpj">
+				<td colspan="12">
+					<div id="Ticket">
+						<ul id="Num">
+							<li id="requiredNum" style="float: left" class="blue">欲购：4张</li>
+							<li id="successTicketNum" style="float: left" class="blue">成功：4张</li>
+							<li class="red">总票价：1,422.00元
+							</li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<div class="tj_btn">
+			<button onmouseout="this.className='long_button_u'"
+				onmousedown="this.className='long_button_u_down'"
+				onmousemove="this.className='long_button_u_over'"
+				class="long_button_u" onclick="confirmSelect('cancelForm');"
+				id="reChooseButton">重新购票</button>
+			<button style="display: none" class="long_button_x"
+				id="reChooseButton_x">重新购票</button>
+			&nbsp;&nbsp;
+			<button onmouseout="this.className='long_button_u'"
+				onmousedown="this.className='long_button_u_down'"
+				onmousemove="this.className='long_button_u_over'"
+				class="long_button_u" onclick="confirmCancel('cancelForm');"
+				id="cancelButton">取消订单</button>
+			<button style="display: none" class="long_button_x"
+				id="cancelButton_x">取消订单</button>
+			&nbsp;&nbsp;
+			<button onmouseout="this.className='long_button_u'"
+				onmousedown="this.className='long_button_u_down'"
+				onmousemove="this.className='long_button_u_over'"
+				class="long_button_u" id="payButton">网上支付</button>
+			<button style="display: none" class="long_button_x" id="payButton_x">网上支付</button>
+			&nbsp;&nbsp;
+
+			
+		</div>
+
+		<!-- 积分支付成功form表单 -->
+		<form name="orderForm" id="integrationPaySuccessForm" method="post" action="/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess"><div><input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="c4bfeddab337f6715a75591f31843979"></div>
+			<input type="hidden" name="sequence_no" value="E759476105">
+			<input type="hidden" name="batch_no" value="1#">
+			<input type="hidden" name="isSendMsg" value="" id="integrationPaySuccess_isSendMsgId">
+			<input type="hidden" name="get_ticket_pass" value="integrationPaySuccess">
+			<!-- 用于和成功支付相互区分 -->
+		</form>
+		<!-- 积分付失败form表单 -->
+		<form name="orderForm" id="integrationpayFailureForm" method="post" action="/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess"><div><input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="c4bfeddab337f6715a75591f31843979"></div>
+			<input type="hidden" name="sequence_no" value="E759476105">
+			<input type="hidden" name="batch_no" value="1#">
+			<input type="hidden" name="isSendMsg" value="" id="integrationpayFailure_isSendMsgId">
+			<input type="hidden" name="get_ticket_pass" value="integrationpay_question">
+			<!-- 用于和成功支付相互区分 -->
+		</form>
+
+		<!-- 网上支付 成功form表单 -->
+		<form name="orderForm" id="epaySuccessForm" method="post" action="/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess"><div><input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="c4bfeddab337f6715a75591f31843979"></div>
+			<input type="hidden" name="sequence_no" value="E759476105">
+			<input type="hidden" name="batch_no" value="1#">
+			<input type="hidden" name="isSendMsg" value="" id="epaySuccess_isSendMsgId">
+		</form>
+		<!-- 网上支付失败form表单 -->
+		<form name="orderForm" id="epayFailureForm" method="post" action="/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess"><div><input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="c4bfeddab337f6715a75591f31843979"></div>
+			<input type="hidden" name="sequence_no" value="E759476105">
+			<input type="hidden" name="batch_no" value="1#">
+			<input type="hidden" name="isSendMsg" value="" id="epayFailure_isSendMsgId">
+			<input type="hidden" name="get_ticket_pass" value="pay_question">
+			<!-- 用于和成功支付相互区分 -->
+		</form>
+		<!-- 网上支付form表单 -->
+		<form id="epayForm" action="https://epay.12306.cn/pay/payGateway" method="post" target="_blank">
+			<input type="hidden" name="interfaceName" value="PAY_SERVLET"></input>
+			<input type="hidden" name="interfaceVersion"value="1.0"></input> 
+			<input type="hidden"
+				name="tranData" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iR0JLIj8+CjxQYXlSZXE+PGludGVyZmFjZU5h
+bWU+UEFZX1NFUlZMRVQ8L2ludGVyZmFjZU5hbWU+PGludGVyZmFjZVZlcnNpb24+MS4wPC9pbnRl
+cmZhY2VWZXJzaW9uPjxvcmRlckRhdGU+MjAxMzA1MDgxMTAxMTE8L29yZGVyRGF0ZT48b3JkZXJU
+aW1lb3V0RGF0ZT4yMDEzMDUwODExNDYwMTwvb3JkZXJUaW1lb3V0RGF0ZT48b3JkZXJJZD4xRTc1
+OTQ3NjEwNTAwMTAwMTExMDExMTA1MDwvb3JkZXJJZD48YW1vdW50PjE0MjIwMDwvYW1vdW50Pjxh
+cHBJZD4wMDAxPC9hcHBJZD48Y3VyVHlwZT4xNTY8L2N1clR5cGU+PG9yZGVyUmVtYXJrLz48bWVy
+VVJMPmh0dHA6Ly9keW5hbWljLjEyMzA2LmNuL290c3BheS8vb3JkZXIvZU5vdGlmeUFjdGlvbi5k
+bz9tZXRob2Q9ZXBheVN0YXR1cyZhbXA7dXNlcl9uYW1lPWVXRnVaM2hwTWpBd01qZzEmYW1wO3Nl
+cXVlbmNlX25vPVJUYzFPVFEzTmpFd05RPT0mYW1wO3BheU9yZGVySUQ9TVVVM05UazBOell4TURV
+d01ERXdNREV4TVRBeE1URXdOVEE9JmFtcDtyZWRpcmVjdFVSTD1hSFIwY0hNNkx5OWtlVzVoYlds
+akxqRXlNekEyTG1OdUwyOTBjM2RsWWk4dmIzSmtaWEl2WlU1dmRHbG1lVUZqZEdsdmJpNWtiejl0
+DQpaWFJvYjJROWNYVmxjbmxOZVU5eVpHVnlVM1JoZEdsakpuTmxjWFZsYm1ObFgyNXZQVVUzTlRr
+ME56WXhNRFU9JmFtcDtwYXlTdGFydD1NUT09JmFtcDtiYXRjaF9ubz1NU009JmFtcDtsb2dpbl9p
+ZD1TazV0TWxoWlJ6SXllVTlxVERWRE0ydzFlRGM1UmpRNE5FNDJUVzkzJmFtcDt0b3VyX2ZsYWc9
+Wm1NPSZhbXA7cmV0dXJuX3RvdGFsPSZhbXA7cmV0dXJuX2Nvc3Q9JmFtcDtvbGRfdGlja2V0X3By
+aWNlPSZhbXA7cGF5X21vZGU9JmFtcDtjaGFubmVsPVJRPT08L21lclVSTD48YXBwVVJMPmh0dHBz
+Oi8vMTAuMS4yMTQuMTM1OjQ0My9vdHNwYXkvb3JkZXIvZU5vdGlmeUFjdGlvbi5kbz9tZXRob2Q9
+ZXBheU5vdGlmeTwvYXBwVVJMPjxpbm5lclVSTD5odHRwOi8vMTAuMS4xOTkuMTA2OjgyMDAvb3Rz
+d3MvcGF5Q2FsbEJhY2s8L2lubmVyVVJMPjxtZXJWQVI+ZVdGdVozaHBNakF3TWpnMU9rcE9iVEpZ
+V1VjeU1ubFBha3cxUXpOc05YZzNPVVkwT0RST05rMXZkenBGTnpVNU5EYzJNVEExT2pFag0KT2pF
+Nk1UTXpOemcwTWpNeE9USTZPam82T2pvNk9tWmpPa1U9PC9tZXJWQVI+PHRyYW5zVHlwZT4wMTwv
+dHJhbnNUeXBlPjwvUGF5UmVxPg=="></input> 
+<input type="hidden"
+				name="merSignMsg" value="NO90epJHAqXw9T8jVVUJktbfP0ajh35n1rqr8eQTcQk6lmhNcju+xtWoRKl1uy6LPMtgPV6n3q72
+g5Bivshw7drDz4RmuNquLUcL6sJUjcIjd6Jl2wW4D6vdUBP4nhGVBmRce0iPRHSEQay56yydLn5o
+hcXebJpv4//KUSHCCcg="></input> <input
+				type="hidden" name="appId" value="0001"></input> <input
+				type="hidden" name="transType" value="01"></input>
+		</form>
+		<!-- 网上支付 取消表单 -->
+		<form name="orderForm" id="cancelForm" method="post" action="/otsweb/order/payConfirmOnlineSingleAction.do?method=cancelOrder"><div><input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="c4bfeddab337f6715a75591f31843979"></div>
+			<input type="hidden" name="sequence_no" value="E759476105">
+			<input type="hidden" name="batch_no" value="1#">
+			
+			<input type="hidden" name="orderRequest.train_date" value="" id="start_date">
+			<input type="hidden" name="orderRequest.train_no" value="" id="train_no">
+			<input type="hidden" name="orderRequest.station_train_code" value="" id="station_train_code">
+			<input type="hidden" name="orderRequest.from_station_telecode" value="" id="start_station_telecode">
+			<input type="hidden" name="orderRequest.to_station_telecode" value="" id="end_station_telecode">
+			<input type="hidden" name="orderRequest.seat_type_code" value="" id="seat_type_code">
+			<input type="hidden" name="orderRequest.ticket_type_order_num" value="" id="ticket_type_order_num">
+			<input type="hidden" name="orderRequest.bed_level_order_num" value="000000000000000000000000000000" id="bed_level_order_num">
+			
+			<input type="hidden" name="orderRequest.start_time" value="" id="orderRequest_start_time">
+			
+			<input type="hidden" name="orderRequest.end_time" value="" id="orderRequest_end_time">
+			<input type="hidden" name="orderRequest.from_station_name" value="" id="orderRequest_start_station">
+			<input type="hidden" name="orderRequest.to_station_name" value="" id="orderRequest_end_station">
+			<input type="hidden" name="orderRequest.cancel_flag" value="2" id="cancel_flag">
+			<input type="hidden" name="orderRequest.id_mode" value="" id="orderRequest_id_mode">
+		</form>
+
+
+		<!--con end-->
+	</div>
+</div>
+<div id="integrationpay_dialog_id" style="display: none">
+	<!--title -->
+	<div class="wc_titlew">
+		<div class="wc_titleleft">
+			<img src="/otsweb/images/er/title_font8.jpg" />
+		</div>
+		<div class="wc_titler">
+			<ul>
+				<li><img src="/otsweb/images/er/jc_off.gif" />完成</li>
+				<li><img src="/otsweb/images/er/jc_on.gif" />确认</li>
+				<li><img src="/otsweb/images/er/jc_on.gif" />预订</li>
+				<li><img src="/otsweb/images/er/jc_on.gif" />查询</li>
+			</ul>
+		</div>
+	</div>
+	<!--title end-->
+
+	<!--right -->
+	<div class="pim_right_new">
+		<script type="text/javascript">
+			var ctx = '/otsweb';
+			function imgfresh() {
+				$("#img_rrand_code").attr(
+						"src",
+						ctx + "/sysuser/passCodeAction.do?rand=randm" + '&'
+								+ Math.random());
+			}
+		</script>
+		<div class="i-rmain">
+			<div class="i-mtit">积分支付</div>
+			<div class="jfzf-bd" style="width: 740px">
+				<div class="wxts-wrap" style="margin-top: 3px; padding: 2px;">
+
+					<dl class="wxts">
+
+						<dt>温馨提示：</dt>
+						<dd>1、可为本人或指定的兑奖受让人兑换全价直达票。</dd>
+						<dd>2、兑换车票每张至少需5000积分。</dd>
+						<dd>3、积分兑换的车票不予办理挂失、改签和退票。</dd>
+						<dd>4、兑换车票票面标识“赠”字，不显示票价。</dd>
+					</dl>
+
+				</div>
+				<table class="table-D mt20px" width="100%" border="0"
+					style="margin-top: 10px">
+
+					<thead>
+
+						<tr>
+							<td colspan="3">积分信息</td>
+						</tr>
+
+					</thead>
+
+					<tr>
+						<th>当前可用积分</th>
+
+						<th>需要消费积分</th>
+					</tr>
+					<tr id="consume_integration_id">
+
+					</tr>
+				</table>
+				<form
+					action="/otsweb/order/integrationPayActionConfirm.do?method=confirmPay"
+					method="post" id="integrationPayForm">
+					<table class="table-E mt20px" width="100%" border="0"
+						style="margin-top: 30px; margin-bottom: 0px;">
+						<tr>
+
+							<td
+								style="text-align: right; font-size: 14px; font-weight: bold; width: 40%;">兑奖密码：</td>
+
+							<td width="360"><input type="password"
+								class="inputtxt width100" id="consume_pwd_id" maxlength="6"
+								style="background: #FFFFFF; color: black;" /> <span
+								style="color: red;" id="passwordSpan_id"></span> <input
+								type="hidden" class="inputtxt width224"
+								value="1E759476105001001110111050" id="order_sn_id" /> <input
+								type="hidden" class="inputtxt width224" id="price_list_id" /> <input
+								type="hidden" class="inputtxt width224"
+								value="4" id="product_num_id" /> <input
+								type="hidden" class="inputtxt width224"
+								value="142200.0" id="product_price_id" />
+								 <input
+								type="hidden" class="inputtxt width224"
+								value="2013-05-08 11:01:11" id="payOrderString_id" /> <input
+								type="hidden" class="inputtxt width224"
+								value="1E759476105001001110111050" id="payOrderID_id" /> <input
+								type="hidden" class="inputtxt width224"
+								value="142200" id="amount_id" /> <input
+								type="hidden" class="inputtxt width224"
+								value="E759476105" id="sequenceNo_id" /> <input
+								type="hidden" class="inputtxt width224" value="1#"
+								id="batchNo_id" /></td>
+
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td
+								style="text-align: right; font-size: 14px; font-weight: bold; width: 40%;">验证码：</td>
+							<td colspan="2"><input type="text" class="inputtxt width100"
+								id="validate_scode_id" maxlength="4"
+								style="background: #FFFFFF; color: black;" /><span
+								class="i-yzm"><img
+									src="/otsweb/sysuser/passCodeAction.do?rand=sjrand" width="80"
+									onclick="this.src=this.src+'&'+Math.random();" height="26"
+									title="单击刷新验证码" id="img_rrand_code" /> </span> <a class="i-changepic"
+								href="#nogo" onclick="javascript:imgfresh();">看不清，换一张</a></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><span style="color: red;" id="randCodeSpan"></span></td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!--i-main end-->
+
+</div>
+
+<script type="text/javascript">
+	var ticket_price_fifty = 'false';
+	timeCountDown('Y');
+</script>
+
+</body>
+</html>
+
+<script language="javascript">
+var f = function() {
+		var message = "";
+        var messageShow ="";
+        var flag ='null';
+        if(messageShow != ""){
+			if(flag == 'u'){
+				$("#messageUp").css({display:"inline"});
+				document.getElementById("messageUp").innerHTML = message;
+			}else{
+				$("#messageDown").css({display:"inline"});
+				document.getElementById("messageDown").innerHTML = message;
+			}
+         }else{
+     		if ( message != ""){ 
+    			alert(message);
+
+    		}
+
+         } }
+         window.setTimeout(f, 500);
+</script>

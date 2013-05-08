@@ -123,7 +123,7 @@ public class NoCompletedOrderFragment extends Fragment {
 	}
 	
 	private void showView(){
-		if(noCompletedOrders.isEmpty()){
+		if(noCompletedOrders == null || noCompletedOrders.isEmpty()){
     		noCompletedOrders = null;
 			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
 			return;
@@ -270,19 +270,28 @@ public class NoCompletedOrderFragment extends Fragment {
 								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										new AsyncTask<String,Integer,PayInfo>(){
+										new AsyncTask<String,Integer,String>(){
 											private ProgressDialog progressDialog;
 											@Override
-											protected PayInfo doInBackground(
+											protected String doInBackground(
 													String... params) {
-												return OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
+												PayInfo payInfo = OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
 														order.getOrderInfos().get(0).getTicketNo());
+												if(payInfo == null){
+													return null;
+												}
+												return OperationUtil.toPaySubmit(payInfo);
 											}
 
 											@Override
 											protected void onPostExecute(
-													PayInfo result) {
+													String result) {
 												progressDialog.dismiss();
+												if(result == null){
+													LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+													return;
+												}
+												Log.i("NoCompletedOrderFragment:getView", result);
 												super.onPostExecute(result);
 											}
 
@@ -322,7 +331,11 @@ public class NoCompletedOrderFragment extends Fragment {
 									protected void onPostExecute(
 											String result) {
 										progressDialog.dismiss();
-										LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
+										if(result == null){
+											LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+										}else{
+											LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
+										}
 										super.onPostExecute(result);
 									}
 

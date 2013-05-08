@@ -46,7 +46,8 @@ public enum UrlEnum {
 								"https://dynamic.12306.cn/otsweb/order/payConfirmOnlineSingleAction.do?method=payConfirmOnlineSingleEpaySuccess","application/x-www-form-urlencoded",""),
 	PAY_ORDER_INIT("order/myOrderAction.do","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 			"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=Y",
-			"application/x-www-form-urlencoded","");
+			"application/x-www-form-urlencoded",""),
+	TO_PAY("https://epay.12306.cn/pay/payGateway","","","","");
 	private String path;
 	
 	private String accept;

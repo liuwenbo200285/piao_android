@@ -12,6 +12,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.util.Log;
 
@@ -84,8 +85,30 @@ public class OperationUtil {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				Document document = JsoupUtil.getPageDocument(response.getEntity().getContent());
 				if(document != null){
-					Element timElement = document.getElementsByClass("f_blue").get(0);
-					return timElement.childNode(1).childNode(0).toString();
+					Elements elements = document.getElementsByTag("script");
+					String data = null;
+					for(Element element:elements){
+						data = element.data();
+						if(StringUtils.contains(data,"loseTime")){
+							break;
+						}
+					}
+					String [] ss = StringUtils.split(data,";");
+					String loseTime = null;
+					String beginTime = null;
+					for(String str:ss){
+						if(StringUtils.contains(str,"loseTime")){
+							loseTime = StringUtils.split(str,"=")[1].replace("\"","").trim();
+							continue;
+						}
+						if(StringUtils.contains(str,"beginTime")){
+							beginTime = StringUtils.split(str,"=")[1].replace("\"","").trim();
+							break;
+						}
+					}
+					long time1 = Long.parseLong(beginTime);
+					long time2 = Long.parseLong(loseTime);
+					return ""+((time2-time1)/(1000*60));
 				}
 			}
 		} catch (Exception e) {
@@ -130,5 +153,49 @@ public class OperationUtil {
 		}
 		return null;
     }
+    
+    /**
+	 * 提交付款请求
+	 * @param inputStream
+	 * @return
+	 */
+    public static String toPaySubmit(PayInfo payInfo){
+    	HttpResponse response = null;
+		try {
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("interfaceName",payInfo.getInterfaceName()));
+			parameters.add(new BasicNameValuePair("interfaceVersion",payInfo.getInterfaceVersion()));
+			parameters.add(new BasicNameValuePair("tranData",payInfo.getTranData()));
+			parameters.add(new BasicNameValuePair("merSignMsg",payInfo.getMerSignMsg()));
+			parameters.add(new BasicNameValuePair("appId",payInfo.getAppId()));
+			parameters.add(new BasicNameValuePair("transType",payInfo.getTransType()));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
+			HttpPost httpPost = new HttpPost(UrlEnum.TO_PAY.getPath());
+			httpPost.addHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
+			httpPost.addHeader("Cache-Control","max-age=0");
+			httpPost.addHeader("Connection","keep-alive");
+			httpPost.addHeader("Origin","https://dynamic.12306.cn");
+			httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+			httpPost.addHeader("Host","dynamic.12306.cn");
+			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
+			if (response.getStatusLine().getStatusCode() == 200) {
+				String info = EntityUtils.toString(response.getEntity());
+				Log.i("toPaySubmit", info);
+			}
+		} catch (Exception e) {
+			Log.e("OperationUtil","canelOrder",e);
+			return null;
+		} finally {
+			
+		}
+		return null;
+    }
+    
+    
+    
+    
 
 }
