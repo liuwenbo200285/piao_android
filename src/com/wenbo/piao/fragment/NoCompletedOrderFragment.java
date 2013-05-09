@@ -295,6 +295,8 @@ public class NoCompletedOrderFragment extends Fragment {
 												progressDialog.dismiss();
 												if(result == null){
 													LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+													OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+													listView.setAdapter(adapter);
 													return;
 												}
 												HttpClientUtil.setPayInfo(result);
@@ -349,6 +351,8 @@ public class NoCompletedOrderFragment extends Fragment {
 										progressDialog.dismiss();
 										if(result == null){
 											LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+											OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
+											listView.setAdapter(adapter);
 										}else{
 											LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
 										}
