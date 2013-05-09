@@ -407,7 +407,6 @@ public class JsoupUtil {
 		try {
 			Document document = getPageDocument(inputStream);
 			if(document != null){
-				Element timElement = document.getElementsByClass("datenew").get(0);
 				Element element = document.getElementById("epayForm");
 				if(element != null){
 					PayInfo payInfo = new PayInfo();

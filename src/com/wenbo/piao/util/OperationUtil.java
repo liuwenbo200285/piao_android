@@ -183,8 +183,16 @@ public class OperationUtil {
 				payInfo.setMerCustomIp(element.attr("value"));
 				element = document.getElementsByAttributeValue("name","orderTimeoutDate").get(0);
 				payInfo.setOrderTimeoutDate(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","tranData").get(0);
+				payInfo.setTranData(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","transType").get(0);
+				payInfo.setTransType(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","merSignMsg").get(0);
+				payInfo.setMerSignMsg(element.attr("value"));
 				element = document.getElementsByAttributeValue("name","channelId").get(0);
 				payInfo.setChannelId(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","appId").get(0);
+				payInfo.setAppId(element.attr("value"));
 				payInfo.setPayMoney(document.getElementsByClass("nav3_5").get(0).text());
 				return payInfo;
 			}else{

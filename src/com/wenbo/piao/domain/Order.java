@@ -25,6 +25,8 @@ public class Order {
 	
 	private String token;
 	
+	private int allMoney;
+	
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -87,5 +89,13 @@ public class Order {
 
 	public void setOrderStatus(String orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	public int getAllMoney() {
+		return allMoney;
+	}
+
+	public void setAllMoney(int allMoney) {
+		this.allMoney = allMoney;
 	}
 }
