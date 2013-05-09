@@ -45,7 +45,6 @@ import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.wenbo.piao.domain.ConfigInfo;
@@ -88,6 +87,8 @@ public class HttpClientUtil {
 	public static List<Order> noCompletedOrders;
 	
 	public static PayInfo payInfo;
+	
+	public static Map<String,String> bankMap;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -362,5 +363,19 @@ public class HttpClientUtil {
 
 	public static void setPayInfo(PayInfo payInfo) {
 		HttpClientUtil.payInfo = payInfo;
+	}
+
+	public static Map<String, String> getBankMap() {
+		if(bankMap == null){
+			bankMap = new HashMap<String, String>();
+			bankMap.put("工商银行","01020000");
+			bankMap.put("农业银行","01030000");
+			bankMap.put("中国银行","01040000");
+			bankMap.put("招商银行","03080000");
+			bankMap.put("中国银联","00011000");
+			bankMap.put("中铁银通卡","00011001");
+			bankMap.put("建设银行","01050000");
+		}
+		return bankMap;
 	}
 }

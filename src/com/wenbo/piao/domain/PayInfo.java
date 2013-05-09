@@ -25,6 +25,8 @@ public class PayInfo {
 	private String bankId;
 	
 	private String payMoney;
+	
+	private String channelId;
 
 	public String getPayUrl() {
 		return payUrl;
@@ -120,5 +122,13 @@ public class PayInfo {
 
 	public void setPayMoney(String payMoney) {
 		this.payMoney = payMoney;
+	}
+
+	public String getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(String channelId) {
+		this.channelId = channelId;
 	}
 }

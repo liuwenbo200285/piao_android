@@ -106,13 +106,16 @@ public class OperationUtil {
 							break;
 						}
 					}
+					if("null".equals(beginTime)){
+						return null;
+					}
 					long time1 = Long.parseLong(beginTime);
 					long time2 = Long.parseLong(loseTime);
 					return ""+((time2-time1)/(1000*60));
 				}
 			}
 		} catch (Exception e) {
-			Log.e("OperationUtil","canelOrder",e);
+			Log.e("OperationUtil","getLastTime",e);
 			return null;
 		} finally {
 			
@@ -146,7 +149,7 @@ public class OperationUtil {
 				return payInfo;
 			}
 		} catch (Exception e) {
-			Log.e("OperationUtil","canelOrder",e);
+			Log.e("OperationUtil","toPayinit",e);
 			return null;
 		} finally {
 			
@@ -180,13 +183,15 @@ public class OperationUtil {
 				payInfo.setMerCustomIp(element.attr("value"));
 				element = document.getElementsByAttributeValue("name","orderTimeoutDate").get(0);
 				payInfo.setOrderTimeoutDate(element.attr("value"));
+				element = document.getElementsByAttributeValue("name","channelId").get(0);
+				payInfo.setChannelId(element.attr("value"));
 				payInfo.setPayMoney(document.getElementsByClass("nav3_5").get(0).text());
 				return payInfo;
 			}else{
 				Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
 			}
 		} catch (Exception e) {
-			Log.e("OperationUtil","canelOrder",e);
+			Log.e("OperationUtil","toPaySubmit",e);
 			return null;
 		} finally {
 			
@@ -194,7 +199,39 @@ public class OperationUtil {
 		return null;
     }
     
-    
+    /**
+	 * 选择银行付款
+	 * @param inputStream
+	 * @return
+	 */
+    public static String selectBank(PayInfo payInfo){
+    	HttpResponse response = null;
+		try {
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("tranData",payInfo.getTranData()));
+			parameters.add(new BasicNameValuePair("merSignMsg",payInfo.getMerSignMsg()));
+			parameters.add(new BasicNameValuePair("appId",payInfo.getAppId()));
+			parameters.add(new BasicNameValuePair("transType",payInfo.getTransType()));
+			parameters.add(new BasicNameValuePair("channelId",payInfo.getChannelId()));
+			parameters.add(new BasicNameValuePair("merCustomIp",payInfo.getMerCustomIp()));
+			parameters.add(new BasicNameValuePair("orderTimeoutDate",payInfo.getOrderTimeoutDate()));
+			parameters.add(new BasicNameValuePair("bankId",payInfo.getBankId()));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
+			HttpPost httpPost = new HttpPost(UrlEnum.SELECT_BANK.getPath());
+			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		} catch (Exception e) {
+			Log.e("OperationUtil","selectBank",e);
+			return null;
+		} finally {
+			
+		}
+		return null;
+    }
     
     
 

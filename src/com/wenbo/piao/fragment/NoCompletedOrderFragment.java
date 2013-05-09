@@ -295,6 +295,7 @@ public class NoCompletedOrderFragment extends Fragment {
 												progressDialog.dismiss();
 												if(result == null){
 													LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+													noCompletedOrders.clear();
 													OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
 													listView.setAdapter(adapter);
 													return;
@@ -351,6 +352,7 @@ public class NoCompletedOrderFragment extends Fragment {
 										progressDialog.dismiss();
 										if(result == null){
 											LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
+											noCompletedOrders.clear();
 											OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
 											listView.setAdapter(adapter);
 										}else{
