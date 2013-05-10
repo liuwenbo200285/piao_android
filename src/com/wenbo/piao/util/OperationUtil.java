@@ -145,8 +145,7 @@ public class OperationUtil {
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				PayInfo payInfo = JsoupUtil.getPayInitParam(response.getEntity().getContent());
-				return payInfo;
+				return JsoupUtil.getPayInitParam(response.getEntity().getContent());
 			}
 		} catch (Exception e) {
 			Log.e("OperationUtil","toPayinit",e);
@@ -230,7 +229,12 @@ public class OperationUtil {
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				return EntityUtils.toString(response.getEntity());
+				if("00011000".equals(payInfo.getBankId())){
+					Document document = JsoupUtil.getPageDocument(response.getEntity().getContent());
+					Element element = document.getElementsByTag("from").get(0);
+				}else{
+					return EntityUtils.toString(response.getEntity());
+				}
 			}
 		} catch (Exception e) {
 			Log.e("OperationUtil","selectBank",e);
