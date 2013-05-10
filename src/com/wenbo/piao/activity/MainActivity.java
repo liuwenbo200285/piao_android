@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.alibaba.fastjson.JSON;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
@@ -29,6 +31,7 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
+import com.wenbo.piao.util.OperationUtil;
 
 public class MainActivity extends Activity {
 	
@@ -234,8 +237,35 @@ public class MainActivity extends Activity {
 	 * 获取登录验证码
 	 */
 	private void getLoginRangeCode(){
+//		checkLogin();
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,null,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+	}
+	
+	private void checkLogin(){
+		//检测是否已经在登录
+				new AsyncTask<Integer,Integer,String>(){
+					@Override
+					protected String doInBackground(Integer... arg0) {
+						return OperationUtil.getOrderPerson();
+					}
+
+					@Override
+					protected void onPostExecute(String result) {
+						try {
+							JSON.parseObject(result);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						super.onPostExecute(result);
+					}
+
+					@Override
+					protected void onPreExecute() {
+						super.onPreExecute();
+					}
+				
+				}.execute(0);
 	}
 	
 	/**

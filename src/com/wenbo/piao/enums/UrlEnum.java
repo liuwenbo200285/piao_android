@@ -48,7 +48,8 @@ public enum UrlEnum {
 			"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrderNotComplete&leftmenu=Y",
 			"application/x-www-form-urlencoded",""),
 	TO_PAY("https://epay.12306.cn/pay/payGateway","","","",""),
-	SELECT_BANK("https://epay.12306.cn/pay/webBusiness","","","","");
+	SELECT_BANK("https://epay.12306.cn/pay/webBusiness","","","",""),
+	PAY_BY_UNIONPAY("https://unionpaysecure.com/api/Pay.action","","","","");
 	private String path;
 	
 	private String accept;

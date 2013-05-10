@@ -1,5 +1,7 @@
 package com.wenbo.piao.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -231,7 +234,8 @@ public class OperationUtil {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				if("00011000".equals(payInfo.getBankId())){
 					Document document = JsoupUtil.getPageDocument(response.getEntity().getContent());
-					Element element = document.getElementsByTag("from").get(0);
+					Element element = document.getElementsByTag("form").get(0);
+					return payByUnionPay(element);
 				}else{
 					return EntityUtils.toString(response.getEntity());
 				}
@@ -245,6 +249,133 @@ public class OperationUtil {
 		return null;
     }
     
+    /**
+     * 用银联付款
+     * @param document
+     * @return
+     */
+    public static String payByUnionPay(Element element){
+    	HttpResponse response = null;
+		try {
+			String url = element.attr("action");
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			Element fromElement = element.getElementsByAttributeValue("name","orderCurrency").get(0);
+			parameters.add(new BasicNameValuePair("orderCurrency",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","orderTime").get(0);
+			parameters.add(new BasicNameValuePair("orderTime",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","backEndUrl").get(0);
+			parameters.add(new BasicNameValuePair("backEndUrl",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","charset").get(0);
+			parameters.add(new BasicNameValuePair("charset",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","merId").get(0);
+			parameters.add(new BasicNameValuePair("merId",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","version").get(0);
+			parameters.add(new BasicNameValuePair("version",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","merAbbr").get(0);
+			parameters.add(new BasicNameValuePair("merAbbr",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","signMethod").get(0);
+			parameters.add(new BasicNameValuePair("signMethod",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","frontEndUrl").get(0);
+			parameters.add(new BasicNameValuePair("frontEndUrl",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","signature").get(0);
+			parameters.add(new BasicNameValuePair("signature",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","orderAmount").get(0);
+			parameters.add(new BasicNameValuePair("orderAmount",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","customerIp").get(0);
+			parameters.add(new BasicNameValuePair("customerIp",fromElement.attr("value")));	
+			fromElement = element.getElementsByAttributeValue("name","transType").get(0);
+			parameters.add(new BasicNameValuePair("transType",fromElement.attr("value")));	
+			fromElement = element.getElementsByAttributeValue("name","merReserved").get(0);
+			parameters.add(new BasicNameValuePair("merReserved",fromElement.attr("value")));
+			fromElement = element.getElementsByAttributeValue("name","orderNumber").get(0);
+			parameters.add(new BasicNameValuePair("orderNumber",fromElement.attr("value")));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
+			HttpPost httpPost = new HttpPost(UrlEnum.PAY_BY_UNIONPAY.getPath());
+			httpPost.addHeader("Referer",url);
+			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			String info = null;
+			if (response.getStatusLine().getStatusCode() == 200) {
+				info = EntityUtils.toString(response.getEntity());
+			}else{
+				info = EntityUtils.toString(response.getEntity());
+			}
+			System.out.println(info);
+		} catch (Exception e) {
+			Log.e("OperationUtil","selectBank",e);
+			return null;
+		} finally {
+			
+		}
+		return null;
+    }
     
+    /**
+     * 查询火车票，检测有没有登录
+     * @return
+     */
+    public static String searchTicket(String date){
+    	try {
+    		List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+    		parameters.add(new BasicNameValuePair("method","queryLeftTicket"));
+    		parameters.add(new BasicNameValuePair("orderRequest.train_date","2013-05-13"));
+    		parameters.add(new BasicNameValuePair("orderRequest.from_station_telecode","SZQ"));
+    		parameters.add(new BasicNameValuePair("orderRequest.to_station_telecode","AEQ"));
+    		parameters.add(new BasicNameValuePair("orderRequest.train_no",""));
+    		parameters.add(new BasicNameValuePair("trainPassType","QB"));
+    		parameters.add(new BasicNameValuePair("trainClass","QB#D#Z#T#K#QT#"));
+    		parameters.add(new BasicNameValuePair("includeStudent","00"));
+    		parameters.add(new BasicNameValuePair("seatTypeAndNum",""));
+    		parameters.add(new BasicNameValuePair("orderRequest.start_time_str","00:00--24:00"));
+    		UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
+    		HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
+    		httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
+    		HttpResponse response = httpClient.execute(httpGet);
+    		if(response.getStatusLine().getStatusCode() == 200){
+    			return EntityUtils.toString(response.getEntity());
+    		}else{
+    			String info = EntityUtils.toString(response.getEntity());
+    			Log.i("searchTicket",info);
+    		}
+		} catch (Exception e) {
+			Log.e("canelOrder","searchTicket",e);
+		}
+    	return null;
+    }
+    
+    /**
+	 * 获取登录账号用户信息
+	 * 
+	 * @throws URISyntaxException
+	 */
+	public static String getOrderPerson() {
+		HttpResponse response = null;
+		try {
+			HttpClient httpClient = HttpClientUtil.getHttpClient();
+//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
+			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_PERSON);
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("method", "getPagePassengerAll"));
+			parameters.add(new BasicNameValuePair("pageIndex",
+					"0"));
+			parameters.add(new BasicNameValuePair("pageSize",
+					"1"));
+			parameters.add(new BasicNameValuePair("passenger_name",
+					"请输入汉字或拼音首字母"));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
+					"UTF-8");
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		} catch (Exception e) {
+			Log.e("GetPersonConstanct","getOrderPerson error!",e);
+		} finally {
+			Log.i("GetPersonConstanct","close getOrderPerson");
+		}
+		return null;
+	}
 
 }

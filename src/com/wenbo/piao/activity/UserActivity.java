@@ -6,15 +6,19 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.alibaba.fastjson.JSON;
 import com.wenbo.piao.R;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.fragment.AboutFargment;
 import com.wenbo.piao.fragment.CompletedOrderListFragment;
 import com.wenbo.piao.fragment.ContactFragment;
@@ -23,12 +27,15 @@ import com.wenbo.piao.fragment.OrderInfoFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
 import com.wenbo.piao.fragment.SelectBankFragment;
 import com.wenbo.piao.util.HttpClientUtil;
+import com.wenbo.piao.util.OperationUtil;
 
 public class UserActivity extends Activity {
 	
 	private static FragmentManager fm;
 	
 	private Fragment currentFragment;
+	
+	private ProgressDialog progressDialog;
 	
 
 	@Override
@@ -207,9 +214,44 @@ public class UserActivity extends Activity {
 	@Override
 	protected void onRestart() {
 		Log.i("UserActivity","onRestart");
-		//检测是否已经在登录
-		
+		checkLogin();
 		super.onRestart();
+	}
+	
+	private void checkLogin(){
+		//检测是否已经在登录
+				new AsyncTask<Integer,Integer,String>(){
+					@Override
+					protected String doInBackground(Integer... arg0) {
+						return OperationUtil.getOrderPerson();
+					}
+
+					@Override
+					protected void onPostExecute(String result) {
+						progressDialog.dismiss();
+						try {
+							JSON.parseObject(result);
+						} catch (Exception e) {
+							e.printStackTrace();
+							LoginDialog.newInstance("登录已超时，请重新登录！").show(getFragmentManager(),"dialog"); 
+							Intent intent = new Intent();
+				            intent.setClass(UserActivity.this,MainActivity.class);
+							startActivity(intent);
+							RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
+				            robitOrderFragment.unRegisterService();
+							finish();
+							cleanInfo();
+						}
+						super.onPostExecute(result);
+					}
+
+					@Override
+					protected void onPreExecute() {
+						progressDialog = ProgressDialog.show(UserActivity.this,"检测登录状态","正在检测登录状态...",true,false);
+						super.onPreExecute();
+					}
+				
+				}.execute(0);
 	}
 
 
