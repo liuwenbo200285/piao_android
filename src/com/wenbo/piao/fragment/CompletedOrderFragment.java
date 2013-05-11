@@ -199,6 +199,7 @@ OnClickListener,android.view.View.OnClickListener {
 			mMonth = monthOfYear;
 			mDay = dayOfMonth;
 			updateDateDisplay(currentEditText);
+			currentEditText.clearFocus();
 //			closeSoftInput();
 		}
 	};
@@ -305,6 +306,7 @@ OnClickListener,android.view.View.OnClickListener {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								passengersNameText.setText(contacts[which]);
+								passengersNameText.clearFocus();
 								closeSoftInput();
 								dialog.dismiss();
 							}
@@ -337,7 +339,7 @@ OnClickListener,android.view.View.OnClickListener {
 			case R.id.orderTimeText:
 				String[] str = StringUtils.split(orderTimeText.getText().toString(),"-");
 				datePickerDialog = new DatePickerDialog(activity,mDateSetListener,Integer.parseInt(str[0]), 
-						Integer.parseInt(str[1]), Integer.parseInt(str[2]));
+						Integer.parseInt(str[1])-1, Integer.parseInt(str[2]));
 				datePickerDialog.show();
 				break;
 			case R.id.endTimeText:

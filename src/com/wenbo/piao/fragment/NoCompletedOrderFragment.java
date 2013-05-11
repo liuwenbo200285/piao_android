@@ -416,7 +416,7 @@ public class NoCompletedOrderFragment extends Fragment {
 						});
 					}
 					sbBuilder.append("\n车次信息： "+order.getTrainInfo()
-							+"\n总  张  数： "+order.getOrderNum()+"张\n总价格:"+order.getAllMoney()+"\n订单状态： "+order.getOrderStatus());
+							+"\n总  张  数： "+order.getOrderNum()+"张\n总  价  格： "+order.getAllMoney()+"元\n订单状态： "+order.getOrderStatus());
 					orderInfo.setText(sbBuilder.toString());
 				}
 			}

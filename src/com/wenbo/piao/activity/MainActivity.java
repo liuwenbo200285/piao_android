@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,12 +18,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.alibaba.fastjson.JSON;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
@@ -34,7 +35,6 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
-import com.wenbo.piao.util.JsoupUtil;
 import com.wenbo.piao.util.OperationUtil;
 
 public class MainActivity extends Activity {
@@ -134,6 +134,7 @@ public class MainActivity extends Activity {
 					rangCodeText.requestFocus();
 					return;
 				}
+				closeSoftInput();
 				LoginTask loginTask = new LoginTask(MainActivity.this,accountService);
 				loginTask.execute("");
 			}
@@ -244,6 +245,13 @@ public class MainActivity extends Activity {
 //		checkLogin();
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,null,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+	}
+	
+	public void closeSoftInput(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE); 
+		if (imm.isActive()) {
+			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+		}
 	}
 	
 	private void checkLogin(){

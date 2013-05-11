@@ -359,7 +359,10 @@ public class JsoupUtil {
 								order.setTrainInfo(StringUtils.replace(orderInfo.getTrainInfo(),"\n"," "));
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 8){
-								orderInfo.setSeatInfo(sbBuilder.toString());
+								String seatInfo = sbBuilder.toString();
+								orderInfo.setSeatInfo(seatInfo);
+								seatInfo = StringUtils.split(seatInfo,"\n")[4];
+								order.setAllMoney(order.getAllMoney()+Double.parseDouble(StringUtils.remove(seatInfo,"元")));
 								sbBuilder.delete(0,sbBuilder.length());
 							}else if(n == 10){
 								orderInfo.setPassengersInfo(sbBuilder.toString());

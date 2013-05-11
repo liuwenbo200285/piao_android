@@ -22,7 +22,7 @@ public class LoginDialog extends DialogFragment {
         String title = getArguments().getString("title"); 
         Dialog dialog =  new AlertDialog.Builder(getActivity())
         .setIcon(R.drawable.ic_dialog_alert) 
-        .setTitle(title)
+        .setMessage(title)
         .setPositiveButton("确定",null)
         .create();
 //        Window window = dialog.getWindow();

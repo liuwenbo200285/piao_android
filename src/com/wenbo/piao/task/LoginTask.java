@@ -194,7 +194,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				}
 			}
 		}catch (Exception e) {
-			Log.i("Login","登录出错!",e);
+			Log.e("Login","登录出错!",e);
 			return 5;
 		}
 		return 4;

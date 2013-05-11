@@ -687,6 +687,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
+								closeSoftInput();
 								dialogTextView.setText("正在确认订票！");
 								progressDialog.show();
 								intent.putExtra(
