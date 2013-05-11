@@ -3,6 +3,9 @@ package com.wenbo.piao.activity;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -31,6 +34,7 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
+import com.wenbo.piao.util.JsoupUtil;
 import com.wenbo.piao.util.OperationUtil;
 
 public class MainActivity extends Activity {
@@ -247,13 +251,15 @@ public class MainActivity extends Activity {
 				new AsyncTask<Integer,Integer,String>(){
 					@Override
 					protected String doInBackground(Integer... arg0) {
-						return OperationUtil.getOrderPerson();
+						return OperationUtil.checkLogin();
 					}
 
 					@Override
 					protected void onPostExecute(String result) {
 						try {
-							JSON.parseObject(result);
+							Document document = Jsoup.parse(result);
+							Element element = document.getElementById("loginForm");
+							System.out.println(element.toString());
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

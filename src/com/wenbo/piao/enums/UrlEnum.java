@@ -49,7 +49,8 @@ public enum UrlEnum {
 			"application/x-www-form-urlencoded",""),
 	TO_PAY("https://epay.12306.cn/pay/payGateway","","","",""),
 	SELECT_BANK("https://epay.12306.cn/pay/webBusiness","","","",""),
-	PAY_BY_UNIONPAY("https://unionpaysecure.com/api/Pay.action","","","","");
+	PAY_BY_UNIONPAY("https://unionpaysecure.com/api/Pay.action","","","",""),
+	CHECK_LOGIN("order/myOrderAction.do?method=queryOrderWaitTime","application/json, text/javascript, */*","","","");
 	private String path;
 	
 	private String accept;

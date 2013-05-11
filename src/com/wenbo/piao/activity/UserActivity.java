@@ -1,5 +1,7 @@
 package com.wenbo.piao.activity;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,7 +18,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.alibaba.fastjson.JSON;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.fragment.AboutFargment;
@@ -223,24 +224,25 @@ public class UserActivity extends Activity {
 				new AsyncTask<Integer,Integer,String>(){
 					@Override
 					protected String doInBackground(Integer... arg0) {
-						return OperationUtil.getOrderPerson();
+						return OperationUtil.checkLogin();
 					}
 
 					@Override
 					protected void onPostExecute(String result) {
 						progressDialog.dismiss();
 						try {
-							JSON.parseObject(result);
+							if(!StringUtils.contains(result,"waitTime")){
+								LoginDialog.newInstance("登录已超时，请重新登录！").show(getFragmentManager(),"dialog"); 
+								Intent intent = new Intent();
+					            intent.setClass(UserActivity.this,MainActivity.class);
+								startActivity(intent);
+								RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
+					            robitOrderFragment.unRegisterService();
+								finish();
+								cleanInfo();
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
-							LoginDialog.newInstance("登录已超时，请重新登录！").show(getFragmentManager(),"dialog"); 
-							Intent intent = new Intent();
-				            intent.setClass(UserActivity.this,MainActivity.class);
-							startActivity(intent);
-							RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
-				            robitOrderFragment.unRegisterService();
-							finish();
-							cleanInfo();
 						}
 						super.onPostExecute(result);
 					}

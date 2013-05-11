@@ -1,7 +1,14 @@
 package com.wenbo.piao.fragment;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -13,6 +20,8 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -272,26 +281,67 @@ public class NoCompletedOrderFragment extends Fragment {
 								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										new AsyncTask<String,Integer,PayInfo>(){
+										new AsyncTask<String,Integer,String>(){
 											private ProgressDialog progressDialog;
 											@Override
-											protected PayInfo doInBackground(
+											protected String doInBackground(
 													String... params) {
-												PayInfo payInfo = OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
+												 PayInfo payInfo = OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
 														order.getOrderInfos().get(0).getTicketNo());
 												if(payInfo == null){
 													return null;
 												}
-												payInfo = OperationUtil.toPaySubmit(payInfo);
-												if(payInfo == null){
+												InputStream inputStream = OperationUtil.toPaySubmit(payInfo);
+												if(inputStream == null){
 													return null;
 												}
-												return payInfo;
+												FileOutputStream fileOutputStream = null;
+												String code = RandomStringUtils.randomNumeric(5);
+												try {
+													fileOutputStream = activity.openFileOutput("pay"+code+".html",Context.MODE_WORLD_READABLE);
+													BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+													String str = bufferedReader.readLine();
+													while(str != null){
+														if(StringUtils.contains(str,"pages/web/mb.html")){
+															str = StringUtils.replace(str,"pages/web/mb.html","https://epay.12306.cn/pay/pages/web/mb.html");
+														}else if(StringUtils.contains(str,"pages/web/css/bank.css")){
+															str = StringUtils.replace(str,"pages/web/css/bank.css","https://epay.12306.cn/pay/pages/web/css/bank.css");
+														}else if(StringUtils.contains(str,"pages/web/mb.html")){
+															str = StringUtils.replace(str,"pages/web/css/bank.css","https://epay.12306.cn/pay/pages/web/mb.html");
+														}
+														else if(StringUtils.contains(str,"/pay/webBusiness")){
+															str = StringUtils.replace(str,"/pay/webBusiness","https://epay.12306.cn/pay/webBusiness");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_gsyh2.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_gsyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_gsyh2.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_nyyh2.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_nyyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_nyyh2.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_zgyh2.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_zgyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_zgyh2.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_zsyh2.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_zsyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_zsyh2.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_zgyl.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_zgyl.gif","https://epay.12306.cn/pay/pages/web/images/bank_zgyl.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_ztytk.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_ztytk.gif","https://epay.12306.cn/pay/pages/web/images/bank_ztytk.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_jsyh2.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_jsyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_jsyh2.gif");
+														}
+														str = str+"\n";
+														fileOutputStream.write(str.getBytes());
+														str = bufferedReader.readLine();
+													}
+												} catch (Exception e) {
+													e.printStackTrace();
+												}finally{
+													IOUtils.closeQuietly(fileOutputStream);
+												}
+												File file = new File(activity.getFilesDir().getPath()+"/pay"+code+".html");
+												return file.getPath();
 											}
 
 											@Override
 											protected void onPostExecute(
-													PayInfo result) {
+													String result) {
 												progressDialog.dismiss();
 												if(result == null){
 													LoginDialog.newInstance("该订单已经被取消").show(activity.getFragmentManager(),"dialog");
@@ -300,17 +350,12 @@ public class NoCompletedOrderFragment extends Fragment {
 													listView.setAdapter(adapter);
 													return;
 												}
-												HttpClientUtil.setPayInfo(result);
-												FragmentTransaction ft = fm.beginTransaction();
-										    	 Fragment selectBankFragment = fm.findFragmentByTag("selectBankFragment");
-										    	if(selectBankFragment == null){
-										    		selectBankFragment = new SelectBankFragment();
-										    	}
-												ft.replace(R.id.details,selectBankFragment,"selectBankFragment");
-												ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
-												ft.addToBackStack(null);
-												ft.commit();
-												activity.setCurrentFragment(selectBankFragment);
+												Intent intent=new Intent(); 
+												intent.setAction("android.intent.action.VIEW"); 
+												Uri CONTENT_URI_BROWSERS = Uri.parse("file://"+result); 
+												intent.setData(CONTENT_URI_BROWSERS); 
+												intent.setClassName("com.android.browser", "com.android.browser.BrowserActivity"); 
+												activity.startActivity(intent); 
 												super.onPostExecute(result);
 											}
 
@@ -371,7 +416,7 @@ public class NoCompletedOrderFragment extends Fragment {
 						});
 					}
 					sbBuilder.append("\n车次信息： "+order.getTrainInfo()
-							+"\n总  张  数： "+order.getOrderNum()+"张\n订单状态： "+order.getOrderStatus());
+							+"\n总  张  数： "+order.getOrderNum()+"张\n总价格:"+order.getAllMoney()+"\n订单状态： "+order.getOrderStatus());
 					orderInfo.setText(sbBuilder.toString());
 				}
 			}

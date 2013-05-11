@@ -25,7 +25,7 @@ public class Order {
 	
 	private String token;
 	
-	private int allMoney;
+	private double allMoney;
 	
 	public String getOrderNo() {
 		return orderNo;
@@ -91,11 +91,11 @@ public class Order {
 		this.orderStatus = orderStatus;
 	}
 
-	public int getAllMoney() {
+	public double getAllMoney() {
 		return allMoney;
 	}
 
-	public void setAllMoney(int allMoney) {
+	public void setAllMoney(double allMoney) {
 		this.allMoney = allMoney;
 	}
 }

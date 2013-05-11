@@ -1,5 +1,6 @@
 package com.wenbo.piao.util;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ public class OperationUtil {
 	 * @param inputStream
 	 * @return
 	 */
-    public static PayInfo toPaySubmit(PayInfo payInfo){
+    public static InputStream toPaySubmit(PayInfo payInfo){
     	HttpResponse response = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
@@ -180,23 +181,8 @@ public class OperationUtil {
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				Document document = JsoupUtil.getPageDocument(response.getEntity().getContent());
-				Element element = document.getElementsByAttributeValue("name","merCustomIp").get(0);
-				payInfo.setMerCustomIp(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","orderTimeoutDate").get(0);
-				payInfo.setOrderTimeoutDate(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","tranData").get(0);
-				payInfo.setTranData(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","transType").get(0);
-				payInfo.setTransType(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","merSignMsg").get(0);
-				payInfo.setMerSignMsg(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","channelId").get(0);
-				payInfo.setChannelId(element.attr("value"));
-				element = document.getElementsByAttributeValue("name","appId").get(0);
-				payInfo.setAppId(element.attr("value"));
-				payInfo.setPayMoney(document.getElementsByClass("nav3_5").get(0).text());
-				return payInfo;
+//				String domain = "https://epay.12306.cn/pay/";
+				return response.getEntity().getContent();
 			}else{
 				Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
 			}
@@ -367,6 +353,29 @@ public class OperationUtil {
 					"UTF-8");
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		} catch (Exception e) {
+			Log.e("GetPersonConstanct","getOrderPerson error!",e);
+		} finally {
+			Log.i("GetPersonConstanct","close getOrderPerson");
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取登录账号用户信息
+	 * 
+	 * @throws URISyntaxException
+	 */
+	public static String checkLogin() {
+		HttpResponse response = null;
+		try {
+			HttpClient httpClient = HttpClientUtil.getHttpClient();
+//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
+			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.CHECK_LOGIN);
+			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return EntityUtils.toString(response.getEntity());
 			}
