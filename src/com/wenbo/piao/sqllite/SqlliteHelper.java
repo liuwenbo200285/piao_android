@@ -11,15 +11,17 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.wenbo.piao.sqllite.domain.Account;
+import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.domain.Station;
 import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.service.StationService;
 
 public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final String DATABASE_NAME = "android_piao";
 
-	private static final int Version = 8;
+	private static final int Version = 11;
 
 	private static Dao<Account, Integer> accountDao = null;
 
@@ -27,7 +29,12 @@ public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 	
 	private static Dao<Station, Integer> stationDao = null;
 	
+	private static Dao<SearchInfo, Integer> searchInfoDao = null;
+	
 	private static StationService stationService = null;
+	
+	private static SearchInfoService searchInfoService = null;
+	
 
 	public SqlliteHelper(Context context) {
 		super(context, DATABASE_NAME, null, Version);
@@ -40,6 +47,7 @@ public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.createTableIfNotExists(connectionSource, Account.class);
 			TableUtils.createTableIfNotExists(connectionSource, UserInfo.class);
 			TableUtils.createTableIfNotExists(connectionSource, Station.class);
+			TableUtils.createTableIfNotExists(connectionSource, SearchInfo.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -90,6 +98,17 @@ public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 		return stationDao;
 	}
 	
+	public Dao<SearchInfo, Integer> getSearchInfoDao() {
+		if (searchInfoDao == null) {
+			try {
+				searchInfoDao = getDao(SearchInfo.class);
+			} catch (Exception e) {
+				Log.e("getSearchInfoDao", "获取searchInfoDao失败！");
+			}
+		}
+		return searchInfoDao;
+	}
+	
 	public StationService getStationService() {
 		if (stationService == null) {
 			try {
@@ -99,6 +118,17 @@ public class SqlliteHelper extends OrmLiteSqliteOpenHelper {
 			}
 		}
 		return stationService;
+	}
+	
+	public SearchInfoService getSearchInfoService() {
+		if (searchInfoService == null) {
+			try {
+				searchInfoService = new SearchInfoService(getSearchInfoDao());
+			} catch (Exception e) {
+				Log.e("getStationDao", "获取stationDao失败！");
+			}
+		}
+		return searchInfoService;
 	}
 
 }

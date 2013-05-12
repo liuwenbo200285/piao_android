@@ -53,6 +53,7 @@ import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.domain.Account;
+import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.ssl.SSLSocketFactoryEx;
 
@@ -89,6 +90,10 @@ public class HttpClientUtil {
 	public static PayInfo payInfo;
 	
 	public static Map<String,String> bankMap;
+	
+	public static List<SearchInfo> searchInfos;
+	
+	public static SearchInfo selectSearchInfo;
 	
 	public static  DefaultHttpClient getHttpClient(){
         if(null == httpClient){
@@ -363,6 +368,22 @@ public class HttpClientUtil {
 
 	public static void setPayInfo(PayInfo payInfo) {
 		HttpClientUtil.payInfo = payInfo;
+	}
+
+	public static List<SearchInfo> getSearchInfos() {
+		return searchInfos;
+	}
+
+	public static void setSearchInfos(List<SearchInfo> searchInfos) {
+		HttpClientUtil.searchInfos = searchInfos;
+	}
+
+	public static SearchInfo getSelectSearchInfo() {
+		return selectSearchInfo;
+	}
+
+	public static void setSelectSearchInfo(SearchInfo selectSearchInfo) {
+		HttpClientUtil.selectSearchInfo = selectSearchInfo;
 	}
 
 	public static Map<String, String> getBankMap() {

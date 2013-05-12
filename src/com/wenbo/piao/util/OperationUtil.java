@@ -381,8 +381,6 @@ public class OperationUtil {
 			}
 		} catch (Exception e) {
 			Log.e("GetPersonConstanct","getOrderPerson error!",e);
-		} finally {
-			Log.i("GetPersonConstanct","close getOrderPerson");
 		}
 		return null;
 	}

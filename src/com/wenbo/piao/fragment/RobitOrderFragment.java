@@ -43,13 +43,17 @@ import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.SqlliteHelper;
+import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.domain.Station;
 import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.service.StationService;
+import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.GetTrainNoTast;
 import com.wenbo.piao.util.HttpClientUtil;
+import com.wenbo.piao.util.SearchInfoUtil;
 
 public class RobitOrderFragment extends Fragment implements OnFocusChangeListener {
 
@@ -80,6 +84,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private int type = 0;
 	private int status = 0;
 	private StationService stationService;
+	private SearchInfoService searchInfoService;
 	private ConfigInfo configInfo;
 	private List<Station> fromStations;
 	private List<Station> toStations;
@@ -116,6 +121,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		activity = getActivity();
 		SqlliteHelper sqlliteHelper = new SqlliteHelper(activity);
 		stationService = sqlliteHelper.getStationService();
+		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
@@ -184,8 +190,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					if(!getConfigInfo()){
 						return;
 					}
-					String code = trainCode.getText().toString();
-					configInfo.setTrainNo(code);
+					configInfo.setTrainNo(trainCode.getText().toString());
 					String orderPerson = orderPeople.getText().toString();
 					if(StringUtils.isBlank(orderPerson)){
 						LoginDialog.newInstance("请选择订票乘客！").show(
@@ -218,6 +223,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					}
 					configInfo.setOrderSeat(sbBuilder.toString());
 					configInfo.setOrderTime(selectTimeText.getText().toString());
+					createSearchInfo(configInfo);
 					intent.putExtra(ParameterEnum.ROBIT_STATE.getValue(),
 							status);
 					intent.putExtras(bundle);
@@ -271,6 +277,14 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		selectTrainTypeText = (EditText) activity.findViewById(R.id.trainTypeText);
 		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
+		Bundle bundle = getArguments();
+		if(bundle != null){
+			Object object = bundle.getSerializable("searchInfo");
+			if(object != null){
+				SearchInfo searchInfo = (SearchInfo)object;
+				initSearchInfo(searchInfo);
+			}
+		}
 		// 注册监听service
 		if(myReceiver == null){
 			IntentFilter intentFilter = new IntentFilter(
@@ -723,6 +737,39 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		}
 	}
 	
+	/**
+	 * 创建查询条件
+	 * @param configInfo
+	 */
+	public void createSearchInfo(ConfigInfo configInfo){
+		try {
+			if(configInfo != null){
+				SearchInfo searchInfo = SearchInfoUtil.findSearchInfo(fromStation.getText().toString(),
+						toStation.getText().toString());
+				if(searchInfo == null){
+					searchInfo = new SearchInfo();
+					searchInfo.setAccountName(HttpClientUtil.getAccount().getName());
+					searchInfo.setFromStation(fromStation.getText().toString());
+					searchInfo.setToStation(toStation.getText().toString());
+					HttpClientUtil.getSearchInfos().add(searchInfo);
+				}
+				searchInfo.setOrderDate(trainDate.getText().toString());
+				searchInfo.setToStation(toStation.getText().toString());
+				searchInfo.setOrderPerson(orderPeople.getText().toString());
+				searchInfo.setOrderSeat(selectSeatText.getText().toString());
+				searchInfo.setOrderTime(selectTimeText.getText().toString());
+				searchInfo.setTrainClass(selectTrainTypeText.getText().toString());
+				searchInfo.setTrainCode(trainCode.getText().toString());
+				if(!StringUtils.isBlank(trainNo.getText().toString())){
+					searchInfo.setTrainNo(trainNo.getText().toString());
+				}
+				searchInfoService.create(searchInfo);
+			}
+		} catch (Exception e) {
+			Log.e("RobitOrderFragment","createSearchInfo",e);
+		}
+	}
+	
 	public void closeSoftInput(){
 		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
 		if (imm.isActive()) {
@@ -777,5 +824,40 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			}
 		}
 		
+	}
+	
+	/**
+	 * 初始化字段
+	 * @param searchInfo
+	 */
+	private void initSearchInfo(SearchInfo searchInfo){
+		if(searchInfo == null){
+			return;
+		}
+		if(StringUtils.isNotBlank(searchInfo.getFromStation())){
+			fromStation.setText(searchInfo.getFromStation());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getToStation())){
+			toStation.setText(searchInfo.getToStation());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getOrderTime())){
+			selectTimeText.setText(searchInfo.getOrderTime());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getTrainClass())){
+			selectTrainTypeText.setText(searchInfo.getTrainClass());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getOrderDate())){
+			trainDate.setText(searchInfo.getOrderDate());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getTrainNo())){
+			trainNo.setText(searchInfo.getTrainNo());
+			trainCode.setText(searchInfo.getTrainCode());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getOrderPerson())){
+			orderPeople.setText(searchInfo.getOrderPerson());
+		}
+		if(StringUtils.isNotBlank(searchInfo.getOrderSeat())){
+			selectSeatText.setText(searchInfo.getOrderSeat());
+		}
 	}
 }

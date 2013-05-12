@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout     
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:orientation="vertical" 
+    android:paddingLeft="3dip"
+    android:descendantFocusability="blocksDescendants"
+    >
+
+    <TextView
+        android:id="@+id/stationText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:textIsSelectable="false"
+        android:textSize="25sp"
+        android:textColor="@color/dark"
+        android:layout_marginRight="110dp"
+        android:text="深圳-->益阳" />
+
+    <TextView
+        android:id="@+id/searchInfoText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_alignParentLeft="true"
+        android:textIsSelectable="false"
+        android:layout_below="@+id/stationText"/>
+
+</RelativeLayout>

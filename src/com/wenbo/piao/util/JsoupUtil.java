@@ -184,7 +184,6 @@ public class JsoupUtil {
 		Element element = document.getElementById("randErr");
 		if(element != null){
 			String errorString = element.child(1).childNode(0).toString();
-			Log.i("Jsoup.validateLogin","登录失败!原因："+errorString);
 			if(StringUtils.contains(errorString,"验证码")){
 				return 3;
 			}
@@ -197,7 +196,7 @@ public class JsoupUtil {
 		Elements elements = document.getElementsByAttributeValue("language","javascript");
 		if(elements.size() > 0){
 			String errorMessage = elements.get(0).childNode(0).toString();
-			Log.i("Jsoup.validateLogin","登录失败!原因："+errorMessage);
+			Log.w("Jsoup.validateLogin","登录失败!原因："+errorMessage);
 			if(StringUtils.contains(errorMessage,"登录名")){
 			    return 1;
 			}else if(StringUtils.contains(errorMessage,"密码")){

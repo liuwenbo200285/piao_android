@@ -1,5 +1,7 @@
 package com.wenbo.piao.activity;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import android.app.ActionBar;
@@ -26,7 +28,10 @@ import com.wenbo.piao.fragment.ContactFragment;
 import com.wenbo.piao.fragment.OrderDetailFragment;
 import com.wenbo.piao.fragment.OrderInfoFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
-import com.wenbo.piao.fragment.SelectBankFragment;
+import com.wenbo.piao.fragment.SearchInfoFragment;
+import com.wenbo.piao.sqllite.domain.SearchInfo;
+import com.wenbo.piao.sqllite.service.SearchInfoService;
+import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.OperationUtil;
 
@@ -38,6 +43,8 @@ public class UserActivity extends Activity {
 	
 	private ProgressDialog progressDialog;
 	
+	private SearchInfoService searchInfoService;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +52,20 @@ public class UserActivity extends Activity {
 		setContentView(R.layout.activity_user);
 		getActionBar().setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
 		getActionBar().setTitle(R.string.app_name);
+		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
+		List<SearchInfo> searchInfos = searchInfoService.findAccountSearchInfos(HttpClientUtil.getAccount().getName());
+		HttpClientUtil.setSearchInfos(searchInfos);
 		fm = getFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
-		currentFragment = new RobitOrderFragment();
-		ft.replace(R.id.details,currentFragment,"tab1");
+		if(searchInfos.isEmpty()){
+			currentFragment = new RobitOrderFragment();
+			ft.replace(R.id.details,currentFragment,"tab1");
+		}else{
+			currentFragment = new SearchInfoFragment();
+			Bundle bundle = new Bundle();  
+			currentFragment.setArguments(bundle);
+			ft.replace(R.id.details,currentFragment,"searchInfo");
+		}
 		ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
 		ft.addToBackStack(null);
 		ft.commit();
@@ -104,7 +121,9 @@ public class UserActivity extends Activity {
             intent.setClass(this,MainActivity.class);
 			startActivity(intent);
 			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
-            robitOrderFragment.unRegisterService();
+			if(robitOrderFragment != null){
+				robitOrderFragment.unRegisterService();
+			}
 			finish();
 			cleanInfo();
 			break;
@@ -137,10 +156,23 @@ public class UserActivity extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
-			    if(currentFragment != null 
-			    		&& currentFragment.getClass() != CompletedOrderListFragment.class
-			    		&& currentFragment.getClass() != OrderDetailFragment.class
-			    		&& currentFragment.getClass() != SelectBankFragment.class){
+			 	if(currentFragment.getClass() == RobitOrderFragment.class){
+			 		if(!HttpClientUtil.getSearchInfos().isEmpty()){
+			 			currentFragment = fm.findFragmentByTag("searchInfo");
+			 			if(currentFragment == null){
+			 				currentFragment = new SearchInfoFragment();
+			 			}
+			 			FragmentTransaction ft = fm.beginTransaction();
+			 			ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out);
+			 			ft.replace(R.id.details,currentFragment);
+						ft.addToBackStack(null);
+						ft.commit();
+			 		}else{
+			 			dialog();
+			 			return true;
+			 		}
+			 	}else if(currentFragment.getClass() != CompletedOrderListFragment.class
+			    		&& currentFragment.getClass() != OrderDetailFragment.class){
 			    	dialog(); 
 		            return true;
 			    }else{
@@ -242,7 +274,7 @@ public class UserActivity extends Activity {
 								cleanInfo();
 							}
 						} catch (Exception e) {
-							e.printStackTrace();
+							
 						}
 						super.onPostExecute(result);
 					}
