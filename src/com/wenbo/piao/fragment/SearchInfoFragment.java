@@ -72,15 +72,12 @@ public class SearchInfoFragment extends Fragment {
 				HttpClientUtil.setSelectSearchInfo(searchInfo);
 				FragmentTransaction ft = fm.beginTransaction();
 				Fragment fragment = fm.findFragmentByTag("tab1");
-				Bundle bundle = null;
 				if(fragment == null){
 					fragment = new RobitOrderFragment();
-				}
-				bundle = fragment.getArguments();
-				if(bundle == null){
-					bundle = new Bundle();
+					Bundle bundle = new Bundle();
 					fragment.setArguments(bundle);
 				}
+				Bundle bundle = fragment.getArguments();
                 bundle.putSerializable("searchInfo",searchInfo);
 				activity.setCurrentFragment(fragment);
 				ft.replace(R.id.details,fragment,"tab1");
@@ -116,7 +113,7 @@ public class SearchInfoFragment extends Fragment {
 				});
 				alertDialog = builder.create();
 				alertDialog.show();
-				return false;
+				return true;
 			}
 		});
 		skipButton = (Button)activity.findViewById(R.id.skipButton);
