@@ -2,6 +2,7 @@ package com.wenbo.piao.fragment;
 
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -9,9 +10,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -33,7 +37,7 @@ import com.wenbo.piao.util.HttpClientUtil;
  * @author wenbo
  *
  */
-public class SearchInfoFragment extends Fragment {
+public class SearchInfoFragment extends Fragment implements OnTouchListener{
 	private UserActivity activity;
 	
 	private TextView stationText;
@@ -52,6 +56,10 @@ public class SearchInfoFragment extends Fragment {
 	
 	private FragmentManager fm;
 	
+	private int verticalMinDistance = 20;  
+	
+	private int minVelocity         = 0;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -61,6 +69,9 @@ public class SearchInfoFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		activity = (UserActivity)getActivity();
+		ActionBar actionBar = activity.getActionBar();
+		activity.getActionBar().setHomeButtonEnabled(true);
+		activity.getActionBar().setDisplayHomeAsUpEnabled(true);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
 		fm = activity.getFragmentManager();
 		listView = (ListView)activity.findViewById(R.id.searchInfoview);
@@ -172,5 +183,11 @@ public class SearchInfoFragment extends Fragment {
 			searchInfoText.setText(stringBuilder.toString());
 			return view;
 		}
+	}
+
+	@Override
+	public boolean onTouch(View arg0, MotionEvent event) {
+		Log.i("onTouch", event.toString());
+		return false;
 	}
 }
