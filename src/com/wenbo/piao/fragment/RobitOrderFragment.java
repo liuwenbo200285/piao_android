@@ -110,6 +110,14 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	public void onStart() {
 		// TODO Auto-generated method stub
 		Log.i("RobitOrderFragment", "onStart");
+		Bundle bundle = getArguments();
+		if(bundle != null){
+			Object object = bundle.getSerializable("searchInfo");
+			if(object != null){
+				SearchInfo searchInfo = (SearchInfo)object;
+				initSearchInfo(searchInfo);
+			}
+		}
 //		closeSoftInput();
 		super.onStart();
 	}
@@ -277,14 +285,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		selectTrainTypeText = (EditText) activity.findViewById(R.id.trainTypeText);
 		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
-		Bundle bundle = getArguments();
-		if(bundle != null){
-			Object object = bundle.getSerializable("searchInfo");
-			if(object != null){
-				SearchInfo searchInfo = (SearchInfo)object;
-				initSearchInfo(searchInfo);
-			}
-		}
 		// 注册监听service
 		if(myReceiver == null){
 			IntentFilter intentFilter = new IntentFilter(

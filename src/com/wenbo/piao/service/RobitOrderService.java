@@ -155,7 +155,7 @@ public class RobitOrderService extends Service {
 				if(isBegin == false){
 					return;
 				}
-				sendInfo("没有余票,休息200毫秒秒，继续刷票");
+				sendInfo("没有余票,休息200毫秒，继续刷票");
 				Thread.sleep(200);
 				response = httpClient.execute(httpGet);
 				info = EntityUtils.toString(response.getEntity());
