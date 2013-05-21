@@ -83,6 +83,7 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 						}
 					}
 				}
+				HttpClientUtil.setUserInfoMap(userInfoMap);
 			}
 		}
 		return null;
@@ -90,22 +91,26 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 
 	@Override
 	protected void onPostExecute(String result) {
-		progressDialog.dismiss();
 		HttpClientUtil.setUserInfoMap(userInfoMap);
-		if(fragment.getClass() == RobitOrderFragment.class){
-			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
-			robitOrderFragment.showDialog();
-		}else if(fragment.getClass() == ContactFragment.class){
-			ContactFragment contactFragment = (ContactFragment)fragment;
-			contactFragment.showView();
+		if(fragment != null){
+			progressDialog.dismiss();
+			if(fragment.getClass() == RobitOrderFragment.class){
+				RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
+				robitOrderFragment.showDialog();
+			}else if(fragment.getClass() == ContactFragment.class){
+				ContactFragment contactFragment = (ContactFragment)fragment;
+				contactFragment.showView();
+			}
 		}
 		super.onPostExecute(result);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		 progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
-		 super.onPreExecute();
+		if(fragment != null){
+			progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
+		}
+		super.onPreExecute();
 	}
 
 	@Override

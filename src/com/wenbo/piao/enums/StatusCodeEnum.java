@@ -6,6 +6,8 @@ package com.wenbo.piao.enums;
  *
  */
 public enum StatusCodeEnum {
+	//没有添加联系人
+	NOT_HAVE_PERSON(14),
 	//取消次数过多，今日将不能继续受理您的订票请求！
 	CANCEL_ORDER_MANY(13),
 	//输入验证码

@@ -3,4 +3,6 @@
     <color name="red">#FF0000</color>
     <color name="dark">#000000</color>
     <color name="blue">#88d1fb</color>
+    <color name="meizu1">#3399CC</color>
+    <color name="meizu2"> #0099CC</color>
 </resources>

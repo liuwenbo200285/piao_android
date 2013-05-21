@@ -1,7 +1,6 @@
 package com.wenbo.piao.fragment;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -130,6 +129,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		SqlliteHelper sqlliteHelper = new SqlliteHelper(activity);
 		stationService = sqlliteHelper.getStationService();
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
+		userInfoMap = HttpClientUtil.getUserInfoMap();
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
@@ -543,9 +543,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		}
 	}
 
-	private void getPersonInfo() {
-		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(
-				activity, userInfoMap, this);
+	private void getPersonInfo(Fragment fragment) {
+		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(activity, userInfoMap, fragment);
 		getPersonConstanct.execute("");
 	}
 	
@@ -726,6 +725,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				LoginDialog.newInstance("今日将不能继续受理您的订票请求！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
+			case 14:
+				LoginDialog.newInstance("请先同步联系人！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
 			default:
 				break;
 			}
@@ -799,16 +802,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				}
 				break;
 			case R.id.orderPeople:
-				userInfoMap = HttpClientUtil.getUserInfoMap();
-				if (userInfoMap == null) {
-					userInfoMap = new HashMap<String, UserInfo>();
-					getPersonInfo();
-				} else {
-					if (userInfoMap.isEmpty()) {
-						getPersonInfo();
-					}
-					showDialog();
+				if (userInfoMap.isEmpty()) {
+					getPersonInfo(this);
 				}
+				showDialog();
 				break;
 			case R.id.seatText:
 				showSeatDialog();
@@ -854,6 +851,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			trainCode.setText(searchInfo.getTrainCode());
 		}
 		if(StringUtils.isNotBlank(searchInfo.getOrderPerson())){
+			if(userInfoMap.isEmpty()){
+				getPersonInfo(null);
+			}
 			orderPeople.setText(searchInfo.getOrderPerson());
 		}
 		if(StringUtils.isNotBlank(searchInfo.getOrderSeat())){

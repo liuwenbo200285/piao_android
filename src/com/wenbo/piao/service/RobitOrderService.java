@@ -397,7 +397,10 @@ public class RobitOrderService extends Service {
 			parameters.add(new BasicNameValuePair("orderRequest.cancel_flag",
 					"1"));
 			parameters.add(new BasicNameValuePair("orderRequest.id_mode", "Y"));
-
+			if(userInfoMap.isEmpty()){
+				sendStatus(StatusCodeEnum.NOT_HAVE_PERSON);
+				return;
+			}
 			// 处理订票信息
 			if (!StringUtils.contains(configInfo.getOrderPerson(), ",")) {
 				Log.w("checkOrderInfo","订票人格式填写不正确！");

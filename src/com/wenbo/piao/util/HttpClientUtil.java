@@ -269,6 +269,9 @@ public class HttpClientUtil {
 	 * @return
 	 */
 	public static Map<String,UserInfo> getUserInfoMap(){
+		if(userinfoMap == null){
+			userinfoMap = new HashMap<String, UserInfo>();
+		}
 		return HttpClientUtil.userinfoMap;
 	}
 

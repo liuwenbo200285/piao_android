@@ -17,11 +17,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
@@ -47,17 +50,38 @@ public class UserActivity extends Activity implements OnTouchListener{
 	private ProgressDialog progressDialog;
 	
 	private SearchInfoService searchInfoService;
-	
-	private View fragmentView;
+		
+	private Button actionBarButton;
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user);
-		getActionBar().setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
-		getActionBar().setTitle(R.string.app_name); 
-		fragmentView = (View)findViewById(R.id.details);
+		// 设置 使用自定义 navigation bar
+		int mActionBarOptions = getActionBar().getDisplayOptions();
+		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+				ActionBar.DISPLAY_SHOW_CUSTOM |mActionBarOptions);
+		// 设置 自定义view
+		View view = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
+		getActionBar().setCustomView(view);
+		actionBarButton = (Button)view.findViewById(R.id.actionBarSkipButton);
+		actionBarButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				FragmentManager fm = getFragmentManager();
+				FragmentTransaction ft = fm.beginTransaction();
+				Fragment fragment = fm.findFragmentByTag("tab1");
+				if(fragment == null){
+					fragment = new RobitOrderFragment();
+				}
+				ft.replace(R.id.details,fragment,"tab1");
+				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+				ft.addToBackStack(null);
+				ft.commit();
+				setCurrentFragment(fragment);
+			}
+		});
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		List<SearchInfo> searchInfos = searchInfoService.findAccountSearchInfos(HttpClientUtil.getAccount().getName());
 		HttpClientUtil.setSearchInfos(searchInfos);
@@ -91,11 +115,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment hideFragment = null;
 //		closeSoftInput();
-		ActionBar actionBar = getActionBar();
-		if(actionBar.getTabCount() > 0 && item.getItemId() != R.id.tab2){
-			actionBar.setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
-			actionBar.setDisplayShowTitleEnabled(true);
-		}
+		actionBarButton.setVisibility(View.INVISIBLE);
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:

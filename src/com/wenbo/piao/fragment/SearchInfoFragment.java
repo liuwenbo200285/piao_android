@@ -2,7 +2,6 @@ package com.wenbo.piao.fragment;
 
 import java.util.List;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -56,10 +55,6 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 	
 	private FragmentManager fm;
 	
-	private int verticalMinDistance = 20;  
-	
-	private int minVelocity         = 0;
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -69,11 +64,11 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		activity = (UserActivity)getActivity();
-		ActionBar actionBar = activity.getActionBar();
-		activity.getActionBar().setHomeButtonEnabled(true);
-		activity.getActionBar().setDisplayHomeAsUpEnabled(true);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
 		fm = activity.getFragmentManager();
+		View view = getActivity().getActionBar().getCustomView();
+		Button skipButton = (Button)view.findViewById(R.id.actionBarSkipButton);
+		skipButton.setVisibility(View.VISIBLE);
 		listView = (ListView)activity.findViewById(R.id.searchInfoview);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -125,23 +120,6 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 				alertDialog = builder.create();
 				alertDialog.show();
 				return true;
-			}
-		});
-		skipButton = (Button)activity.findViewById(R.id.skipButton);
-		skipButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				FragmentManager fm = activity.getFragmentManager();
-				FragmentTransaction ft = fm.beginTransaction();
-				Fragment fragment = fm.findFragmentByTag("tab1");
-				if(fragment == null){
-					fragment = new RobitOrderFragment();
-				}
-				ft.replace(R.id.details,fragment,"tab1");
-				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
-				ft.addToBackStack(null);
-				ft.commit();
-				activity.setCurrentFragment(fragment);
 			}
 		});
 		showView();
