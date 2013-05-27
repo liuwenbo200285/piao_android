@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,8 +42,6 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 	
 	private TextView searchInfoText;
 	
-	private Button skipButton;
-	
 	private SearchInfoService searchInfoService;
 	
 	private ListView listView;
@@ -67,7 +64,7 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
 		fm = activity.getFragmentManager();
 		View view = getActivity().getActionBar().getCustomView();
-		Button skipButton = (Button)view.findViewById(R.id.actionBarSkipButton);
+		final Button skipButton = (Button)view.findViewById(R.id.actionBarSkipButton);
 		skipButton.setVisibility(View.VISIBLE);
 		listView = (ListView)activity.findViewById(R.id.searchInfoview);
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -90,6 +87,7 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
 				ft.addToBackStack(null);
 				ft.commit();
+				skipButton.setVisibility(View.INVISIBLE);
 			}
 			
 		});

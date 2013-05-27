@@ -13,6 +13,7 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,6 +54,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 		
 	private Button actionBarButton;
 	
+	private View actionBarView;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +66,9 @@ public class UserActivity extends Activity implements OnTouchListener{
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
 				ActionBar.DISPLAY_SHOW_CUSTOM |mActionBarOptions);
 		// 设置 自定义view
-		View view = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
-		getActionBar().setCustomView(view);
-		actionBarButton = (Button)view.findViewById(R.id.actionBarSkipButton);
+		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
+		getActionBar().setCustomView(actionBarView);
+		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		actionBarButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -80,6 +83,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 				ft.addToBackStack(null);
 				ft.commit();
 				setCurrentFragment(fragment);
+				actionBarButton.setVisibility(View.INVISIBLE);
 			}
 		});
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
@@ -114,8 +118,19 @@ public class UserActivity extends Activity implements OnTouchListener{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment hideFragment = null;
-//		closeSoftInput();
+		ActionBar actionBar = getActionBar();
+		if(actionBar.getTabCount() > 0 && item.getItemId() != R.id.tab2){
+			int mActionBarOptions = getActionBar().getDisplayOptions();
+			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+					ActionBar.DISPLAY_SHOW_CUSTOM |mActionBarOptions);
+			// 设置 自定义view
+			actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
+			getActionBar().setCustomView(actionBarView);
+			actionBar.setNavigationMode(ActionBar.DISPLAY_SHOW_TITLE);
+			actionBar.setDisplayShowTitleEnabled(true);
+		}
 		actionBarButton.setVisibility(View.INVISIBLE);
+		actionBarView.setVisibility(View.VISIBLE);
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:
@@ -129,6 +144,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 			}
 			break;
 		case R.id.tab2:
+			actionBarView.setVisibility(View.INVISIBLE);
 			hideFragment = fm.findFragmentByTag("tab2");
 			if(hideFragment == null){
 				hideFragment = new OrderInfoFragment();
@@ -337,9 +353,6 @@ public class UserActivity extends Activity implements OnTouchListener{
 		Log.i("UserActivity","onStop");
 		super.onStop();
 	}
-
-
-
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {

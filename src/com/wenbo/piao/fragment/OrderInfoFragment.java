@@ -42,6 +42,8 @@ public class OrderInfoFragment extends Fragment implements TabListener  {
 		activity = getActivity();
 //		closeSoftInput();
 		ActionBar actionBar = activity.getActionBar();
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE);
+		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		currentFragment = this;
 		if(actionBar.getTabCount() == 0){
