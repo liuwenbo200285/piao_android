@@ -13,7 +13,6 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 
@@ -69,40 +67,25 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
-		actionBarButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				FragmentManager fm = getFragmentManager();
-				FragmentTransaction ft = fm.beginTransaction();
-				Fragment fragment = fm.findFragmentByTag("tab1");
-				if(fragment == null){
-					fragment = new RobitOrderFragment();
-				}
-				ft.replace(R.id.details,fragment,"tab1");
-				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
-				ft.addToBackStack(null);
-				ft.commit();
-				setCurrentFragment(fragment);
-				actionBarButton.setVisibility(View.INVISIBLE);
-			}
-		});
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
-		List<SearchInfo> searchInfos = searchInfoService.findAccountSearchInfos(HttpClientUtil.getAccount().getName());
-		HttpClientUtil.setSearchInfos(searchInfos);
-		fm = getFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		if(searchInfos.isEmpty()){
-			currentFragment = new RobitOrderFragment();
-			Bundle bundle = new Bundle();
-			currentFragment.setArguments(bundle);
-			ft.replace(R.id.details,currentFragment,"tab1");
-		}else{
-			currentFragment = new SearchInfoFragment();
-			ft.replace(R.id.details,currentFragment,"searchInfo");
+		if(HttpClientUtil.getAccount() != null){
+			List<SearchInfo> searchInfos = searchInfoService.findAccountSearchInfos(HttpClientUtil.getAccount().getName());
+			HttpClientUtil.setSearchInfos(searchInfos);
+			fm = getFragmentManager();
+			FragmentTransaction ft = fm.beginTransaction();
+			if(searchInfos.isEmpty()){
+				currentFragment = new RobitOrderFragment();
+				Bundle bundle = new Bundle();
+				currentFragment.setArguments(bundle);
+				ft.replace(R.id.details,currentFragment,"tab1");
+			}else{
+				currentFragment = new SearchInfoFragment();
+				ft.replace(R.id.details,currentFragment,"searchInfo");
+			}
+			ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+			ft.addToBackStack(null);
+			ft.commit();
 		}
-		ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
-		ft.addToBackStack(null);
-		ft.commit();
 	}
 	
 	
@@ -211,6 +194,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 			 			ft.replace(R.id.details,currentFragment);
 						ft.addToBackStack(null);
 						ft.commit();
+						actionBarButton.setText("跳过");
 			 		}else{
 			 			dialog();
 			 			return true;

@@ -13,8 +13,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -50,7 +50,8 @@ public class ContactFragment extends Fragment {
 	public void showView(){
 		userInfoService = SqlLiteUtil.getUserInfoService(activity);
 		Collection<UserInfo> userInfos;
-		if(HttpClientUtil.getUserInfoMap() != null){
+		if(HttpClientUtil.getUserInfoMap() != null
+				&& !HttpClientUtil.getUserInfoMap().isEmpty()){
 			userInfos = HttpClientUtil.getUserInfoMap().values();
 		}else{
 			userInfos = userInfoService.findAllInfos();
@@ -81,18 +82,25 @@ public class ContactFragment extends Fragment {
 		// TODO Auto-generated method stub
 		activity = getActivity();
 //		closeSoftInput();
-		Button syncButton = (Button)activity.findViewById(R.id.sync);
-		syncButton.setOnClickListener(new OnClickListener() {
+		View view = getActivity().getActionBar().getCustomView();
+		final Button skipButton = (Button)view.findViewById(R.id.actionBarSkipButton);
+		skipButton.setText("同步");
+		skipButton.setVisibility(View.VISIBLE);
+		skipButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View arg0) {
-				Map<String,UserInfo> userinfoMap = new HashMap<String, UserInfo>();
-				userInfoService.delByAccountName();
-				GetPersonConstanct getPersonConstanct = new GetPersonConstanct(activity,userinfoMap,ContactFragment.this);
-				getPersonConstanct.execute("");
+			public void onClick(View v) {
+				sync();
 			}
 		});
 		showView();
 		super.onActivityCreated(savedInstanceState);
+	}
+	
+	public void sync(){
+		Map<String,UserInfo> userinfoMap = new HashMap<String, UserInfo>();
+		userInfoService.delByAccountName();
+		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(activity,userinfoMap,ContactFragment.this);
+		getPersonConstanct.execute("");
 	}
 
 

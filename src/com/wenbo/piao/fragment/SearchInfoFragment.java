@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -66,6 +67,24 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 		View view = getActivity().getActionBar().getCustomView();
 		final Button skipButton = (Button)view.findViewById(R.id.actionBarSkipButton);
 		skipButton.setVisibility(View.VISIBLE);
+		skipButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				FragmentManager fm = getFragmentManager();
+				FragmentTransaction ft = fm.beginTransaction();
+				Fragment fragment = fm.findFragmentByTag("tab1");
+				if(fragment == null){
+					fragment = new RobitOrderFragment();
+					fragment.setArguments(new Bundle());
+				}
+				ft.replace(R.id.details,fragment,"tab1");
+				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
+				ft.addToBackStack(null);
+				ft.commit();
+				activity.setCurrentFragment(fragment);
+				skipButton.setVisibility(View.INVISIBLE);
+			}
+		});
 		listView = (ListView)activity.findViewById(R.id.searchInfoview);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -77,8 +96,7 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 				Fragment fragment = fm.findFragmentByTag("tab1");
 				if(fragment == null){
 					fragment = new RobitOrderFragment();
-					Bundle bundle = new Bundle();
-					fragment.setArguments(bundle);
+					fragment.setArguments(new Bundle());
 				}
 				Bundle bundle = fragment.getArguments();
                 bundle.putSerializable("searchInfo",searchInfo);

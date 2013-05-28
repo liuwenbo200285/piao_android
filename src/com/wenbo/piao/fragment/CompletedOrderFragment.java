@@ -239,7 +239,7 @@ OnClickListener,android.view.View.OnClickListener {
 						httpPost.setEntity(uef);
 						response = HttpClientUtil.getHttpClient().execute(httpPost);
 						if (response.getStatusLine().getStatusCode() == 200) {
-							orders = JsoupUtil.myOrders(activity.getAssets().open("Noname6.txt"));
+							orders = JsoupUtil.myOrders(response.getEntity().getContent());
 						}
 					}
 				} catch (Exception e) {
