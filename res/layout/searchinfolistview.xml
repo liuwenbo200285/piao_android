@@ -25,7 +25,7 @@
         android:id="@+id/searchInfoText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
+        android:textSize="18sp"
         android:layout_alignParentLeft="true"
         android:textIsSelectable="false"
         android:layout_below="@+id/stationText"/>

@@ -2,6 +2,8 @@ package com.wenbo.piao.fragment;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -171,9 +173,12 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 			stationText.setText(searchInfo.getFromStation()+"→"+searchInfo.getToStation());
 			searchInfoText = (TextView)view.findViewById(R.id.searchInfoText);
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("坐   席："+searchInfo.getOrderSeat()+"\n")
-						 .append("乘   客："+searchInfo.getOrderPerson()+"\n")
-						 .append("出发时间："+searchInfo.getOrderTime());
+			stringBuilder.append("坐     席："+searchInfo.getOrderSeat()+"\n")
+						 .append("乘     客："+searchInfo.getOrderPerson()+"\n");
+			if(StringUtils.isNotBlank(searchInfo.getTrainNo())){
+				stringBuilder.append("车     次："+searchInfo.getTrainNo()+"\n");
+			}
+			stringBuilder.append("出发时间："+searchInfo.getOrderDate());
 			searchInfoText.setText(stringBuilder.toString());
 			return view;
 		}

@@ -481,11 +481,11 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	public void showDialog() {
 		if (dialog == null) {
 			try {
-				if (userInfoMap.isEmpty()) {
-					LoginDialog.newInstance("此账号还没有添加联系人！").show(
-							activity.getFragmentManager(), "dialog");
-					return;
-				}
+//				if (userInfoMap.isEmpty()) {
+//					LoginDialog.newInstance("此账号还没有添加联系人！").show(
+//							activity.getFragmentManager(), "dialog");
+//					return;
+//				}
 				contacts = new String[userInfoMap.size()];
 				int i = 0;
 				for (String key : userInfoMap.keySet()) {

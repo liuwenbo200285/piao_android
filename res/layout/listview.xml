@@ -10,7 +10,8 @@
 <TextView 
 	android:id="@+id/textView1"
     android:layout_height="wrap_content"   
-    android:textSize="20sp"   
+    android:textSize="20sp" 
+    android:textColor="@color/dark"  
     android:layout_width="fill_parent"
     android:textIsSelectable="true"
     />
