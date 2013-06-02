@@ -481,11 +481,11 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	public void showDialog() {
 		if (dialog == null) {
 			try {
-//				if (userInfoMap.isEmpty()) {
-//					LoginDialog.newInstance("此账号还没有添加联系人！").show(
-//							activity.getFragmentManager(), "dialog");
-//					return;
-//				}
+				if (userInfoMap.isEmpty()) {
+					LoginDialog.newInstance("此账号还没有添加联系人！").show(
+							activity.getFragmentManager(), "dialog");
+					return;
+				}
 				contacts = new String[userInfoMap.size()];
 				int i = 0;
 				for (String key : userInfoMap.keySet()) {
@@ -671,7 +671,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 						activity.getFragmentManager(), "dialog");
 				break;
 			case 11:
-				LoginDialog.newInstance("订票成功！").show(
+				LoginDialog.newInstance("订票成功，请十秒后查看订单！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			case 12:

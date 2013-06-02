@@ -187,6 +187,7 @@ OnClickListener,android.view.View.OnClickListener {
 		if(!oldDate.equals(newDate)){
 			editText.setText(newDate);
 		}
+//		editText.clearFocus();
 	}
 	
 	/**
@@ -199,7 +200,8 @@ OnClickListener,android.view.View.OnClickListener {
 			mMonth = monthOfYear;
 			mDay = dayOfMonth;
 			updateDateDisplay(currentEditText);
-			currentEditText.clearFocus();
+			orderSearch.requestFocus();
+//			currentEditText.clearFocus();
 //			closeSoftInput();
 		}
 	};

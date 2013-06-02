@@ -94,43 +94,39 @@ public class NoCompletedOrderFragment extends Fragment {
 	}
 	
 	private void getOrder(){
-		if(noCompletedOrders == null || noCompletedOrders.isEmpty()){
-			new AsyncTask<Integer,Integer,Integer>() {
-				@Override
-				protected Integer doInBackground(Integer... params) {
-					HttpResponse response = null;
-					try {
-						HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
-						response = HttpClientUtil.getHttpClient().execute(httpGet);
-						if (response.getStatusLine().getStatusCode() == 200) {
-							noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-//							noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
-							HttpClientUtil.setNoCompletedOrders(noCompletedOrders);
-						}
-					} catch (Exception e) {
-						Log.e("GetNoCompletedOrder","onTabSelected", e);
-					} finally {
-						
+		new AsyncTask<Integer,Integer,Integer>() {
+			@Override
+			protected Integer doInBackground(Integer... params) {
+				HttpResponse response = null;
+				try {
+					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
+					response = HttpClientUtil.getHttpClient().execute(httpGet);
+					if (response.getStatusLine().getStatusCode() == 200) {
+						noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
+//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
+						HttpClientUtil.setNoCompletedOrders(noCompletedOrders);
 					}
-					return null;
+				} catch (Exception e) {
+					Log.e("GetNoCompletedOrder","onTabSelected", e);
+				} finally {
+					
 				}
+				return null;
+			}
 
-				@Override
-				protected void onPostExecute(Integer result) {
-					progressDialog.dismiss();
-					showView();
-					super.onPostExecute(result);
-				}
+			@Override
+			protected void onPostExecute(Integer result) {
+				progressDialog.dismiss();
+				showView();
+				super.onPostExecute(result);
+			}
 
-				@Override
-				protected void onPreExecute() {
-					progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
-					super.onPreExecute();
-				}
-			}.execute(0);
-		}else{
-			showView();
-		}
+			@Override
+			protected void onPreExecute() {
+				progressDialog = ProgressDialog.show(activity,"获取未付款订单","正在获取未付款订单...",true,false);
+				super.onPreExecute();
+			}
+		}.execute(0);
 	}
 	
 	private void showView(){
