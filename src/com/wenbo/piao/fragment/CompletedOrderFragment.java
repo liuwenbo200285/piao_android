@@ -194,14 +194,13 @@ OnClickListener,android.view.View.OnClickListener {
 	 * 日期控件的事件
 	 */
 	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
+		public void onDateSet(DatePicker view, int year, int monthOfYear,int dayOfMonth) {
 			mYear = year;
 			mMonth = monthOfYear;
 			mDay = dayOfMonth;
 			updateDateDisplay(currentEditText);
-			orderSearch.requestFocus();
-//			currentEditText.clearFocus();
+//			orderSearch.requestFocus();
+			currentEditText.clearFocus();
 //			closeSoftInput();
 		}
 	};
