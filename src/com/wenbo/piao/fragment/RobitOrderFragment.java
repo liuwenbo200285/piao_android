@@ -361,7 +361,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				.append("-").append((mDay < 10) ? "0" + mDay : mDay).toString().trim();
 		if(!oldDate.equals(newDate)){
 			trainDate.setText(newDate);
-//			trainDate.clearFocus();
+			trainDate.clearFocus();
 //			trainCode.requestFocus();
 //			closeSoftInput();
 		}

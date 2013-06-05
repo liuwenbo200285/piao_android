@@ -73,12 +73,13 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	@Override
 	protected void onPostExecute(final String[] result) {
 		progressDialog.dismiss();
+		final EditText editText = (EditText)activity.findViewById(R.id.startTrainNo);
 		if(result == null){
 			LoginDialog.newInstance("没有找到可以乘坐的车次！").show(
 					activity.getFragmentManager(), "dialog");
+			editText.clearFocus();
 			return;
 		}
-		final EditText editText = (EditText)activity.findViewById(R.id.startTrainNo);
 		final EditText trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
 		.setSingleChoiceItems(result, 0,
@@ -96,6 +97,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 							imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
 						}
 						dialog.dismiss();
+						editText.clearFocus();
 					}
 				}).setIcon(android.R.drawable.arrow_down_float);
 		builder.setTitle("选择车次");
