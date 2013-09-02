@@ -127,6 +127,7 @@ public class CompletedOrderListFragment extends Fragment {
 					Button lastTimeButton = (Button)view.findViewById(R.id.lastTimeButton);
 					payButton.setVisibility(View.GONE);
 					lastTimeButton.setVisibility(View.GONE);
+					refundButton.setVisibility(View.GONE);
 					if(StringUtils.contains(order.getOrderStatus(),"已出票")){
 						refundButton.setVisibility(View.GONE);
 					}else{

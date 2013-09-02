@@ -54,7 +54,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	@Override
 	protected String[] doInBackground(String... arg0) {
 		String info = getTrainNo();
-		if(StringUtils.isBlank(info)){
+		if(info == null || StringUtils.isBlank(info)){
 			return null;
 		}
 		JSONArray arry = JSONArray.parseArray(info);
