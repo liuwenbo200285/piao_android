@@ -8,6 +8,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -31,6 +32,8 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	private Activity activity = null;
 	
 	private int type;
+	
+	private ProgressDialog progressDialog;
 	
 	private static DefaultHttpClient httpClient = null;
 	
@@ -61,11 +64,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 			return;
 		}
 		imageView.setImageBitmap(result);
+		progressDialog.dismiss();
 	}
 
 	@Override
 	protected void onPreExecute() {
-//		progressDialog = ProgressDialog.show(activity,"获取验证码","正在获取验证码...",true,false);
+		progressDialog = ProgressDialog.show(activity,"获取验证码","正在获取验证码...",true,false);
 		Log.i("GetRandCodeTask.onPreExecute","开始获取验证码...");
 	}
 

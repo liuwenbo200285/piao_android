@@ -133,10 +133,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
-		final Calendar c = Calendar.getInstance();
-		mYear = c.get(Calendar.YEAR);
-		mMonth = c.get(Calendar.MONTH);
-		mDay = c.get(Calendar.DAY_OF_MONTH);
 		setDateTime();
 		fromStation = (AutoCompleteTextView) activity.findViewById(R.id.startArea);
 		fromStation.addTextChangedListener(new TextWatcher() {
@@ -345,9 +341,19 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	 */
 	private void setDateTime() {
 		final Calendar c = Calendar.getInstance();
-		mYear = c.get(Calendar.YEAR);
-		mMonth = c.get(Calendar.MONTH);
-		mDay = c.get(Calendar.DAY_OF_MONTH);
+		String oldDate = trainDate.getText().toString().trim();
+		if(StringUtils.isNotBlank(oldDate)){
+			String[] date = StringUtils.split(oldDate,"-");
+			if(date.length == 3){
+				mYear = Integer.parseInt(date[0]);
+				mMonth = Integer.parseInt(date[1])-1;
+				mDay = Integer.parseInt(date[2]);
+			}
+		}else {
+			mYear = c.get(Calendar.YEAR);
+			mMonth = c.get(Calendar.MONTH);
+			mDay = c.get(Calendar.DAY_OF_MONTH);
+		}
 		updateDateDisplay();
 	}
 
@@ -384,8 +390,17 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private void showTrainTypeDialog() {
 		if (selectTrainTypeDialog == null) {
 			final String[] trainType = { "全部", "动车", "Z字头", "T字头", "K字头", "其它" };
+			String trainText = selectTrainTypeText.getText().toString();
+			int i = 0;
+			if(StringUtils.isNotBlank(trainText)){
+				for(; i < trainType.length; i++){
+					if(trainText.equals(trainType[i])){
+						break;
+					}
+				}
+			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-					.setSingleChoiceItems(trainType, 0,
+					.setSingleChoiceItems(trainType,i,
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
@@ -410,8 +425,17 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		if (selectTimeDialog == null) {
 			final String[] times = { "00:00--24:00", "00:00--06:00",
 					"06:00--12:00", "12:00--18:00", "18:00--24:00" };
+			String timeText = selectTimeText.getText().toString();
+			int i = 0;
+			if(StringUtils.isNotBlank(timeText)){
+				for(; i < times.length; i++){
+					if(timeText.equals(times[i])){
+						break;
+					}
+				}
+			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-					.setSingleChoiceItems(times, 0,
+					.setSingleChoiceItems(times,i,
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
@@ -433,9 +457,19 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 
 	private void showSeatDialog() {
 		if (selectSeatDialog == null) {
-			final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧",
-					"硬卧", "软座", "硬座", "无座" };
+			final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座" };
 			final boolean[] selectSeats = new boolean[seats.length];
+			if(StringUtils.isNotBlank(selectSeatText.getText())){
+				String [] seatNames = StringUtils.split(selectSeatText.getText().toString(),",");
+				for(String name:seatNames){
+					for(int i = 0; i < seats.length;i++){
+						if(name.equals(seats[i])){
+							selectSeats[i] = true;
+							break;
+						}
+					}
+				}
+			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
 					.setMultiChoiceItems(seats, selectSeats,
 							new OnMultiChoiceClickListener() {
@@ -444,7 +478,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 										int which, boolean isChecked) {
 								}
 							}).setIcon(android.R.drawable.btn_dropdown);
-			builder.setTitle("选择乘客坐席")
+					builder.setTitle("选择乘客坐席")
 					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -494,6 +528,18 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				}
 				if (checkedItems == null) {
 					checkedItems = new boolean[contacts.length];
+				}
+				String orderPeoples = orderPeople.getText().toString();
+				if(StringUtils.isNotBlank(orderPeoples)){
+					String[] peoples = StringUtils.split(orderPeoples,",");
+					for(String people:peoples){
+						for(int n = 0; n < contacts.length; n++){
+							if(people.equals(contacts[n])){
+								checkedItems[n] = true;
+								break;
+							}
+						}
+					}
 				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity)
 						.setMultiChoiceItems(contacts, checkedItems,
@@ -624,6 +670,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		// 自定义一个广播接收器
 		@Override
 		public void onReceive(Context context, Intent receiveIntent) {
+			if(type == 0){
+				return;
+			}
 			Bundle bundle = receiveIntent.getExtras();
 			status = bundle.getInt("status");
 			if(status >= 1000){
@@ -719,7 +768,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								status = 0;
 							}
 						});
-				orderCodeBuilder.show();
+				if(type == 1){
+					orderCodeBuilder.show();
+				}
 				break;
 			case 13:
 				LoginDialog.newInstance("今日将不能继续受理您的订票请求！").show(
@@ -791,6 +842,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		if(hasFocus){
 			switch (v.getId()) {
 			case R.id.startTime:
+				setDateTime();
 				datePickerDialog = new DatePickerDialog(activity,
 						mDateSetListener, mYear, mMonth, mDay);
 				datePickerDialog.show();

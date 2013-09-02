@@ -37,6 +37,7 @@ import com.wenbo.piao.fragment.SearchInfoFragment;
 import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
+import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.OperationUtil;
 
@@ -86,6 +87,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 			ft.addToBackStack(null);
 			ft.commit();
 		}
+		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(this,HttpClientUtil.getUserInfoMap(),null);
+		getPersonConstanct.execute("");
 	}
 	
 	
@@ -102,7 +105,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment hideFragment = null;
 		ActionBar actionBar = getActionBar();
-		if(actionBar.getTabCount() > 0 && item.getItemId() != R.id.tab2){
+		if(actionBar.getTabCount() > 0 && item.getItemId() != R.id.tab3){
 			int mActionBarOptions = getActionBar().getDisplayOptions();
 			getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
 					ActionBar.DISPLAY_SHOW_CUSTOM |mActionBarOptions);
@@ -117,6 +120,14 @@ public class UserActivity extends Activity implements OnTouchListener{
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:
+			hideFragment = fm.findFragmentByTag("searchInfo");
+			if(hideFragment == null){
+				hideFragment = new SearchInfoFragment();
+				ft.replace(R.id.details,hideFragment,"searchInfo");
+				isNew = true;
+			}
+			break;
+		case R.id.tab2:
 			hideFragment = fm.findFragmentByTag("tab1");
 			if(hideFragment == null){
 				hideFragment = new RobitOrderFragment();
@@ -126,7 +137,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 				isNew = true;
 			}
 			break;
-		case R.id.tab2:
+		case R.id.tab3:
 			actionBarView.setVisibility(View.INVISIBLE);
 			hideFragment = fm.findFragmentByTag("tab2");
 			if(hideFragment == null){
@@ -135,7 +146,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 				isNew = true;
 			}
 			break;
-		case R.id.tab3:
+		case R.id.tab4:
 			hideFragment = fm.findFragmentByTag("tab3");
 			if(hideFragment == null){
 				hideFragment = new ContactFragment();
@@ -143,7 +154,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 				isNew = true;
 			}
 			break;
-		case R.id.tab4:
+		case R.id.tab5:
 			Intent intent = new Intent();
             intent.setClass(this,MainActivity.class);
 			startActivity(intent);
@@ -154,7 +165,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 			finish();
 			cleanInfo();
 			break;
-		case R.id.tab5:
+		case R.id.tab6:
 			hideFragment = fm.findFragmentByTag("tab4");
 			if(hideFragment == null){
 				hideFragment = new AboutFargment();

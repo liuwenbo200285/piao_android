@@ -1,5 +1,6 @@
 package com.wenbo.piao.task;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	@Override
 	protected String[] doInBackground(String... arg0) {
 		String info = getTrainNo();
-		if(StringUtils.isBlank(info)){
+		if(info == null || StringUtils.isBlank(info)){
 			return null;
 		}
 		JSONArray arry = JSONArray.parseArray(info);
@@ -137,7 +138,9 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return EntityUtils.toString(response.getEntity());
 			}
-		} catch (Exception e) {
+		}catch(SocketTimeoutException e){
+			getTrainNo();
+		}catch (Exception e) {
 			Log.e("getTrainNo","search trainNo error!", e);
 		}
 		return null;

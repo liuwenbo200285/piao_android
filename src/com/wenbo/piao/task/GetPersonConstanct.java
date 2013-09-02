@@ -92,8 +92,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	@Override
 	protected void onPostExecute(String result) {
 		HttpClientUtil.setUserInfoMap(userInfoMap);
+		progressDialog.dismiss();
 		if(fragment != null){
-			progressDialog.dismiss();
 			if(fragment.getClass() == RobitOrderFragment.class){
 				RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
 				robitOrderFragment.showDialog();
@@ -107,9 +107,7 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 
 	@Override
 	protected void onPreExecute() {
-		if(fragment != null){
-			progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
-		}
+		progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
 		super.onPreExecute();
 	}
 

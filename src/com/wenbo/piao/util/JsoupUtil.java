@@ -237,6 +237,9 @@ public class JsoupUtil {
 					Element element3 = elements3.get(i);
 					if(i !=0 && i != elements3.size()-1){
 						Element element4 = element3.getElementById("checkbox_pay");
+						if(element4 == null){
+							continue;
+						}
 						if(StringUtils.isBlank(order.getOrderNo())
 								&& element4 != null){
 							order.setOrderNo(StringUtils.split(element4.attr("name"),"_")[2]);
@@ -307,6 +310,31 @@ public class JsoupUtil {
 						}
 						orderInfos.add(orderInfo);
 					}
+				}
+				if(order.getOrderInfo() == null
+						|| StringUtils.isEmpty(order.getOrderStatus())){
+					Elements errorElements = document.getElementsByClass("blue_bold");
+					if(errorElements != null){
+						Element errorElement = errorElements.get(0).parent();
+						errorElements = errorElement.children();
+					}
+					OrderInfo orderInfo = new OrderInfo();
+					int i = 0;
+					for(Element errorElement:errorElements){
+						if(i == 0){
+							orderInfo.setTrainInfo(errorElement.text());
+							order.setTrainInfo(orderInfo.getTrainInfo());
+						}else if(i == 1){
+							orderInfo.setSeatInfo(errorElement.text());
+						}else if(i == 2){
+							orderInfo.setPassengersInfo(errorElement.text());
+						}else if(i == 3){
+							orderInfo.setStatusInfo(errorElement.text());
+							order.setOrderStatus(orderInfo.getStatusInfo());
+						}
+						i++;
+					}
+					order.setOrderInfo(orderInfo);
 				}
 				order.setOrderInfos(orderInfos);
 				orders.add(order);

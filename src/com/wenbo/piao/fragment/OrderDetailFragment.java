@@ -3,12 +3,17 @@ package com.wenbo.piao.fragment;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +28,8 @@ public class OrderDetailFragment extends Fragment {
 	
 	private ListView listView;
 	
+	private AlertDialog alertDialog;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -36,6 +43,38 @@ public class OrderDetailFragment extends Fragment {
 		listView = (ListView)activity.findViewById(R.id.noCompleteOrderView);
 		OrderAdapter adapter = new OrderAdapter(activity,0,HttpClientUtil.getSelectOrder().getOrderInfos());
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+			}
+			
+		});
+		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					final int arg2, long arg3) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+				.setIcon(android.R.drawable.btn_dropdown)
+				.setTitle("取消订单")
+				.setMessage("您确认要取消该订单吗？")
+				.setNegativeButton("确定",new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						
+					}
+				})
+				.setPositiveButton("取消",new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						alertDialog.hide();
+					}
+				});
+				alertDialog = builder.create();
+				alertDialog.show();
+				return true;
+			}
+		});
 		super.onActivityCreated(savedInstanceState);
 	}
 
