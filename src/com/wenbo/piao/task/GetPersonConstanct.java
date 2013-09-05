@@ -1,5 +1,6 @@
 package com.wenbo.piao.task;
 
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.fragment.ContactFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
@@ -64,6 +66,10 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 			boolean isInit = false;
 			if(userInfos == null || userInfos.isEmpty()){
 				String info = getOrderPerson();
+				if(info == null){
+					LoginDialog.newInstance("获取联系人超时，请在联系人菜单选择同步！").show(activity.getFragmentManager(),"dialog");
+					return null;
+				}
 		    	JSONObject jsonObject = JSON.parseObject(info);
 		    	userInfos = JSONArray.parseArray(
 						jsonObject.getString("rows"), UserInfo.class);
@@ -92,8 +98,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	@Override
 	protected void onPostExecute(String result) {
 		HttpClientUtil.setUserInfoMap(userInfoMap);
-		progressDialog.dismiss();
 		if(fragment != null){
+			progressDialog.dismiss();
 			if(fragment.getClass() == RobitOrderFragment.class){
 				RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
 				robitOrderFragment.showDialog();
@@ -107,7 +113,9 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 
 	@Override
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
+		if(fragment != null){
+			progressDialog = ProgressDialog.show(activity,"获取联系人","正在获取联系人...",true,false);
+		}
 		super.onPreExecute();
 	}
 
@@ -142,6 +150,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return EntityUtils.toString(response.getEntity());
 			}
+		} catch (SocketTimeoutException e) {
+			Log.e("GetPersonConstanct","getOrderPerson data timeout!",e);
 		} catch (Exception e) {
 			Log.e("GetPersonConstanct","getOrderPerson error!",e);
 		} finally {

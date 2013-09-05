@@ -50,6 +50,11 @@ public enum UrlEnum {
 	TO_PAY("https://epay.12306.cn/pay/payGateway","","","",""),
 	SELECT_BANK("https://epay.12306.cn/pay/webBusiness","","","",""),
 	PAY_BY_UNIONPAY("https://unionpaysecure.com/api/Pay.action","","","",""),
+	INIT_REFUND_TICKET("order/ticketAction.do?method=initRefundTicket","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+			"https://dynamic.12306.cn/otsweb/order/myOrderAction.do?method=queryMyOrder","application/x-www-form-urlencoded",
+			""),
+	CONFIRM_REFUND_TICKET("order/ticketAction.do?method=confirmRefundTicket","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+			"https://dynamic.12306.cn/otsweb/order/ticketAction.do?method=initRefundTicket","application/x-www-form-urlencoded",""),
 	CHECK_LOGIN("order/myOrderAction.do?method=queryOrderWaitTime","application/json, text/javascript, */*","","","");
 	private String path;
 	

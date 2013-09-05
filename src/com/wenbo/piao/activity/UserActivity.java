@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
@@ -38,6 +39,7 @@ import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
+import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.OperationUtil;
 
@@ -53,6 +55,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 		
 	private Button actionBarButton;
 	
+	private TextView actionBarText;
+	
 	private View actionBarView;
 	
 
@@ -67,6 +71,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 		// 设置 自定义view
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
+		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
+		actionBarText.setText("无忧火车票("+CommonUtil.showTitileName()+")");
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		if(HttpClientUtil.getAccount() != null){
@@ -86,9 +92,9 @@ public class UserActivity extends Activity implements OnTouchListener{
 			ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
 			ft.addToBackStack(null);
 			ft.commit();
+			GetPersonConstanct getPersonConstanct = new GetPersonConstanct(this,HttpClientUtil.getUserInfoMap(),currentFragment);
+			getPersonConstanct.execute("");
 		}
-		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(this,HttpClientUtil.getUserInfoMap(),null);
-		getPersonConstanct.execute("");
 	}
 	
 	
@@ -117,6 +123,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 		}
 		actionBarButton.setVisibility(View.INVISIBLE);
 		actionBarView.setVisibility(View.VISIBLE);
+		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
+		actionBarText.setText("无忧火车票("+CommonUtil.showTitileName()+")");
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:
@@ -155,15 +163,33 @@ public class UserActivity extends Activity implements OnTouchListener{
 			}
 			break;
 		case R.id.tab5:
-			Intent intent = new Intent();
-            intent.setClass(this,MainActivity.class);
-			startActivity(intent);
-			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
-			if(robitOrderFragment != null){
-				robitOrderFragment.unRegisterService();
-			}
-			finish();
-			cleanInfo();
+			AlertDialog.Builder builder = new AlertDialog.Builder(UserActivity.this); 
+	        builder.setMessage("确定要切换账号吗?"); 
+	        builder.setTitle("提示"); 
+	        builder.setPositiveButton("确认", 
+	                new android.content.DialogInterface.OnClickListener() { 
+	                    @Override 
+	                    public void onClick(DialogInterface dialog, int which) { 
+	                        dialog.dismiss(); 
+	                        Intent intent = new Intent();
+	                        intent.setClass(UserActivity.this,MainActivity.class);
+	            			startActivity(intent);
+	            			RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fm.findFragmentByTag("tab1");
+	            			if(robitOrderFragment != null){
+	            				robitOrderFragment.unRegisterService();
+	            			}
+	            			finish();
+	            			cleanInfo();
+	                    } 
+	                }); 
+	        builder.setNegativeButton("取消", 
+	                new android.content.DialogInterface.OnClickListener() { 
+	                    @Override 
+	                    public void onClick(DialogInterface dialog, int which) { 
+	                        dialog.dismiss(); 
+	                    } 
+	                }); 
+	        builder.create().show(); 
 			break;
 		case R.id.tab6:
 			hideFragment = fm.findFragmentByTag("tab4");

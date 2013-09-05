@@ -3,15 +3,11 @@ package com.wenbo.piao.activity;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,7 +31,6 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
-import com.wenbo.piao.util.OperationUtil;
 
 public class MainActivity extends Activity {
 	
@@ -147,7 +142,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		initDataStation();
-		getLoginRangeCode();
+//		getLoginRangeCode();
 		Account account = accountService.queryLastLoginAccount();
 		if(account != null){
 			userNameText.setText(account.getName());
@@ -254,36 +249,8 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	private void checkLogin(){
-		//检测是否已经在登录
-				new AsyncTask<Integer,Integer,String>(){
-					@Override
-					protected String doInBackground(Integer... arg0) {
-						return OperationUtil.checkLogin();
-					}
-
-					@Override
-					protected void onPostExecute(String result) {
-						try {
-							Document document = Jsoup.parse(result);
-							Element element = document.getElementById("loginForm");
-							System.out.println(element.toString());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						super.onPostExecute(result);
-					}
-
-					@Override
-					protected void onPreExecute() {
-						super.onPreExecute();
-					}
-				
-				}.execute(0);
-	}
-	
 	/**
-	 * 获取登录验证码
+	 * 初始化车站数据
 	 */
 	private void initDataStation(){
 		SqlliteHelper sqlliteHelper = new SqlliteHelper(this);
@@ -293,6 +260,8 @@ public class MainActivity extends Activity {
 		if(num == 0){
 			InitStationTask initStationTask = new InitStationTask(this);
 			initStationTask.execute("");
+		}else{
+			getLoginRangeCode();
 		}
 	}
 

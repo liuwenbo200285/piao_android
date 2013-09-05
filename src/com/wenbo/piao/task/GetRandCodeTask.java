@@ -59,12 +59,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
+		progressDialog.dismiss();
 		if(result == null){
 			LoginDialog.newInstance("请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 
 			return;
 		}
 		imageView.setImageBitmap(result);
-		progressDialog.dismiss();
 	}
 
 	@Override

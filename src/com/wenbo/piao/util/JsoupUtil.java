@@ -7,9 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +32,9 @@ public class JsoupUtil {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public static void main(String[] args) throws Exception {
-		
+		String str = "Mon, 09 Sep 2013 09:49:21 GMT";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		simpleDateFormat.parse(str);
 	}	
 	
 	
@@ -74,7 +74,7 @@ public class JsoupUtil {
 	/**
 	 * 检测有没有票
 	 */
-	public static int checkHaveTicket(Document document,String type,RobitOrderService robitOrderService){
+	public static int checkHaveTicket(Document document,String type,RobitOrderService robitOrderService,Date serverDate){
 		int max = 10000000;
 		Integer maxType = 0;
 		String trainNo = null;
@@ -132,7 +132,8 @@ public class JsoupUtil {
 						String clo = StringUtils.substring(info,0,bengin);
 						if(StringUtils.isNumeric(clo)){
 							int hour = Integer.valueOf(clo);
-							GregorianCalendar calender = new GregorianCalendar(Locale.CHINA);
+							Calendar calender = Calendar.getInstance();
+							calender.setTime(serverDate);
 							SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 							String str = calender.get(Calendar.YEAR)+"-"+
 									(calender.get(Calendar.MONTH)+1)+"-"+(calender.get(Calendar.DAY_OF_MONTH))+" "+hour+":00:00";

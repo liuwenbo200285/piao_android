@@ -5,8 +5,10 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.util.HttpClientUtil;
+import com.wenbo.piao.util.OperationUtil;
 
 public class OrderDetailFragment extends Fragment {
 	
@@ -61,7 +65,33 @@ public class OrderDetailFragment extends Fragment {
 				.setNegativeButton("确定",new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						
+						new AsyncTask<String,Integer,String>(){
+							private ProgressDialog progressDialog;
+							@Override
+							protected String doInBackground(
+									String... params) {
+								return null;
+							}
+							@Override
+							protected void onPostExecute(
+									String result) {
+								progressDialog.dismiss();
+								if(result == null){
+									LoginDialog.newInstance( "退票失败！").show(activity.getFragmentManager(),"dialog"); 
+								}else{
+									if(result.equals(OperationUtil.OPERATION_SUCCESS)){
+										LoginDialog.newInstance( "退票成功！").show(activity.getFragmentManager(),"dialog");
+									}
+								}
+								super.onPostExecute(result);
+							}
+
+							@Override
+							protected void onPreExecute() {
+								progressDialog = ProgressDialog.show(activity,"退票","正在退票...",true,false);
+								super.onPreExecute();
+							}
+						}.execute("");
 					}
 				})
 				.setPositiveButton("取消",new DialogInterface.OnClickListener() {

@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -148,10 +151,14 @@ public class RobitOrderService extends Service {
 			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
 			httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
 			response = httpClient.execute(httpGet);
+			Date serverDate = null;
 			if(response.getStatusLine().getStatusCode() == 200){
+				String dateStr = response.getHeaders("Date")[0].getValue();
+				dateStr = StringUtils.replace(dateStr,",","");
+				serverDate =  new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss z",Locale.ENGLISH).parse(dateStr);
 				info = EntityUtils.toString(response.getEntity());
 			}
-			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date)) == null){
+			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date,serverDate)) == null){
 				if(isBegin == false){
 					return;
 				}
@@ -191,7 +198,7 @@ public class RobitOrderService extends Service {
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 */
-	public OrderParameter checkTickeAndOrder(String message, String date) {
+	public OrderParameter checkTickeAndOrder(String message, String date,Date serverDate) {
 		Document document = null;
 		OrderParameter orderParameter = null;
 		try {
@@ -218,7 +225,7 @@ public class RobitOrderService extends Service {
 				}
 				document = Jsoup.parse(trainInfo);
 				ticketType = JsoupUtil.checkHaveTicket(document,
-						configInfo.getOrderSeat(),this);
+						configInfo.getOrderSeat(),this,serverDate);
 				if (ticketType > 0) {
 					break;
 				}
