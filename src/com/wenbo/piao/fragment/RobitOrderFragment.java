@@ -51,6 +51,7 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.GetTrainNoTast;
+import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.SearchInfoUtil;
 

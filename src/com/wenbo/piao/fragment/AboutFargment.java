@@ -29,7 +29,7 @@ public class AboutFargment extends Fragment {
 		activity = getActivity();
 //		closeSoftInput();
 		textView = (TextView)activity.findViewById(R.id.aboutTextView);
-		textView.setText("无忧火车票V0.1\n\n新浪微博:http://weibo.com/wenbol");
+		textView.setText("无忧火车票V0.1\n\n新浪微博:http://weibo.com/wenbol\n\n支付宝捐赠地址：https://me.alipay.com/wenbo200285");
 		super.onActivityCreated(savedInstanceState);
 	}
 

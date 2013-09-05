@@ -364,6 +364,34 @@ public class OperationUtil {
 		return null;
 	}
 	
+	public static String initRefundTicket() {
+		HttpResponse response = null;
+		try {
+			HttpClient httpClient = HttpClientUtil.getHttpClient();
+//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
+			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.INIT_REFUND_TICKET);
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			parameters.add(new BasicNameValuePair("method", "initRefundTicket"));
+			parameters.add(new BasicNameValuePair("ticket_key","E4100807031133005"));
+			parameters.add(new BasicNameValuePair("org.apache.struts.taglib.html.TOKEN","67432f582867f4b3868e93fa9a777326"));
+			parameters.add(new BasicNameValuePair("queryOrderDTO.from_order_date","2013-09-02"));
+			parameters.add(new BasicNameValuePair("queryOrderDTO.to_order_date","2013-09-02"));
+			parameters.add(new BasicNameValuePair("ticket_key","E4100807031133005"));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
+					"UTF-8");
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		} catch (Exception e) {
+			Log.e("GetPersonConstanct","getOrderPerson error!",e);
+		} finally {
+			Log.i("GetPersonConstanct","close getOrderPerson");
+		}
+		return null;
+	}
+	
 	/**
 	 * 获取登录账号用户信息
 	 * 
