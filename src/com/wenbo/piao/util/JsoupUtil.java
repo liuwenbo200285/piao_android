@@ -138,8 +138,7 @@ public class JsoupUtil {
 							String str = calender.get(Calendar.YEAR)+"-"+
 									(calender.get(Calendar.MONTH)+1)+"-"+(calender.get(Calendar.DAY_OF_MONTH))+" "+hour+":00:00";
 							Date beginDate = simpleDateFormat.parse(str);
-							Date now = new Date();
-							long waitTime = (beginDate.getTime()-now.getTime());
+							long waitTime = (beginDate.getTime()-serverDate.getTime());
 							if(waitTime > 10*1000){
 								waitTime = waitTime-5*1000;
 								Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
