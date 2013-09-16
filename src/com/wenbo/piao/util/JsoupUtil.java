@@ -125,26 +125,31 @@ public class JsoupUtil {
 			    	}
 			    	n++;
 			    }else if("btn130".equals(node.attr("class"))){
-					String info = node.childNode(0).toString();
-					int bengin = StringUtils.indexOf(info,"点起售");
+			    	String info = node.childNode(0).toString();
+					int bengin = StringUtils.indexOf(info,"日");
+					int end = StringUtils.indexOf(info,"点起售");
+					String clo = null;
 					if(bengin != -1){
 						Log.i("JsoupUtil.checkHaveTicket",trainNo+":"+info);
-						String clo = StringUtils.substring(info,0,bengin);
-						if(StringUtils.isNumeric(clo)){
-							int hour = Integer.valueOf(clo);
-							Calendar calender = Calendar.getInstance();
-							calender.setTime(serverDate);
-							SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-							String str = calender.get(Calendar.YEAR)+"-"+
-									(calender.get(Calendar.MONTH)+1)+"-"+(calender.get(Calendar.DAY_OF_MONTH))+" "+hour+":00:00";
-							Date beginDate = simpleDateFormat.parse(str);
-							long waitTime = (beginDate.getTime()-serverDate.getTime());
-							if(waitTime > 10*1000){
-								waitTime = waitTime-5*1000;
-								Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
-								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
-								Thread.sleep(waitTime);
-							}
+						clo = StringUtils.substring(info, bengin+1, end);
+					}else if(end != -1){
+						clo = StringUtils.substring(info,0,end);
+					}
+					if(StringUtils.isNumeric(clo)){
+						int hour = Integer.valueOf(clo);
+						Calendar calender = Calendar.getInstance();
+						calender.setTime(serverDate);
+						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						String str = calender.get(Calendar.YEAR)+"-"+
+								(calender.get(Calendar.MONTH)+1)+"-"+(calender.get(Calendar.DAY_OF_MONTH))+" "+hour+":00:00";
+						Date beginDate = simpleDateFormat.parse(str);
+						Date now = serverDate;
+						long waitTime = (beginDate.getTime()-now.getTime());
+						if(waitTime > 3*1000){
+							waitTime = waitTime-3*1000;
+							Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
+							robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
+							Thread.sleep(waitTime);
 						}
 					}
 			    }
