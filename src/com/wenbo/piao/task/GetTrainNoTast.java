@@ -18,13 +18,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -82,36 +85,30 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			return;
 		}
 		final EditText trainCode = (EditText)activity.findViewById(R.id.trainCode);
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-		.setSingleChoiceItems(result, 0,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
-						String info = result[which];
-						String trainNo = StringUtils.split(info,"(")[0];
-						editText.setText(info);
-						String code = trainCodeMap.get(trainNo.trim());
-						trainCode.setText(code);
-						InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
-						if (imm.isActive()) {
-							imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
-						}
-						dialog.dismiss();
-						editText.clearFocus();
-					}
-				}).setIcon(android.R.drawable.arrow_down_float);
-		builder.setTitle("选择车次");
+		View showView = LayoutInflater.from(activity).inflate(R.layout.activity_info3,null);
+		ListView listView = (ListView) showView.findViewById(R.id.noCompleteOrderView);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,android.R.layout.simple_list_item_1, result);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				String info = result[arg2];
+				String trainNo = StringUtils.split(info,"(")[0];
+				editText.setText(info);
+				String code = trainCodeMap.get(trainNo.trim());
+				trainCode.setText(code);
+				InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
+				if (imm.isActive()) {
+					imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
+				}
+				editText.clearFocus();
+			}
+		});
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle("选择车次").setView(showView);
 		AlertDialog dialog = builder.create();
 		dialog.show();
-//		Window window = dialog.getWindow();
-//        WindowManager.LayoutParams wl = window.getAttributes();
-//        wl.x = -100;
-//        wl.y = -300;
-//        window.setAttributes(wl);
-//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//        WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-//        window.setLayout(0,500);
 		super.onPostExecute(result);
 	}
 
