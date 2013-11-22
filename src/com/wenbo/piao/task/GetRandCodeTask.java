@@ -2,6 +2,7 @@ package com.wenbo.piao.task;
 
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;

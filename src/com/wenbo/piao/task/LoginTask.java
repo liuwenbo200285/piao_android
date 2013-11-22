@@ -139,8 +139,13 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				String str = EntityUtils.toString(response.getEntity());
 				JSONObject object = JSONObject.parseObject(str);
 				Log.i("Login",object.getString("loginRand")+":"+object.getString("randError"));
-				return login(object.getString("loginRand"),
-						object.getString("randError"));
+				httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_JS);
+				response = httpClient.execute(httpget);
+				if(response.getStatusLine().getStatusCode() == 200){
+					str = EntityUtils.toString(response.getEntity());
+					Log.i("aaaaa",str);
+				}
+				return login(object.getString("loginRand"),object.getString("randError"));
 			}else if(response.getStatusLine().getStatusCode() == 404){
 				Log.w("Login","404");
 				return 4;
@@ -174,8 +179,9 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			parameters.add(new BasicNameValuePair("user.password",password));
 			parameters.add(new BasicNameValuePair("randCode", randCode));
 			parameters.add(new BasicNameValuePair("randErrorFocus", ""));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
+			parameters.add(new BasicNameValuePair("myversion", "undefined"));
+			parameters.add(new BasicNameValuePair("MTEwNDQyNQ==", "ZGYyMGJjZDA4ZTRmMmJlMA=="));
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
 //			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.LONGIN_CONFIM.getPath());
 			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.LONGIN_CONFIM);
 			httpPost.setEntity(uef);
