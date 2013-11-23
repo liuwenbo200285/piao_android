@@ -47,6 +47,8 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	
 	private ProgressDialog progressDialog;
 	
+	private AlertDialog alertDialog;
+	
 	private Map<String,String> trainCodeMap = null;
 	
 	public GetTrainNoTast(Activity activity,ConfigInfo configInfo){
@@ -91,8 +93,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
 				String info = result[arg2];
 				String trainNo = StringUtils.split(info,"(")[0];
 				editText.setText(info);
@@ -103,12 +104,15 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 					imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
 				}
 				editText.clearFocus();
+				if(alertDialog != null){
+					alertDialog.dismiss();
+				}
 			}
 		});
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setTitle("选择车次").setView(showView);
-		AlertDialog dialog = builder.create();
-		dialog.show();
+		alertDialog = builder.create();
+		alertDialog.show();
 		super.onPostExecute(result);
 	}
 
