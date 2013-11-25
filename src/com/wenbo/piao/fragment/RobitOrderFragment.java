@@ -19,14 +19,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -51,7 +52,6 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.GetTrainNoTast;
-import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.SearchInfoUtil;
 
@@ -91,6 +91,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private EditText trainCode;
 	private MyReceiver myReceiver;
 	private TextView dialogTextView;
+	private InputMethodManager imm = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -132,8 +133,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
+		trainCode.setInputType(InputType.TYPE_NULL);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
+		trainDate.setInputType(InputType.TYPE_NULL);
 		setDateTime();
 		fromStation = (AutoCompleteTextView) activity.findViewById(R.id.startArea);
 		fromStation.addTextChangedListener(new TextWatcher() {
@@ -182,9 +185,11 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		});
 //		toStation.addTextChangedListener(watcher);
 		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
+		trainNo.setInputType(InputType.TYPE_NULL);
 		trainNo.setOnFocusChangeListener(this);
 		orderPeople = (EditText) activity.findViewById(R.id.orderPeople);
 		orderPeople.setOnFocusChangeListener(this);
+		orderPeople.setInputType(InputType.TYPE_NULL);
 		orderButton = (Button) activity.findViewById(R.id.orderButton);
 		orderButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -276,12 +281,15 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		});
 		selectSeatText = (EditText) activity.findViewById(R.id.seatText);
 		selectSeatText.setOnFocusChangeListener(this);
+		selectSeatText.setInputType(InputType.TYPE_NULL);
 		selectTimeText = (EditText) activity.findViewById(R.id.timeText);
 		selectTimeText.setOnFocusChangeListener(this);
 		selectTimeText.setText("00:00--24:00");
+		selectTimeText.setInputType(InputType.TYPE_NULL);
 		selectTrainTypeText = (EditText) activity.findViewById(R.id.trainTypeText);
 		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
+		selectTrainTypeText.setInputType(InputType.TYPE_NULL);
 		// 注册监听service
 		if(myReceiver == null){
 			IntentFilter intentFilter = new IntentFilter(
@@ -384,7 +392,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			mMonth = monthOfYear;
 			mDay = dayOfMonth;
 			updateDateDisplay();
-			closeSoftInput();
+//			closeSoftInput();
 		}
 	};
 
@@ -409,9 +417,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									selectTrainTypeText
 											.setText(trainType[which]);
 									selectTrainTypeText.clearFocus();
-									trainCode.requestFocus();
 									selectTrainTypeDialog.dismiss();
-									closeSoftInput();
+//									closeSoftInput();
 								}
 							}).setIcon(android.R.drawable.btn_star);
 			builder.setTitle("选择车次类型");
@@ -442,10 +449,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								public void onClick(DialogInterface dialog,
 										int which) {
 									selectTimeText.setText(times[which]);
-									selectTimeText.clearFocus();
-									trainCode.requestFocus();
 									selectTimeDialog.dismiss();
-									closeSoftInput();
 								}
 							}).setIcon(android.R.drawable.btn_dropdown);
 			builder.setTitle("选择时间段");
@@ -492,7 +496,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							selectSeatText.setText(sbBuilder.toString());
 							selectSeatText.clearFocus();
 							trainCode.requestFocus();
-							closeSoftInput();
+//							closeSoftInput();
 						}
 						
 					})
@@ -503,7 +507,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 										int which) {
 									selectSeatText.clearFocus();
 									trainCode.requestFocus();
-									closeSoftInput();
+//									closeSoftInput();
 								}
 							});
 			selectSeatDialog = builder.create();
@@ -563,9 +567,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									}
 								}
 								orderPeople.setText(sbBuilder.toString());
-								orderPeople.clearFocus();
-								trainCode.requestFocus();
-								closeSoftInput();
+//								orderPeople.clearFocus();
+//								trainCode.requestFocus();
+//								closeSoftInput();
 							}
 							
 						})
@@ -576,7 +580,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 											int which) {
 										orderPeople.clearFocus();
 										trainCode.requestFocus();
-										closeSoftInput();
+//										closeSoftInput();
 									}
 								});
 				dialog = builder.create();
@@ -750,12 +754,12 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								closeSoftInput();
+								InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(rangeCode.getWindowToken(), 0);
+								rangeCode.clearFocus();
 								dialogTextView.setText("正在确认订票！");
 								progressDialog.show();
-								intent.putExtra(
-										ParameterEnum.ROBIT_STATE
-												.getValue(), status);
+								intent.putExtra(ParameterEnum.ROBIT_STATE.getValue(), status);
 								intent.putExtra(ParameterEnum.RANGECODE
 										.getValue(), rangeCode
 										.getText().toString());
@@ -822,13 +826,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			}
 		} catch (Exception e) {
 			Log.e("RobitOrderFragment","createSearchInfo",e);
-		}
-	}
-	
-	public void closeSoftInput(){
-		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
-		if (imm.isActive()) {
-			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
 		}
 	}
 	

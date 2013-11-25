@@ -139,12 +139,12 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 				String str = EntityUtils.toString(response.getEntity());
 				JSONObject object = JSONObject.parseObject(str);
 				Log.i("Login",object.getString("loginRand")+":"+object.getString("randError"));
-				httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_JS);
-				response = httpClient.execute(httpget);
-				if(response.getStatusLine().getStatusCode() == 200){
-					str = EntityUtils.toString(response.getEntity());
-					Log.i("aaaaa",str);
-				}
+//				httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_JS);
+//				response = httpClient.execute(httpget);
+//				if(response.getStatusLine().getStatusCode() == 200){
+//					str = EntityUtils.toString(response.getEntity());
+//					Log.i("aaaaa",str);
+//				}
 				return login(object.getString("loginRand"),object.getString("randError"));
 			}else if(response.getStatusLine().getStatusCode() == 404){
 				Log.w("Login","404");

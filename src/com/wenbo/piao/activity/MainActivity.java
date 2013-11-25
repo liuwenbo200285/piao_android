@@ -129,7 +129,9 @@ public class MainActivity extends Activity {
 					rangCodeText.requestFocus();
 					return;
 				}
-				closeSoftInput();
+				//关闭软键盘
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(rangCodeText.getWindowToken(), 0);
 				LoginTask loginTask = new LoginTask(MainActivity.this,accountService);
 				loginTask.execute("");
 			}
@@ -240,13 +242,6 @@ public class MainActivity extends Activity {
 //		checkLogin();
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,null,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
-	}
-	
-	public void closeSoftInput(){
-		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE); 
-		if (imm.isActive()) {
-			imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
-		}
 	}
 	
 	/**

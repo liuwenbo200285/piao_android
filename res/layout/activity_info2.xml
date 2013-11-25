@@ -42,7 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/timeText"
         android:layout_alignLeft="@+id/endArea"
-        android:editable="false"
         android:ems="10"
         android:hint="@string/selectTrainType"
         android:inputType="none" >
@@ -56,7 +55,6 @@
         android:layout_below="@+id/startArea"
         android:layout_marginTop="15dp"
         android:layout_toLeftOf="@+id/trainTypeText"
-        android:editable="false"
         android:ems="10"
         android:hint="@string/peopleTime"
         android:inputType="none" />

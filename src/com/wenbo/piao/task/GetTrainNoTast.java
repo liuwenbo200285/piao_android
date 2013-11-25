@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,6 +81,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	protected void onPostExecute(final String[] result) {
 		progressDialog.dismiss();
 		final EditText editText = (EditText)activity.findViewById(R.id.startTrainNo);
+		editText.setInputType(InputType.TYPE_NULL);
 		if(result == null){
 			LoginDialog.newInstance("没有找到可以乘坐的车次！").show(
 					activity.getFragmentManager(), "dialog");
@@ -99,11 +101,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 				editText.setText(info);
 				String code = trainCodeMap.get(trainNo.trim());
 				trainCode.setText(code);
-				InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE); 
-				if (imm.isActive()) {
-					imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); 
-				}
-				editText.clearFocus();
+//				editText.clearFocus();
 				if(alertDialog != null){
 					alertDialog.dismiss();
 				}
