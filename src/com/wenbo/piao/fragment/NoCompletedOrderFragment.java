@@ -321,6 +321,8 @@ public class NoCompletedOrderFragment extends Fragment {
 															str = StringUtils.replace(str,"pages/web/images/bank_ztytk.gif","https://epay.12306.cn/pay/pages/web/images/bank_ztytk.gif");
 														}else if(StringUtils.contains(str,"pages/web/images/bank_jsyh2.gif")){
 															str = StringUtils.replace(str,"pages/web/images/bank_jsyh2.gif","https://epay.12306.cn/pay/pages/web/images/bank_jsyh2.gif");
+														}else if(StringUtils.contains(str,"pages/web/images/bank_zfb.gif")){
+															str = StringUtils.replace(str,"pages/web/images/bank_zfb.gif","https://epay.12306.cn/pay/pages/web/images/bank_zfb.gif");
 														}
 														str = str+"\n";
 														fileOutputStream.write(str.getBytes());

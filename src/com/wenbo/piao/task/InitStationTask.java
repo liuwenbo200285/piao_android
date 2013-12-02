@@ -12,6 +12,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.wenbo.piao.activity.MainActivity;
 import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.Station;
@@ -59,6 +60,7 @@ public class InitStationTask extends AsyncTask<String,Integer,Integer> {
 	@Override
 	protected void onPostExecute(Integer result) {
 		progressDialog.dismiss();
+		MainActivity.isInit = false;
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,null,1);
 		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
 	}

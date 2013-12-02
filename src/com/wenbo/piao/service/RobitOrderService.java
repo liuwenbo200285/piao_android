@@ -170,7 +170,7 @@ public class RobitOrderService extends Service {
 					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
 					return;
 				}
-				if("-10".equals(info)|| StringUtils.isBlank(info)){
+				if("-10".equals(info)){
 					Log.i("searchTicket","刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
 					sendInfo("刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
 					Thread.sleep(configInfo.getSearchWatiTime()*1000);

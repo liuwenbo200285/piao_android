@@ -52,10 +52,11 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.GetTrainNoTast;
+import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.SearchInfoUtil;
 
-public class RobitOrderFragment extends Fragment implements OnFocusChangeListener {
+public class RobitOrderFragment extends Fragment implements OnFocusChangeListener{
 
 	private Activity activity;
 	private EditText trainDate;
@@ -134,12 +135,31 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		trainCode = (EditText)activity.findViewById(R.id.trainCode);
 		trainCode.setInputType(InputType.TYPE_NULL);
+		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
+		trainNo.setInputType(InputType.TYPE_NULL);
+		trainNo.setOnFocusChangeListener(this);
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
 		trainDate.setInputType(InputType.TYPE_NULL);
+		trainDate.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+				trainCode.setText("");
+				trainNo.setText("");
+			}
+		});
 		setDateTime();
 		fromStation = (AutoCompleteTextView) activity.findViewById(R.id.startArea);
 		fromStation.addTextChangedListener(new TextWatcher() {
+			
+			private String oldFromStation = fromStation.getText().toString();
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				// TODO Auto-generated method stub
@@ -153,16 +173,19 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				// TODO Auto-generated method stub
 			}
-			
 			@Override
 			public void afterTextChanged(Editable s) {
-				
+				if(!oldFromStation.equals(s.toString())){
+					trainCode.setText("");
+					trainNo.setText("");
+				}
 			}
 		});
+		fromStation.setOnFocusChangeListener(this);
 		toStation = (AutoCompleteTextView) activity.findViewById(R.id.endArea);
 		toStation.addTextChangedListener(new TextWatcher() {
+			private String oldToStation = fromStation.getText().toString();
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if(s.length() < 2){
@@ -175,18 +198,17 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				// TODO Auto-generated method stub
-				
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-				
+				if(!oldToStation.equals(s.toString())){
+					trainCode.setText("");
+					trainNo.setText("");
+				}
 			}
 		});
+		toStation.setOnFocusChangeListener(this);
 //		toStation.addTextChangedListener(watcher);
-		trainNo = (EditText) activity.findViewById(R.id.startTrainNo);
-		trainNo.setInputType(InputType.TYPE_NULL);
-		trainNo.setOnFocusChangeListener(this);
 		orderPeople = (EditText) activity.findViewById(R.id.orderPeople);
 		orderPeople.setOnFocusChangeListener(this);
 		orderPeople.setInputType(InputType.TYPE_NULL);
@@ -286,10 +308,44 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		selectTimeText.setOnFocusChangeListener(this);
 		selectTimeText.setText("00:00--24:00");
 		selectTimeText.setInputType(InputType.TYPE_NULL);
+		selectTimeText.addTextChangedListener(new TextWatcher() {
+			private String old = selectTimeText.getText().toString();
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(!old.equals(s.toString())){
+					trainCode.setText("");
+					trainNo.setText("");
+				}
+			}
+		});
 		selectTrainTypeText = (EditText) activity.findViewById(R.id.trainTypeText);
 		selectTrainTypeText.setOnFocusChangeListener(this);
 		selectTrainTypeText.setText("全部");
 		selectTrainTypeText.setInputType(InputType.TYPE_NULL);
+		selectTrainTypeText.addTextChangedListener(new TextWatcher() {
+			private String old = selectTrainTypeText.getText().toString();
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(!old.equals(s.toString())){
+					trainCode.setText("");
+					trainNo.setText("");
+				}
+			}
+		});
 		// 注册监听service
 		if(myReceiver == null){
 			IntentFilter intentFilter = new IntentFilter(
@@ -449,6 +505,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								public void onClick(DialogInterface dialog,
 										int which) {
 									selectTimeText.setText(times[which]);
+									selectTimeText.clearFocus();
 									selectTimeDialog.dismiss();
 								}
 							}).setIcon(android.R.drawable.btn_dropdown);
@@ -495,7 +552,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							}
 							selectSeatText.setText(sbBuilder.toString());
 							selectSeatText.clearFocus();
-							trainCode.requestFocus();
+//							trainCode.requestFocus();
 //							closeSoftInput();
 						}
 						
@@ -567,7 +624,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									}
 								}
 								orderPeople.setText(sbBuilder.toString());
-//								orderPeople.clearFocus();
+								orderPeople.clearFocus();
 //								trainCode.requestFocus();
 //								closeSoftInput();
 							}
@@ -869,6 +926,15 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			default:
 				break;
 			}
+		}else{
+			switch (v.getId()) {
+				case R.id.startArea:
+					CommonUtil.closeSoftMethod(fromStation.getContext(),fromStation);
+				case R.id.endArea:
+					CommonUtil.closeSoftMethod(toStation.getContext(),toStation);
+				default:
+					break;
+			 }
 		}
 		
 	}

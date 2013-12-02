@@ -2,6 +2,10 @@ package com.wenbo.piao.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+
 public class CommonUtil {
 
 	/**
@@ -17,5 +21,11 @@ public class CommonUtil {
 			}
 		}
 		return null;
+	}
+	
+	//关闭软键盘
+	public static void closeSoftMethod(Context context,EditText editText){
+		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 	}
 }

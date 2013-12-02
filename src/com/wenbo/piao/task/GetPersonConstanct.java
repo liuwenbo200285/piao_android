@@ -49,6 +49,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	
 	private Fragment fragment;
 	
+	private int count = 0;
+	
 	public GetPersonConstanct(Activity activity,Map<String,UserInfo> userInfoMap
 			,Fragment fragment){
 		this.activity = activity;
@@ -131,10 +133,11 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	 */
 	private String getOrderPerson() {
 		HttpResponse response = null;
+		HttpPost httpPost = null;
 		try {
 			HttpClient httpClient = HttpClientUtil.getHttpClient();
 //			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_PERSON);
+			httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_PERSON);
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method", "getPagePassengerAll"));
 			parameters.add(new BasicNameValuePair("pageIndex",
@@ -148,14 +151,20 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
+				count = 0;
 				return EntityUtils.toString(response.getEntity());
 			}
 		} catch (SocketTimeoutException e) {
 			Log.e("GetPersonConstanct","getOrderPerson data timeout!",e);
+			if(count < 5){
+				count++;
+				return getOrderPerson();
+			}
 		} catch (Exception e) {
 			Log.e("GetPersonConstanct","getOrderPerson error!",e);
 		} finally {
 			Log.i("GetPersonConstanct","close getOrderPerson");
+			httpPost.abort();
 		}
 		return null;
 	}

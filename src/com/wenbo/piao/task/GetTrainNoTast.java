@@ -17,13 +17,11 @@ import org.apache.http.util.EntityUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -51,6 +49,8 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	private AlertDialog alertDialog;
 	
 	private Map<String,String> trainCodeMap = null;
+	
+	private int count = 0;
 	
 	public GetTrainNoTast(Activity activity,ConfigInfo configInfo){
 		this.activity = activity;
@@ -101,7 +101,8 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 				editText.setText(info);
 				String code = trainCodeMap.get(trainNo.trim());
 				trainCode.setText(code);
-//				editText.clearFocus();
+//				trainCode.clearFocus();
+				editText.clearFocus();
 				if(alertDialog != null){
 					alertDialog.dismiss();
 				}
@@ -122,6 +123,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	
 	public String getTrainNo(){
 		HttpResponse response = null;
+		HttpPost httpPost = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method","queryststrainall"));
@@ -131,16 +133,22 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			parameters.add(new BasicNameValuePair("starttime",configInfo.getOrderTime()));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
 					"UTF-8");
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.SEARCH_TRAINNO);
+			httpPost = HttpClientUtil.getHttpPost(UrlEnum.SEARCH_TRAINNO);
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
+				count = 0;
 				return EntityUtils.toString(response.getEntity());
 			}
 		}catch(SocketTimeoutException e){
-			getTrainNo();
+			if(count < 5){
+				count++;
+				return getTrainNo();
+			}
 		}catch (Exception e) {
 			Log.e("getTrainNo","search trainNo error!", e);
+		}finally{
+			httpPost.abort();
 		}
 		return null;
 	}

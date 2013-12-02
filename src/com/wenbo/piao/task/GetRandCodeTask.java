@@ -103,7 +103,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 			Log.e("GetRandCodeTask.getRandCode","获取验证码失败!",e.fillInStackTrace());
 			return null;
 		} finally {
-			
+			httpGet.abort();
 		}
 		return bitmap;
 	}

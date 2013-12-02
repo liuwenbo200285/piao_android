@@ -31,6 +31,7 @@ import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetRandCodeTask;
 import com.wenbo.piao.task.InitStationTask;
 import com.wenbo.piao.task.LoginTask;
+import com.wenbo.piao.util.CommonUtil;
 
 public class MainActivity extends Activity {
 	
@@ -51,6 +52,8 @@ public class MainActivity extends Activity {
 	private EditText rangCodeText;
 	
 	private ImageView imageView;
+	
+	public static boolean isInit = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +135,7 @@ public class MainActivity extends Activity {
 				//关闭软键盘
 				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(rangCodeText.getWindowToken(), 0);
+				CommonUtil.closeSoftMethod(getBaseContext(),rangCodeText);
 				LoginTask loginTask = new LoginTask(MainActivity.this,accountService);
 				loginTask.execute("");
 			}
@@ -252,10 +256,11 @@ public class MainActivity extends Activity {
 		StationService stationService = sqlliteHelper.getStationService();
 //		stationService.delAll();
 		long num = stationService.countAllStation();
-		if(num == 0){
+		if(num < 2144 && !isInit){
+			isInit = true;
 			InitStationTask initStationTask = new InitStationTask(this);
 			initStationTask.execute("");
-		}else{
+		}else if(!isInit){
 			getLoginRangeCode();
 		}
 	}
