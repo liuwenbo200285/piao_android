@@ -7,6 +7,8 @@ package com.wenbo.piao.enums;
  */
 public enum StatusCodeEnum {
 	//没有此席位
+	NO_ORDER(16),
+	//没有此席位
 	NO_TRAIN_SEAT(15),
 	//没有添加联系人
 	NOT_HAVE_PERSON(14),

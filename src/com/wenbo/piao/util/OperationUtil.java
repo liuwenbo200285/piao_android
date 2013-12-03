@@ -1,6 +1,7 @@
 package com.wenbo.piao.util;
 
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class OperationUtil {
 	 */
 	public static String canelOrder(String orderNo,String token){
 		HttpResponse response = null;
+		HttpPost httpPost = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method","cancelMyOrderNotComplete"));
@@ -47,7 +49,7 @@ public class OperationUtil {
 			parameters.add(new BasicNameValuePair("orderRequest.tour_flag",""));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
 					"UTF-8");
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.CANCEL_ORDER);
+			httpPost = HttpClientUtil.getHttpPost(UrlEnum.CANCEL_ORDER);
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
@@ -56,11 +58,16 @@ public class OperationUtil {
 					return OPERATION_SUCCESS;
 				}
 			}
+		}catch(SocketTimeoutException socketTimeoutException){
+			Log.e("OperationUtil","canelOrder",socketTimeoutException);
+			return canelOrder(orderNo, token);
 		} catch (Exception e) {
 			Log.e("OperationUtil","canelOrder",e);
 			return OPERATION_FAILURE;
 		} finally {
-			
+//			if(httpPost != null){
+//				httpPost.abort();
+//			}
 		}
 		return OPERATION_FAILURE;
 	}
@@ -72,6 +79,7 @@ public class OperationUtil {
 	 */
     public static String getLastTime(String orderNo,String token,String ticketNo){
     	HttpResponse response = null;
+    	HttpPost httpPost = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("method","laterEpay"));
@@ -83,7 +91,7 @@ public class OperationUtil {
 			parameters.add(new BasicNameValuePair("ticket_key",ticketNo));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
 					"UTF-8");
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.PAY_ORDER_INIT);
+			httpPost = HttpClientUtil.getHttpPost(UrlEnum.PAY_ORDER_INIT);
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
@@ -118,11 +126,16 @@ public class OperationUtil {
 					return ""+((time2-time1)/(1000*60));
 				}
 			}
-		} catch (Exception e) {
+		}catch(SocketTimeoutException socketTimeoutException){
+			Log.e("OperationUtil","getLastTime",socketTimeoutException);
+			return getLastTime(orderNo, token, ticketNo);
+		}catch (Exception e) {
 			Log.e("OperationUtil","getLastTime",e);
 			return null;
 		} finally {
-			
+//			if(httpPost != null){
+//				httpPost.abort();
+//			}
 		}
 		return null;
     }
@@ -151,7 +164,10 @@ public class OperationUtil {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return JsoupUtil.getPayInitParam(response.getEntity().getContent());
 			}
-		} catch (Exception e) {
+		}catch(SocketTimeoutException socketTimeoutException){
+			Log.e("OperationUtil","toPayinit",socketTimeoutException);
+			return toPayinit(orderNo, token, ticketNo);
+		}catch (Exception e) {
 			Log.e("OperationUtil","toPayinit",e);
 			return null;
 		} finally {
@@ -167,6 +183,7 @@ public class OperationUtil {
 	 */
     public static InputStream toPaySubmit(PayInfo payInfo){
     	HttpResponse response = null;
+    	HttpPost httpPost = null;
 		try {
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("interfaceName",payInfo.getInterfaceName()));
@@ -176,21 +193,25 @@ public class OperationUtil {
 			parameters.add(new BasicNameValuePair("appId",payInfo.getAppId()));
 			parameters.add(new BasicNameValuePair("transType",payInfo.getTransType()));
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
-			HttpPost httpPost = new HttpPost(UrlEnum.TO_PAY.getPath());
+			httpPost = new HttpPost(UrlEnum.TO_PAY.getPath());
 			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
 			httpPost.setEntity(uef);
 			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == 200) {
-//				String domain = "https://epay.12306.cn/pay/";
 				return response.getEntity().getContent();
 			}else{
 				Log.i("toPaySubmit",EntityUtils.toString(response.getEntity()));
 			}
-		} catch (Exception e) {
+		}catch(SocketTimeoutException socketTimeoutException){
+			Log.e("OperationUtil","getLastTime",socketTimeoutException);
+			return toPaySubmit(payInfo);
+		}catch (Exception e) {
 			Log.e("OperationUtil","toPaySubmit",e);
 			return null;
 		} finally {
-			
+//			if(httpPost != null){
+//				httpPost.abort();
+//			}
 		}
 		return null;
     }

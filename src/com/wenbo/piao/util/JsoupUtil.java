@@ -131,7 +131,9 @@ public class JsoupUtil {
 					String clo = null;
 					if(bengin != -1){
 						Log.i("JsoupUtil.checkHaveTicket",trainNo+":"+info);
-						clo = StringUtils.substring(info, bengin+1, end);
+						robitOrderService.sendInfo(trainNo+":"+info);
+						maxType = -1;
+						break;
 					}else if(end != -1){
 						clo = StringUtils.substring(info,0,end);
 					}
@@ -149,7 +151,7 @@ public class JsoupUtil {
 							waitTime = waitTime-3*1000;
 							Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
 							robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
-							Thread.sleep(waitTime);
+							Thread.sleep(1000*60);
 						}
 					}
 			    }
@@ -159,6 +161,8 @@ public class JsoupUtil {
 		}
 		if(maxType > 0){
 			Log.i("JsoupUtil.checkHaveTicket",trainNo+"有票!");
+		}else if(maxType < 0){
+			
 		}else{
 			Log.i("JsoupUtil.checkHaveTicket",trainNo+"没有票!");
 			robitOrderService.sendInfo(trainNo+"没有票!");

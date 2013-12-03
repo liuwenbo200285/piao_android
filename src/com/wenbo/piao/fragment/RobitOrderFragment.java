@@ -141,20 +141,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		trainDate = (EditText) activity.findViewById(R.id.startTime);
 		trainDate.setOnFocusChangeListener(this);
 		trainDate.setInputType(InputType.TYPE_NULL);
-		trainDate.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-			@Override
-			public void afterTextChanged(Editable s) {
-				trainCode.setText("");
-				trainNo.setText("");
-			}
-		});
 		setDateTime();
 		fromStation = (AutoCompleteTextView) activity.findViewById(R.id.startArea);
 		fromStation.addTextChangedListener(new TextWatcher() {
@@ -844,6 +830,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				break;
 			case 15:
 				LoginDialog.newInstance("该车次没有该坐席，请重新选择坐席！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
+			case 16:
+				LoginDialog.newInstance("该日期车次未到预售期，请重新选择时间！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			default:

@@ -214,7 +214,7 @@ public class RobitOrderService extends Service {
 			boolean isLast = false;
 			String trainInfo = null;
 			int ticketType = 0;
-			boolean ischeck = false;
+			boolean isHave = false;
 			while ((n = StringUtils.indexOf(message, m + ",<span")) != -1
 					|| !isLast) {
 				if (n == -1) {
@@ -224,22 +224,27 @@ public class RobitOrderService extends Service {
 				} else {
 					trainInfo = StringUtils.substring(message, lastIndex, n);
 				}
-				if(!ischeck){
-					int i = StringUtils.lastIndexOf(trainInfo,"<br>");
-					String str1 = StringUtils.substring(trainInfo,i+4,trainInfo.length());
-					String[] strs = StringUtils.split(str1,",");
-					int seatNum = Integer.parseInt(StringUtils.remove(configInfo.getOrderSeat(),","));
-					if("--".equals(strs[seatNum])){
+				int i = StringUtils.lastIndexOf(trainInfo,"<br>");
+				String str1 = StringUtils.substring(trainInfo,i+4,trainInfo.length());
+				String[] strs = StringUtils.split(str1,",");
+				String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
+				for(String orderSeat:orderSeats){
+					if("--".equals(strs[Integer.parseInt(orderSeat)])){
 						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 						return null;
+					}else if("无".equals(strs[Integer.parseInt(orderSeat)])){
+						
 					}
-					ischeck = true;
 				}
 				document = Jsoup.parse(trainInfo);
 				ticketType = JsoupUtil.checkHaveTicket(document,
 						configInfo.getOrderSeat(),this,serverDate);
 				if (ticketType > 0) {
 					break;
+				}else if(ticketType < 0){
+					isBegin = false;
+					sendStatus(StatusCodeEnum.NO_ORDER);
+					return null;
 				}
 				document = null;
 				m++;
