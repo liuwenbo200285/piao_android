@@ -842,6 +842,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				LoginDialog.newInstance("请先同步联系人！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
+			case 15:
+				LoginDialog.newInstance("该车次没有该坐席，请重新选择坐席！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
 			default:
 				break;
 			}

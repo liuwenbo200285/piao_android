@@ -162,8 +162,8 @@ public class RobitOrderService extends Service {
 				if(isBegin == false){
 					return;
 				}
-				sendInfo("没有余票,休息200毫秒，继续刷票");
-				Thread.sleep(200);
+				sendInfo("没有余票,休息100毫秒，继续刷票");
+				Thread.sleep(100);
 				response = httpClient.execute(httpGet);
 				info = EntityUtils.toString(response.getEntity());
 				if(StringUtils.contains(info, "系统维护中")){
@@ -214,6 +214,7 @@ public class RobitOrderService extends Service {
 			boolean isLast = false;
 			String trainInfo = null;
 			int ticketType = 0;
+			boolean ischeck = false;
 			while ((n = StringUtils.indexOf(message, m + ",<span")) != -1
 					|| !isLast) {
 				if (n == -1) {
@@ -222,6 +223,17 @@ public class RobitOrderService extends Service {
 					isLast = true;
 				} else {
 					trainInfo = StringUtils.substring(message, lastIndex, n);
+				}
+				if(!ischeck){
+					int i = StringUtils.lastIndexOf(trainInfo,"<br>");
+					String str1 = StringUtils.substring(trainInfo,i+4,trainInfo.length());
+					String[] strs = StringUtils.split(str1,",");
+					int seatNum = Integer.parseInt(StringUtils.remove(configInfo.getOrderSeat(),","));
+					if("--".equals(strs[seatNum])){
+						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
+						return null;
+					}
+					ischeck = true;
 				}
 				document = Jsoup.parse(trainInfo);
 				ticketType = JsoupUtil.checkHaveTicket(document,
