@@ -212,11 +212,14 @@ public class RobitOrderService extends Service {
 			int n = 0;
 			int lastIndex = 0;
 			boolean isLast = false;
+			boolean isHave = false;
 			String trainInfo = null;
 			int ticketType = 0;
-			boolean isHave = false;
+			int allNoSeat = 1;
+			String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
 			while ((n = StringUtils.indexOf(message, m + ",<span")) != -1
 					|| !isLast) {
+				isHave = false;
 				if (n == -1) {
 					trainInfo = StringUtils.substring(message, lastIndex,
 							message.length());
@@ -227,24 +230,23 @@ public class RobitOrderService extends Service {
 				int i = StringUtils.lastIndexOf(trainInfo,"<br>");
 				String str1 = StringUtils.substring(trainInfo,i+4,trainInfo.length());
 				String[] strs = StringUtils.split(str1,",");
-				String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
 				for(String orderSeat:orderSeats){
-					if("--".equals(strs[Integer.parseInt(orderSeat)])){
-						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
-						return null;
-					}else if("无".equals(strs[Integer.parseInt(orderSeat)])){
-						
+					if(!"--".equals(strs[Integer.parseInt(orderSeat)])){
+						isHave = true;
 					}
 				}
-				document = Jsoup.parse(trainInfo);
-				ticketType = JsoupUtil.checkHaveTicket(document,
-						configInfo.getOrderSeat(),this,serverDate);
-				if (ticketType > 0) {
-					break;
-				}else if(ticketType < 0){
-					isBegin = false;
-					sendStatus(StatusCodeEnum.NO_ORDER);
-					return null;
+				if(!isHave){
+					allNoSeat++;
+				}else{
+					document = Jsoup.parse(trainInfo);
+					ticketType = JsoupUtil.checkHaveTicket(document,configInfo.getOrderSeat(),this,serverDate);
+					if (ticketType > 0) {
+						break;
+					}else if(ticketType < 0){
+						isBegin = false;
+						sendStatus(StatusCodeEnum.NO_ORDER);
+						return null;
+					}
 				}
 				document = null;
 				m++;
@@ -254,6 +256,9 @@ public class RobitOrderService extends Service {
 				orderParameter = new OrderParameter();
 				orderParameter.setDocument(document);
 				orderParameter.setTicketType(ticketType);
+			}else if(allNoSeat == m){
+				isBegin = false;
+				sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 			}
 		} catch (Exception e) {
 			Log.e("checkTickeAndOrder","checkTickeAndOrder error!", e);

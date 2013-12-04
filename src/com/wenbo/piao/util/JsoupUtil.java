@@ -116,7 +116,6 @@ public class JsoupUtil {
 			    	n++;
 			    }else if("#008800".equals(node.attr("color"))){
 			    	if((index = StringUtils.indexOf(type, n+",")) != -1){
-//			    		logger.info(trainNo+"有大量的票!");
 			    		robitOrderService.sendInfo(trainNo+"有大量的"+HttpClientUtil.getSeatTypeMap(n)+"票!");
 			    		max = compare(max,index);
 			    		if(max != 10000000){
@@ -146,13 +145,21 @@ public class JsoupUtil {
 								(calender.get(Calendar.MONTH)+1)+"-"+(calender.get(Calendar.DAY_OF_MONTH))+" "+hour+":00:00";
 						Date beginDate = simpleDateFormat.parse(str);
 						Date now = serverDate;
+						Date clientDate = new Date();
+						long timeReduce = serverDate.getTime()-clientDate.getTime();
 						long waitTime = (beginDate.getTime()-now.getTime());
-						if(waitTime > 3*1000){
+						while(waitTime > 3*1000){
 							waitTime = waitTime-3*1000;
 							Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
-							robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
-							Thread.sleep(1000*60);
+							if(waitTime > 1000*60){
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
+							}else{
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000)+"秒！");
+							}
+							Thread.sleep(1000*2);
+							waitTime = beginDate.getTime()-new Date().getTime()+timeReduce;
 						}
+						robitOrderService.sendInfo(trainNo+":正在等待出票，请做好输入验证码准备!");
 					}
 			    }
 			}

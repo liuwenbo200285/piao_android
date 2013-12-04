@@ -65,10 +65,11 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			return null;
 		}
 		JSONArray arry = JSONArray.parseArray(info);
-		String[] infos = new String[arry.size()];
+		String[] infos = new String[arry.size()+1];
+		infos[0] = "不选择车次";
 		trainCodeMap = new HashMap<String, String>();
-		for(int i = 0; i < arry.size(); i++){
-			JSONObject object = arry.getJSONObject(i);
+		for(int i = 1; i <= arry.size(); i++){
+			JSONObject object = arry.getJSONObject(i-1);
 			String str=object.getString("value")+"("+object.getString("start_station_name")+object.getString("start_time")
 					+"→"+object.getString("end_station_name")+object.getString("end_time")+")";
 			trainCodeMap.put(object.getString("value"),object.getString("id"));
@@ -96,12 +97,16 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
-				String info = result[arg2];
-				String trainNo = StringUtils.split(info,"(")[0];
-				editText.setText(info);
-				String code = trainCodeMap.get(trainNo.trim());
-				trainCode.setText(code);
-//				trainCode.clearFocus();
+				if(arg2 != 0){
+					String info = result[arg2];
+					String trainNo = StringUtils.split(info,"(")[0];
+					editText.setText(info);
+					String code = trainCodeMap.get(trainNo.trim());
+					trainCode.setText(code);
+				}else{
+					editText.setText("");
+					trainCode.setText("");
+				}
 				editText.clearFocus();
 				if(alertDialog != null){
 					alertDialog.dismiss();
@@ -109,7 +114,7 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			}
 		});
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setTitle("选择车次").setView(showView);
+		builder.setTitle("选择车次").setView(showView).setCancelable(false);
 		alertDialog = builder.create();
 		alertDialog.show();
 		super.onPostExecute(result);

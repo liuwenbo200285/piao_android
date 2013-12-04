@@ -386,6 +386,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		Log.i("RobitOrderFragment", "onViewCreated");
 		super.onViewCreated(view, savedInstanceState);
 	}
+	
+	
+	
 
 	/**
 	 * 设置日期
@@ -462,7 +465,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									selectTrainTypeDialog.dismiss();
 //									closeSoftInput();
 								}
-							}).setIcon(android.R.drawable.btn_star);
+							}).setIcon(android.R.drawable.btn_star)
+							.setCancelable(false);
 			builder.setTitle("选择车次类型");
 			selectTrainTypeDialog = builder.create();
 			selectTrainTypeDialog.show();
@@ -494,7 +498,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									selectTimeText.clearFocus();
 									selectTimeDialog.dismiss();
 								}
-							}).setIcon(android.R.drawable.btn_dropdown);
+							}).setIcon(android.R.drawable.btn_dropdown)
+							.setCancelable(false);
 			builder.setTitle("选择时间段");
 			selectTimeDialog = builder.create();
 			selectTimeDialog.show();
@@ -552,7 +557,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									trainCode.requestFocus();
 //									closeSoftInput();
 								}
-							});
+							})
+					.setCancelable(false);
 			selectSeatDialog = builder.create();
 			selectSeatDialog.show();
 		} else {
@@ -625,7 +631,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 										trainCode.requestFocus();
 //										closeSoftInput();
 									}
-								});
+								})
+						.setCancelable(false);
 				dialog = builder.create();
 				dialog.show();
 
