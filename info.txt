@@ -1,0 +1,2 @@
+用zipalign(压缩对齐)优化你的APK文件。
+zipalign -v 4 demo_signed.apk final.apk
