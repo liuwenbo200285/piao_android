@@ -149,10 +149,14 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				// TODO Auto-generated method stub
-				if(s.length() < 2){
+				if(StringUtils.isBlank(s)){
 					return;
 				}
-				fromStations =  stationService.findStationLike(s.toString());
+				if (s.toString().getBytes().length == s.toString().length()) {
+					fromStations =  stationService.findStationLike(s.toString());
+		        }else{
+		        	fromStations = stationService.findStationByCharacterLike(s.toString());
+		        }
 				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,fromStations);
 				fromStation.setAdapter(adapter);
 			}
@@ -171,13 +175,17 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 		fromStation.setOnFocusChangeListener(this);
 		toStation = (AutoCompleteTextView) activity.findViewById(R.id.endArea);
 		toStation.addTextChangedListener(new TextWatcher() {
-			private String oldToStation = fromStation.getText().toString();
+			private String oldToStation = toStation.getText().toString();
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if(s.length() < 2){
+				if(StringUtils.isBlank(s)){
 					return;
 				}
-				toStations =  stationService.findStationLike(s.toString());
+				if (s.toString().getBytes().length == s.toString().length()) {
+					toStations =  stationService.findStationLike(s.toString());
+		        }else{
+		        	toStations = stationService.findStationByCharacterLike(s.toString());
+		        }
 				StationAdapter adapter = new StationAdapter(activity,android.R.layout.simple_dropdown_item_1line,toStations);
 				toStation.setAdapter(adapter);
 			}

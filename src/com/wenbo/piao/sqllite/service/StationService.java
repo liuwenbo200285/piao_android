@@ -1,5 +1,6 @@
 package com.wenbo.piao.sqllite.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -74,11 +75,32 @@ public class StationService {
 	public List<Station> findStationLike(String station){
 		try {
 			if(StringUtils.isBlank(station)){
-				return null;
+				return new ArrayList<Station>();
 			}
 			QueryBuilder<Station,Integer> queryBuilder = stationDao.queryBuilder();
 			Where<Station,Integer> where = queryBuilder.where();
 			where.like("simplePinyingCode",station+"%");
+//			where.or().like("zhCode", station+"%");
+			return queryBuilder.query();
+		} catch (Exception e) {
+			Log.e("StationService","findStationLike Station error!",e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 车站联想
+	 * @param station
+	 * @return
+	 */
+	public List<Station> findStationByCharacterLike(String station){
+		try {
+			if(StringUtils.isBlank(station)){
+				return new ArrayList<Station>();
+			}
+			QueryBuilder<Station,Integer> queryBuilder = stationDao.queryBuilder();
+			Where<Station,Integer> where = queryBuilder.where();
+			where.like("zhCode",station+"%");
 //			where.or().like("zhCode", station+"%");
 			return queryBuilder.query();
 		} catch (Exception e) {
