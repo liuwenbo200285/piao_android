@@ -311,7 +311,7 @@ OnClickListener,android.view.View.OnClickListener {
 								closeSoftInput();
 								dialog.dismiss();
 							}
-						}).setIcon(android.R.drawable.btn_dropdown);
+						}).setIcon(android.R.drawable.btn_star);
 				builder.setTitle("选择查询乘客姓名")
 						// 设置Dialog的标题
 						.setPositiveButton("取消", new DialogInterface.OnClickListener() {

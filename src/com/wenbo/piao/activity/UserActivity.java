@@ -39,7 +39,6 @@ import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
-import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.OperationUtil;
 
@@ -72,7 +71,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票("+CommonUtil.showTitileName()+")");
+		actionBarText.setText("无忧火车票(V0.1)");
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		if(HttpClientUtil.getAccount() != null){
@@ -124,7 +123,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarButton.setVisibility(View.INVISIBLE);
 		actionBarView.setVisibility(View.VISIBLE);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票("+CommonUtil.showTitileName()+")");
+		actionBarText.setText("无忧火车票(V0.1)");
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:

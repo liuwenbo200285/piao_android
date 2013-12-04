@@ -117,7 +117,7 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-				.setIcon(android.R.drawable.btn_dropdown)
+				.setIcon(android.R.drawable.btn_star)
 				.setTitle("删除查询记录")
 				.setMessage("您确认要删除该查询记录吗？")
 				.setNegativeButton("确定",new DialogInterface.OnClickListener() {

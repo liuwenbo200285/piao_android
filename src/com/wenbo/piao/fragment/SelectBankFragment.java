@@ -146,7 +146,7 @@ public class SelectBankFragment extends Fragment implements OnTouchListener {
 		}
 		payInfo.setBankId(HttpClientUtil.getBankMap().get(selectBank));
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-		.setIcon(android.R.drawable.btn_dropdown)
+		.setIcon(android.R.drawable.btn_star)
 		.setTitle(selectBank+"付款")
 		.setMessage("您确认要选择"+selectBank+"付款吗？")
 		.setPositiveButton("确定",new DialogInterface.OnClickListener() {

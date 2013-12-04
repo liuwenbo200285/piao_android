@@ -197,7 +197,7 @@ public class MainActivity extends Activity {
 						}
 					}
 				})
-				.setIcon(android.R.drawable.btn_dropdown);
+				.setIcon(android.R.drawable.btn_star);
 				builder.setTitle("选择登录账号");
 				dialog = builder.create();
 		        dialog.show();

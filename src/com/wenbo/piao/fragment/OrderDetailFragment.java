@@ -59,7 +59,7 @@ public class OrderDetailFragment extends Fragment {
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					final int arg2, long arg3) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-				.setIcon(android.R.drawable.btn_dropdown)
+				.setIcon(android.R.drawable.btn_star)
 				.setTitle("取消订单")
 				.setMessage("您确认要取消该订单吗？")
 				.setNegativeButton("确定",new DialogInterface.OnClickListener() {

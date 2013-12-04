@@ -217,7 +217,7 @@ public class NoCompletedOrderFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-								.setIcon(android.R.drawable.btn_dropdown)
+								.setIcon(android.R.drawable.btn_star)
 								.setTitle("订单号："+order.getOrderNo())
 								.setMessage("您确认要取消该订单吗？")
 								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
@@ -271,7 +271,7 @@ public class NoCompletedOrderFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-								.setIcon(android.R.drawable.btn_dropdown)
+								.setIcon(android.R.drawable.btn_star)
 								.setTitle("订单号："+order.getOrderNo())
 								.setMessage("您确认要付款吗？")
 								.setPositiveButton("确定",new DialogInterface.OnClickListener() {

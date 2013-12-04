@@ -498,7 +498,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									selectTimeText.clearFocus();
 									selectTimeDialog.dismiss();
 								}
-							}).setIcon(android.R.drawable.btn_dropdown)
+							}).setIcon(android.R.drawable.btn_star)
 							.setCancelable(false);
 			builder.setTitle("选择时间段");
 			selectTimeDialog = builder.create();
@@ -530,7 +530,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								public void onClick(DialogInterface dialog,
 										int which, boolean isChecked) {
 								}
-							}).setIcon(android.R.drawable.btn_dropdown);
+							}).setIcon(android.R.drawable.btn_star);
 					builder.setTitle("选择乘客坐席")
 					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
 						@Override
@@ -602,7 +602,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 									public void onClick(DialogInterface dialog,
 											int which, boolean isChecked) {
 									}
-								}).setIcon(android.R.drawable.btn_dropdown);
+								}).setIcon(android.R.drawable.btn_star);
 				builder.setTitle("选择订票乘客")
 						// 设置Dialog的标题
 						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
