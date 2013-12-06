@@ -81,6 +81,7 @@ public class RobitOrderService extends Service {
 	public void onDestroy() {
 		Log.i("RobitOrderService","onDestroy");
 		isBegin = false;
+		JsoupUtil.isSearch = false;
 		super.onDestroy();
 	}
 
@@ -159,7 +160,7 @@ public class RobitOrderService extends Service {
 				info = EntityUtils.toString(response.getEntity());
 			}
 			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date,serverDate)) == null){
-				if(isBegin == false){
+				if(!isBegin){
 					return;
 				}
 				sendInfo("没有余票,休息100毫秒，继续刷票");
@@ -219,6 +220,9 @@ public class RobitOrderService extends Service {
 			String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
 			while ((n = StringUtils.indexOf(message, m + ",<span")) != -1
 					|| !isLast) {
+				if(!isBegin){
+					break;
+				}
 				isHave = false;
 				if (n == -1) {
 					trainInfo = StringUtils.substring(message, lastIndex,

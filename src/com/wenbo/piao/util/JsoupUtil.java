@@ -25,6 +25,8 @@ import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.service.RobitOrderService;
 
 public class JsoupUtil {
+	
+	public static boolean isSearch = true;
 
 	/**
 	 * @param args
@@ -75,6 +77,7 @@ public class JsoupUtil {
 	 * 检测有没有票
 	 */
 	public static int checkHaveTicket(Document document,String type,RobitOrderService robitOrderService,Date serverDate){
+		isSearch = true;
 		int max = 10000000;
 		Integer maxType = 0;
 		String trainNo = null;
@@ -148,18 +151,20 @@ public class JsoupUtil {
 						Date clientDate = new Date();
 						long timeReduce = serverDate.getTime()-clientDate.getTime();
 						long waitTime = (beginDate.getTime()-now.getTime());
-						while(waitTime > 3*1000){
+						while(waitTime > 3*1000 && isSearch){
 							waitTime = waitTime-3*1000;
-							Log.i("JsoupUtil.checkHaveTicket","等待："+waitTime/(1000*60)+"分钟！");
+							Log.i("JsoupUtil.checkHaveTicket","等待"+waitTime/(1000*60)+"分钟！");
 							if(waitTime > 1000*60){
-								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000*60)+"分钟！");
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000*60)+"分钟！");
 							}else{
-								robitOrderService.sendInfo(trainNo+":"+info+"，等待："+waitTime/(1000)+"秒！");
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000)+"秒！");
 							}
 							Thread.sleep(1000*2);
 							waitTime = beginDate.getTime()-new Date().getTime()+timeReduce;
 						}
-						robitOrderService.sendInfo(trainNo+":正在等待出票，请做好输入验证码准备!");
+						if(isSearch){
+							robitOrderService.sendInfo(trainNo+":正在等待出票，请做好输入验证码准备!");
+						}
 					}
 			    }
 			}

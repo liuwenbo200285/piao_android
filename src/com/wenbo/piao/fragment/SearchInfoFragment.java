@@ -107,6 +107,7 @@ public class SearchInfoFragment extends Fragment implements OnTouchListener{
 				ft.setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out); 
 				ft.addToBackStack(null);
 				ft.commit();
+				activity.setCurrentFragment(fragment);
 				skipButton.setVisibility(View.INVISIBLE);
 			}
 			

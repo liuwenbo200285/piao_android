@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
@@ -26,8 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -36,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
@@ -58,7 +58,7 @@ import com.wenbo.piao.util.SearchInfoUtil;
 
 public class RobitOrderFragment extends Fragment implements OnFocusChangeListener{
 
-	private Activity activity;
+	private UserActivity activity;
 	private EditText trainDate;
 	private DatePickerDialog datePickerDialog;
 	private ProgressDialog progressDialog;
@@ -92,20 +92,12 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private EditText trainCode;
 	private MyReceiver myReceiver;
 	private TextView dialogTextView;
-	private InputMethodManager imm = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		return inflater.inflate(R.layout.activity_info2, null);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onCreate");
-		super.onCreate(savedInstanceState);
+		return inflater.inflate(R.layout.activity_info2, container, false);
 	}
 
 	@Override
@@ -120,7 +112,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				initSearchInfo(searchInfo);
 			}
 		}
-//		closeSoftInput();
 		super.onStart();
 	}
 
@@ -128,7 +119,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		Log.i("RobitOrderFragment", "onActivityCreated");
-		activity = getActivity();
+		activity = (UserActivity)getActivity();
 		SqlliteHelper sqlliteHelper = new SqlliteHelper(activity);
 		stationService = sqlliteHelper.getStationService();
 		searchInfoService = SqlLiteUtil.getSearchInfoService(activity);
@@ -347,56 +338,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			myReceiver = new RobitOrderFragment.MyReceiver();
 			activity.registerReceiver(myReceiver, intentFilter);
 		}
-//		if(StringUtils.isBlank(fromStation.getText().toString())){
-//			fromStation.requestFocus();
-//		}
 		super.onActivityCreated(savedInstanceState);
 	}
-
-	@Override
-	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onAttach");
-		super.onAttach(activity);
-	}
-
-	@Override
-	public void onDetach() {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onDetach");
-		super.onDetach();
-	}
-
-	@Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onPause");
-		super.onPause();
-	}
-
-	@Override
-	public void onResume() {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onResume");
-		super.onResume();
-	}
-
-	@Override
-	public void onStop() {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onStop");
-		super.onStop();
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		Log.i("RobitOrderFragment", "onViewCreated");
-		super.onViewCreated(view, savedInstanceState);
-	}
-	
-	
-	
 
 	/**
 	 * 设置日期
@@ -741,6 +684,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			if(status >= 1000){
 			    String info = bundle.getString("tips");
 			    dialogTextView.setText("   "+info);
+			    activity.showNotification(info,false);
 				return;
 			}
 			switch (status) {
@@ -803,6 +747,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
 				rangeCode = (EditText) orderCodeView
 						.findViewById(R.id.orderCode);
+				activity.showNotification("已经有票，赶紧入验证码！",true);
 				AlertDialog.Builder orderCodeBuilder = new AlertDialog.Builder(activity);
 				orderCodeBuilder.setTitle("请输入验证码！")
 				.setIcon(android.R.drawable.ic_dialog_info)

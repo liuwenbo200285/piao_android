@@ -10,6 +10,9 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -58,11 +61,18 @@ public class UserActivity extends Activity implements OnTouchListener{
 	
 	private View actionBarView;
 	
+	private NotificationManager m_NotificationManager; 
+	
+	private Notification  m_Notification;
+	
+	private PendingIntent m_PendingIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user);
+		//初始化NotificationManager对象
+		m_NotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		// 设置 使用自定义 navigation bar
 		int mActionBarOptions = getActionBar().getDisplayOptions();
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
@@ -98,6 +108,35 @@ public class UserActivity extends Activity implements OnTouchListener{
 	
 	
 
+	/** 设置 */
+	 public void showNotification(String info,boolean isSound){ 
+	  //点击通知时转移内容 
+	  Intent intent = new Intent(this,UserActivity.class);
+	  intent.putExtra("isNotification",true);
+	  //主要是设置点击通知时显示内容的类 
+	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,intent,0); //如果转移内容则用m_Intent();
+	  //构造Notification对象 
+	  m_Notification = new Notification(); 
+	  //设置通知在状态栏显示的图标 
+	  m_Notification.icon = R.drawable.icon;
+	  //当我们点击通知时显示的内容 
+	  m_Notification.tickerText = info; 
+	  //通知时发出默认的声音 
+	  if(isSound){
+		  m_Notification.defaults = Notification.DEFAULT_SOUND; 
+	  }
+	  //设置通知显示的参数 
+	  m_Notification.setLatestEventInfo(UserActivity.this,"定时刷票信息",info, m_PendingIntent); 
+	  //可以理解为执行这个通知 
+	  m_NotificationManager.notify(0, m_Notification); 
+	 }
+	 
+	 /** 取消 */
+	 public void cancelNotification(){
+	   m_NotificationManager.cancelAll();
+	 }
+	 
+	 
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -359,7 +398,13 @@ public class UserActivity extends Activity implements OnTouchListener{
 	@Override
 	protected void onResume() {
 		Log.i("UserActivity","onResume");
+		if(getIntent().getExtras() != null){
+			if(getIntent().getExtras().containsKey("isNotification")){
+				currentFragment  = fm.findFragmentByTag("tab1");
+			}
+		}
 		super.onResume();
+		
 	}
 
 	@Override
