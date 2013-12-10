@@ -52,6 +52,7 @@ import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.domain.SearchInfo;
 import com.wenbo.piao.sqllite.domain.UserInfo;
@@ -194,6 +195,30 @@ public class HttpClientUtil {
 		httpPost.addHeader("Origin","https://dynamic.12306.cn");
 		httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
 		httpPost.addHeader("Host","dynamic.12306.cn");
+		httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
+		if(StringUtils.isNotEmpty(urlEnum.getxRequestWith())){
+			httpPost.addHeader("X-Requested-With",urlEnum.getxRequestWith());
+		}
+		if(StringUtils.isNotEmpty(urlEnum.getContentType())){
+			httpPost.addHeader("Content-Type",urlEnum.getContentType());
+		}
+		if(StringUtils.isNotEmpty(urlEnum.getRefer())){
+			httpPost.addHeader("Referer",urlEnum.getRefer());
+		}
+		return httpPost;
+	}
+	
+	public static HttpPost getNewHttpPost(UrlNewEnum urlEnum){
+		HttpPost httpPost = new HttpPost(UrlNewEnum.DO_MAIN.getPath()+urlEnum.getPath());
+		if(StringUtils.isNotEmpty(urlEnum.getAccept())){
+			httpPost.addHeader("Accept",urlEnum.getAccept());
+		}
+		httpPost.addHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
+		httpPost.addHeader("Cache-Control","max-age=0");
+		httpPost.addHeader("Connection","keep-alive");
+		httpPost.addHeader("Origin","https://kyfw.12306.cn");
+		httpPost.addHeader("Accept-Language","zh-CN,zh;q=0.8");
+		httpPost.addHeader("Host","kyfw.12306.cn");
 		httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
 		if(StringUtils.isNotEmpty(urlEnum.getxRequestWith())){
 			httpPost.addHeader("X-Requested-With",urlEnum.getxRequestWith());

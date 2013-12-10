@@ -151,15 +151,17 @@ public class JsoupUtil {
 						Date clientDate = new Date();
 						long timeReduce = serverDate.getTime()-clientDate.getTime();
 						long waitTime = (beginDate.getTime()-now.getTime());
-						while(waitTime > 3*1000 && isSearch){
+						while(waitTime > 2*1000 && isSearch){
 							waitTime = waitTime-3*1000;
 							Log.i("JsoupUtil.checkHaveTicket","等待"+waitTime/(1000*60)+"分钟！");
+							long waitMinutes = 1000*60;
 							if(waitTime > 1000*60){
 								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000*60)+"分钟！");
 							}else{
 								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000)+"秒！");
+								waitMinutes = 1000;
 							}
-							Thread.sleep(1000*2);
+							Thread.sleep(waitMinutes);
 							waitTime = beginDate.getTime()-new Date().getTime()+timeReduce;
 						}
 						if(isSearch){

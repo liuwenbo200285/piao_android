@@ -111,10 +111,10 @@ public class UserActivity extends Activity implements OnTouchListener{
 	/** 设置 */
 	 public void showNotification(String info,boolean isSound){ 
 	  //点击通知时转移内容 
-	  Intent intent = new Intent(this,UserActivity.class);
-	  intent.putExtra("isNotification",true);
+//	  Intent intent = new Intent(this,UserActivity.class);
+//	  intent.putExtra("isNotification",true);
 	  //主要是设置点击通知时显示内容的类 
-	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,intent,0); //如果转移内容则用m_Intent();
+	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,getIntent(),0); //如果转移内容则用m_Intent();
 	  //构造Notification对象 
 	  m_Notification = new Notification(); 
 	  //设置通知在状态栏显示的图标 
@@ -123,7 +123,9 @@ public class UserActivity extends Activity implements OnTouchListener{
 	  m_Notification.tickerText = info; 
 	  //通知时发出默认的声音 
 	  if(isSound){
-		  m_Notification.defaults = Notification.DEFAULT_SOUND; 
+		  m_Notification.defaults = Notification.DEFAULT_SOUND|Notification.DEFAULT_VIBRATE|Notification.FLAG_AUTO_CANCEL; 
+	  }else{
+		  m_Notification.defaults = Notification.FLAG_AUTO_CANCEL;
 	  }
 	  //设置通知显示的参数 
 	  m_Notification.setLatestEventInfo(UserActivity.this,"定时刷票信息",info, m_PendingIntent); 
