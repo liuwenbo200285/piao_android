@@ -262,6 +262,28 @@ public class HttpClientUtil {
 		return httpGet;
 	}
 	
+	public static HttpGet getNewHttpGet(UrlNewEnum urlEnum){
+		HttpGet httpGet = new HttpGet(UrlNewEnum.DO_MAIN.getPath()+urlEnum.getPath());
+		if(StringUtils.isNotEmpty(urlEnum.getAccept())){
+			httpGet.addHeader("Accept",urlEnum.getAccept());
+		}
+		httpGet.addHeader("Cache-Control","max-age=0");
+		httpGet.addHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
+		httpGet.addHeader("Connection","keep-alive");
+		httpGet.addHeader("Host","kyfw.12306.cn");
+		httpGet.addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
+		if(StringUtils.isNotEmpty(urlEnum.getxRequestWith())){
+			httpGet.addHeader("X-Requested-With",urlEnum.getxRequestWith());
+		}
+		if(StringUtils.isNotEmpty(urlEnum.getContentType())){
+			httpGet.addHeader("Content-Type",urlEnum.getContentType());
+		}
+		if(StringUtils.isNotEmpty(urlEnum.getRefer())){
+			httpGet.addHeader("Referer",urlEnum.getRefer());
+		}
+		return httpGet;
+	}
+	
 	/**
 	 * 获取坐席枚举
 	 * @param trainSeat

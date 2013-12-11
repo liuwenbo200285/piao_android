@@ -1,22 +1,10 @@
 package com.wenbo.piao.task;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -25,25 +13,23 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
-import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.service.AccountService;
 import com.wenbo.piao.util.HttpClientUtil;
-import com.wenbo.piao.util.JsoupUtil;
 
 /**
  * 登录task
  * @author wenbo
  *
  */
-public class LoginTask extends AsyncTask<String,Integer,Integer> {
+public class LoginTask extends AsyncTask<String,Integer,String> {
 	
-	private HttpClient httpClient;
 	
 	private Activity activity;
 	
@@ -55,16 +41,17 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	
 	private String randCode;
 	
+	private EditText rangCodeEditText;
+	
 	private AccountService accountService;
 	
 	public LoginTask(Activity activity,AccountService accountService){
-		this.httpClient = HttpClientUtil.getHttpClient();
 		this.activity = activity;
 		this.accountService = accountService;
 	}
 
 	@Override
-	protected Integer doInBackground(String... arg0) {
+	protected String doInBackground(String... arg0) {
 		return login();
 	}
 
@@ -74,15 +61,14 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	}
 
 	@Override
-	protected void onCancelled(Integer result) {
+	protected void onCancelled(String result) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
+	protected void onPostExecute(String result) {
 		progressDialog.dismiss();
-		switch (result) {
-		case 0:
+		if(StringUtils.isBlank(result)){
 			Log.i("Login","登录成功!");
 			Account account = new Account();
 			account.setName(username);
@@ -94,30 +80,12 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
             intent.setClass(activity,UserActivity.class);
 			activity.startActivity(intent);
 			activity.finish();
-			break;
-		case 1:
-//			Toast.makeText(activity, "用户名不存在!",Toast.LENGTH_SHORT).show();
-			LoginDialog.newInstance( "用户名不存在！").show(activity.getFragmentManager(),"dialog"); 
-			break;
-		case 2:
-//			Toast.makeText(activity, "密码错误!",Toast.LENGTH_SHORT).show();
-			LoginDialog.newInstance( "密码错误！").show(activity.getFragmentManager(),"dialog"); 
-			break;
-		case 3:
-//			Toast.makeText(activity, "验证码错误!",Toast.LENGTH_SHORT).show();
-			LoginDialog.newInstance("验证码错误！").show(activity.getFragmentManager(),"dialog"); 
-			EditText editText = (EditText)activity.findViewById(R.id.rangcode);
-			editText.setText("");
-			editText.requestFocus();
+		}else{
+			rangCodeEditText.setText("");
+			rangCodeEditText.requestFocus();
 			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,null,1);
-			getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
-			break;
-		case 4:
-			LoginDialog.newInstance("系统维护中！").show(activity.getFragmentManager(),"dialog"); 
-			break;
-		default:
-			LoginDialog.newInstance("请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 
-			break;
+			getRandCodeTask.execute(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.LOGIN_RANGCODE_URL.getPath());
+			LoginDialog.newInstance(result).show(activity.getFragmentManager(),"dialog"); 
 		}
 	}
 
@@ -132,12 +100,12 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		Log.i("Login","正在登录...");
 	}
 	
-	private int login() {
+	private String login() {
 		// 获取验证码
 		try {
 			EditText userNameEditText = (EditText)activity.findViewById(R.id.username);
 			EditText passwordEditText = (EditText)activity.findViewById(R.id.password);
-			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.rangcode);
+			rangCodeEditText = (EditText)activity.findViewById(R.id.rangcode);
 			username = userNameEditText.getText().toString();
 			password = passwordEditText.getText().toString();
 			randCode = rangCodeEditText.getText().toString();
@@ -147,13 +115,18 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			paraMap.put("randCode",randCode);
 			String info = HttpClientUtil.doPost(UrlNewEnum.LONGIN_CONFIM, paraMap,0);
 			if(StringUtils.isNotBlank(info)){
-				
+				JSONObject jsonObject = JSON.parseObject(info);
+				if(jsonObject.containsKey("data")){
+					if("Y".equals(jsonObject.getJSONObject("data").getString("loginCheck"))){
+						return "";
+					}
+				}
+				return jsonObject.getString("messages");
 			}
 		}catch (Exception e) {
 			Log.e("Login","登录出错!",e);
-			return 5;
 		}
-		return 4;
+		return "登录异常！";
 	}
 
 }

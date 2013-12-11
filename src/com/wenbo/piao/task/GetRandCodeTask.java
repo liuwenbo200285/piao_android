@@ -2,7 +2,6 @@ package com.wenbo.piao.task;
 
 import java.net.URISyntaxException;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -18,7 +17,7 @@ import android.widget.ImageView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
-import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 
 /**
@@ -48,12 +47,12 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(String... arg0) {
-		UrlEnum urlEnum = null;
+		UrlNewEnum urlEnum = null;
 		if(type == 1){
 			this.imageView = (ImageView)activity.findViewById(R.id.rangCodeImg);
-			urlEnum = UrlEnum.LOGIN_RANGCODE_URL;
+			urlEnum = UrlNewEnum.LOGIN_RANGCODE_URL;
 		}else if(type == 2){
-			urlEnum = UrlEnum.ORDER_RANGCODE_URL;
+			urlEnum = UrlNewEnum.GET_ORDER_RANGCODE;
 		}
 		return getRandCode(urlEnum);
 	}
@@ -86,15 +85,14 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	private Bitmap getRandCode(UrlEnum urlEnum) {
-		HttpGet httpGet = HttpClientUtil.getHttpGet(urlEnum);
+	private Bitmap getRandCode(UrlNewEnum urlEnum) {
+		HttpGet httpGet = HttpClientUtil.getNewHttpGet(urlEnum);
 		HttpResponse response = null;
 		Bitmap bitmap = null;
 		try {
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
 				byte[] bb = EntityUtils.toByteArray(response.getEntity());
-				Log.d("验证码大小:",""+bb.length);
 				bitmap = BitmapFactory.decodeByteArray(bb, 0, bb.length);
 			} else {
 				getRandCode(urlEnum);

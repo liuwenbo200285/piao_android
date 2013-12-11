@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.service.AccountService;
@@ -225,7 +226,7 @@ public class MainActivity extends Activity {
 	private void getLoginRangeCode(){
 //		checkLogin();
 		GetRandCodeTask getRandCodeTask = new GetRandCodeTask(this,null,1);
-		getRandCodeTask.execute(UrlEnum.DO_MAIN.getPath()+UrlEnum.LOGIN_RANGCODE_URL.getPath());
+		getRandCodeTask.execute(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.LOGIN_RANGCODE_URL.getPath());
 	}
 	
 	/**
