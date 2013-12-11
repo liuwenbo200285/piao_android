@@ -111,8 +111,10 @@ public class UserActivity extends Activity implements OnTouchListener{
 	/** 设置 */
 	 public void showNotification(String info,boolean isSound){ 
 	  //点击通知时转移内容 
-//	  Intent intent = new Intent(this,UserActivity.class);
-//	  intent.putExtra("isNotification",true);
+	  Intent intent = new Intent(this,UserActivity.class);
+	  intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	  intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	  intent.putExtra("isNotification",true);
 	  //主要是设置点击通知时显示内容的类 
 	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,getIntent(),0); //如果转移内容则用m_Intent();
 	  //构造Notification对象 
