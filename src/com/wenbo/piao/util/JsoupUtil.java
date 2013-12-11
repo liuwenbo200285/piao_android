@@ -22,6 +22,7 @@ import android.util.Log;
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.domain.PayInfo;
+import com.wenbo.piao.enums.InfoCodeEnum;
 import com.wenbo.piao.service.RobitOrderService;
 
 public class JsoupUtil {
@@ -105,7 +106,7 @@ public class JsoupUtil {
 			    			}else if(StringUtils.isNumeric(nn)){
 			    				if((index = StringUtils.indexOf(type, n+",")) != -1){
 			    					Log.i("JsoupUtil:checkHaveTicket",trainNo+"有票:"+nn+"张!");
-			    					robitOrderService.sendInfo(trainNo+"有"+HttpClientUtil.getSeatTypeMap(n)+"票:"+nn+"张!");
+			    					robitOrderService.sendInfo(trainNo+"有"+HttpClientUtil.getSeatTypeMap(n)+"票:"+nn+"张!",InfoCodeEnum.INFO_TIPS);
 			    					max = compare(max,index);
 			    					if(max != 10000000){
 			    						return n;
@@ -119,7 +120,7 @@ public class JsoupUtil {
 			    	n++;
 			    }else if("#008800".equals(node.attr("color"))){
 			    	if((index = StringUtils.indexOf(type, n+",")) != -1){
-			    		robitOrderService.sendInfo(trainNo+"有大量的"+HttpClientUtil.getSeatTypeMap(n)+"票!");
+			    		robitOrderService.sendInfo(trainNo+"有大量的"+HttpClientUtil.getSeatTypeMap(n)+"票!",InfoCodeEnum.INFO_TIPS);
 			    		max = compare(max,index);
 			    		if(max != 10000000){
     						return n;
@@ -133,7 +134,7 @@ public class JsoupUtil {
 					String clo = null;
 					if(bengin != -1){
 						Log.i("JsoupUtil.checkHaveTicket",trainNo+":"+info);
-						robitOrderService.sendInfo(trainNo+":"+info);
+						robitOrderService.sendInfo(trainNo+":"+info,InfoCodeEnum.INFO_TIPS);
 						maxType = -1;
 						break;
 					}else if(end != -1){
@@ -156,16 +157,16 @@ public class JsoupUtil {
 							Log.i("JsoupUtil.checkHaveTicket","等待"+waitTime/(1000*60)+"分钟！");
 							long waitMinutes = 1000*60;
 							if(waitTime > 1000*60){
-								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000*60)+"分钟！");
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000*60)+"分钟！",InfoCodeEnum.INFO_NOTIFICATION);
 							}else{
-								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000)+"秒！");
+								robitOrderService.sendInfo(trainNo+":"+info+"，等待"+waitTime/(1000)+"秒！",InfoCodeEnum.INFO_NOTIFICATION);
 								waitMinutes = 1000;
 							}
 							Thread.sleep(waitMinutes);
 							waitTime = beginDate.getTime()-new Date().getTime()+timeReduce;
 						}
 						if(isSearch){
-							robitOrderService.sendInfo(trainNo+":正在等待出票，请做好输入验证码准备!");
+							robitOrderService.sendInfo(trainNo+":正在等待出票，请做好输入验证码准备!",InfoCodeEnum.INFO_NOTIFICATION);
 						}
 					}
 			    }
@@ -179,7 +180,7 @@ public class JsoupUtil {
 			
 		}else{
 			Log.i("JsoupUtil.checkHaveTicket",trainNo+"没有票!");
-			robitOrderService.sendInfo(trainNo+"没有票!");
+			robitOrderService.sendInfo(trainNo+"没有票!",InfoCodeEnum.INFO_TIPS);
 		}
 		return maxType;
 	}

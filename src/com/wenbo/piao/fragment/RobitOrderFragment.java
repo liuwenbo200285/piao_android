@@ -684,7 +684,9 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			if(status >= 1000){
 			    String info = bundle.getString("tips");
 			    dialogTextView.setText("   "+info);
-			    activity.showNotification(info,false);
+			    if(status == 1001){
+			    	activity.showNotification(info,false);
+			    }
 				return;
 			}
 			switch (status) {

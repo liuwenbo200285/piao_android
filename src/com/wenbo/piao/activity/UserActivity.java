@@ -81,7 +81,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.1)");
+		actionBarText.setText("无忧火车票(V0.2)");
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		if(HttpClientUtil.getAccount() != null){
@@ -116,7 +116,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 	  intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 	  intent.putExtra("isNotification",true);
 	  //主要是设置点击通知时显示内容的类 
-	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,getIntent(),0); //如果转移内容则用m_Intent();
+	  m_PendingIntent = PendingIntent.getActivity(UserActivity.this, 0,intent,0); //如果转移内容则用m_Intent();
 	  //构造Notification对象 
 	  m_Notification = new Notification(); 
 	  //设置通知在状态栏显示的图标 
@@ -125,10 +125,9 @@ public class UserActivity extends Activity implements OnTouchListener{
 	  m_Notification.tickerText = info; 
 	  //通知时发出默认的声音 
 	  if(isSound){
-		  m_Notification.defaults = Notification.DEFAULT_SOUND|Notification.DEFAULT_VIBRATE|Notification.FLAG_AUTO_CANCEL; 
-	  }else{
-		  m_Notification.defaults = Notification.FLAG_AUTO_CANCEL;
+		  m_Notification.defaults = Notification.DEFAULT_SOUND|Notification.DEFAULT_VIBRATE;
 	  }
+	  m_Notification.flags = Notification.FLAG_AUTO_CANCEL;
 	  //设置通知显示的参数 
 	  m_Notification.setLatestEventInfo(UserActivity.this,"定时刷票信息",info, m_PendingIntent); 
 	  //可以理解为执行这个通知 
@@ -166,7 +165,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarButton.setVisibility(View.INVISIBLE);
 		actionBarView.setVisibility(View.VISIBLE);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.1)");
+		actionBarText.setText("无忧火车票(V0.2)");
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:

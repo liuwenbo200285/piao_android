@@ -163,7 +163,7 @@ public class RobitOrderService extends Service {
 				if(!isBegin){
 					return;
 				}
-				sendInfo("没有余票,休息100毫秒，继续刷票");
+				sendInfo("没有余票,休息100毫秒，继续刷票",InfoCodeEnum.INFO_TIPS);
 				Thread.sleep(100);
 				response = httpClient.execute(httpGet);
 				info = EntityUtils.toString(response.getEntity());
@@ -173,7 +173,7 @@ public class RobitOrderService extends Service {
 				}
 				if("-10".equals(info)){
 					Log.i("searchTicket","刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
-					sendInfo("刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
+					sendInfo("刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒",InfoCodeEnum.INFO_TIPS);
 					Thread.sleep(configInfo.getSearchWatiTime()*1000);
 				}
 			}
@@ -716,10 +716,10 @@ public class RobitOrderService extends Service {
 	 * 发送订票提示消息
 	 * @param info
 	 */
-	public void sendInfo(String info){
+	public void sendInfo(String info,InfoCodeEnum infoCodeEnum){
 		Log.i("sendInfo：",""+info);
 		Intent intent = new Intent("com.wenbo.piao.robitService");
-		intent.putExtra("status",InfoCodeEnum.INFO_TIPS.getCode());
+		intent.putExtra("status",infoCodeEnum.getCode());
 		intent.putExtra("tips",info);
 		sendBroadcast(intent);
 	}
