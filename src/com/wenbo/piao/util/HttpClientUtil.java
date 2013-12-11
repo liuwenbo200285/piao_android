@@ -1,12 +1,17 @@
 package com.wenbo.piao.util;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
@@ -21,6 +26,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
@@ -37,6 +43,7 @@ import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -44,6 +51,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
@@ -265,6 +273,76 @@ public class HttpClientUtil {
 			if(trainSeatEnum.getCode() == trainSeat){
 				return trainSeatEnum;
 			}
+		}
+		return null;
+	}
+	
+	public static String doPost(UrlNewEnum urlNewEnum,Map<String,String> paraMap,int num){
+		HttpResponse response = null;
+		// 获取验证码
+		try {
+			if(paraMap == null){
+				Log.e("doPost","请求参数为null！action:"+urlNewEnum.getPath());
+				return null;
+			}
+			Iterator<Entry<String,String>> iterator = paraMap.entrySet().iterator();
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			Entry<String,String> entry = null;
+			while(iterator.hasNext()){
+				entry = iterator.next();
+				parameters.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+			}
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
+			HttpPost httpPost = HttpClientUtil.getNewHttpPost(urlNewEnum);
+			httpPost.setEntity(uef);
+			response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 302) {
+			} else if (response.getStatusLine().getStatusCode() == 404) {
+			} else if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		}catch(SocketTimeoutException e){
+			Log.e("doPost","网络连接超时!action:"+urlNewEnum.getPath(),e);
+			if(num < 5){
+				num++;
+				doPost(urlNewEnum, paraMap, num);
+			}
+		}catch (Exception e) {
+			Log.e("doPost","网络操作出错!action:"+urlNewEnum.getPath(),e);
+		}
+		return null;
+	}
+	
+	public static String doGet(UrlNewEnum urlNewEnum,Map<String,String> paraMap,int num){
+		HttpResponse response = null;
+		// 获取验证码
+		try {
+			if(paraMap == null){
+				Log.e("doGet","请求参数为null！action:"+urlNewEnum.getPath());
+				return null;
+			}
+			Iterator<Entry<String,String>> iterator = paraMap.entrySet().iterator();
+			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+			Entry<String,String> entry = null;
+			while(iterator.hasNext()){
+				entry = iterator.next();
+				parameters.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+			}
+			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
+			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
+			httpGet.setURI(new URI(UrlNewEnum.DO_MAIN.getPath()+urlNewEnum.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
+			response = httpClient.execute(httpGet);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return EntityUtils.toString(response.getEntity());
+			}
+		}catch(SocketTimeoutException e){
+			Log.e("doGet","网络连接超时!action:"+urlNewEnum.getPath(),e);
+			if(num < 5){
+				num++;
+				doPost(urlNewEnum, paraMap, num);
+			}
+		}catch (Exception e) {
+			Log.e("doGet","网络操作出错!action:"+urlNewEnum.getPath(),e);
 		}
 		return null;
 	}

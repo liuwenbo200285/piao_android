@@ -2,9 +2,12 @@ package com.wenbo.piao.task;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -27,6 +30,7 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.Account;
 import com.wenbo.piao.sqllite.service.AccountService;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -49,6 +53,8 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 	
 	private String password;
 	
+	private String randCode;
+	
 	private AccountService accountService;
 	
 	public LoginTask(Activity activity,AccountService accountService){
@@ -59,7 +65,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 
 	@Override
 	protected Integer doInBackground(String... arg0) {
-		return getLoginRand();
+		return login();
 	}
 
 	@Override
@@ -126,41 +132,7 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 		Log.i("Login","正在登录...");
 	}
 	
-	/**
-	 * 获取登录码
-	 */
-	private int getLoginRand() {
-		HttpResponse response = null;
-		try {
-			HttpGet httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_URL);
-			httpget.getParams().setParameter("method","loginAysnSuggest");
-			response = httpClient.execute(httpget);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				String str = EntityUtils.toString(response.getEntity());
-				JSONObject object = JSONObject.parseObject(str);
-				Log.i("Login",object.getString("loginRand")+":"+object.getString("randError"));
-//				httpget = HttpClientUtil.getHttpGet(UrlEnum.LOGIN_INIT_JS);
-//				response = httpClient.execute(httpget);
-//				if(response.getStatusLine().getStatusCode() == 200){
-//					str = EntityUtils.toString(response.getEntity());
-//					Log.i("aaaaa",str);
-//				}
-				return login(object.getString("loginRand"),object.getString("randError"));
-			}else if(response.getStatusLine().getStatusCode() == 404){
-				Log.w("Login","404");
-				return 4;
-			}
-		} catch (Exception e) {
-			Log.e("Login","获取登录随机码失败!",e);
-			return 5;
-		} finally {
-
-		}
-		return 0;
-	}
-	
-	private int login(String loginRand, String randError) {
-		HttpResponse response = null;
+	private int login() {
 		// 获取验证码
 		try {
 			EditText userNameEditText = (EditText)activity.findViewById(R.id.username);
@@ -168,36 +140,14 @@ public class LoginTask extends AsyncTask<String,Integer,Integer> {
 			EditText rangCodeEditText = (EditText)activity.findViewById(R.id.rangcode);
 			username = userNameEditText.getText().toString();
 			password = passwordEditText.getText().toString();
-			String randCode = rangCodeEditText.getText().toString();
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method", "login"));
-			parameters.add(new BasicNameValuePair("loginRand", loginRand));
-			parameters.add(new BasicNameValuePair("refundLogin", "N"));
-			parameters.add(new BasicNameValuePair("refundFlag", "Y"));
-			parameters.add(new BasicNameValuePair("loginUser.user_name",username));
-			parameters.add(new BasicNameValuePair("nameErrorFocus", ""));
-			parameters.add(new BasicNameValuePair("user.password",password));
-			parameters.add(new BasicNameValuePair("randCode", randCode));
-			parameters.add(new BasicNameValuePair("randErrorFocus", ""));
-			parameters.add(new BasicNameValuePair("myversion", "undefined"));
-			parameters.add(new BasicNameValuePair("MTEwNDQyNQ==", "ZGYyMGJjZDA4ZTRmMmJlMA=="));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
-//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.LONGIN_CONFIM.getPath());
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.LONGIN_CONFIM);
-			httpPost.setEntity(uef);
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 302) {
-			} else if (response.getStatusLine().getStatusCode() == 404) {
-			} else if (response.getStatusLine().getStatusCode() == 200) {
-				String info = EntityUtils.toString(response.getEntity());
-				Document document = Jsoup.parse(info);
-				// 判断登录状态
-				if(StringUtils.contains(info,"系统维护中")){
-					Log.i("Login","系统维护中，请明天订票!");
-					return 4;
-				}else{
-					return JsoupUtil.validateLogin(document);
-				}
+			randCode = rangCodeEditText.getText().toString();
+			Map<String,String> paraMap = new HashMap<String, String>();
+			paraMap.put("loginUserDTO.user_name",username);
+			paraMap.put("userDTO.password",password);
+			paraMap.put("randCode",randCode);
+			String info = HttpClientUtil.doPost(UrlNewEnum.LONGIN_CONFIM, paraMap,0);
+			if(StringUtils.isNotBlank(info)){
+				
 			}
 		}catch (Exception e) {
 			Log.e("Login","登录出错!",e);

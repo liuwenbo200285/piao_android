@@ -77,26 +77,6 @@ public class MainActivity extends Activity {
 				
 			}
 		});
-//		userNameText.setThreshold(2);
-//		userNameText.addTextChangedListener(new TextWatcher() {
-//			@Override
-//			public void onTextChanged(CharSequence s, int start, int before, int count) {
-//				stations =  stationService.findStationLike(s.toString());
-//				StationAdapter adapter = new StationAdapter(MainActivity.this,android.R.layout.simple_dropdown_item_1line,stations);
-//				userNameText.setAdapter(adapter);
-//			}
-//			
-//			@Override
-//			public void beforeTextChanged(CharSequence s, int start, int count,
-//					int after) {
-//			}
-//			
-//			@Override
-//			public void afterTextChanged(Editable s) {
-//				// TODO Auto-generated method stub
-//			}
-//		});
-		
 	}
 	
 	@Override
