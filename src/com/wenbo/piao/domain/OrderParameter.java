@@ -2,6 +2,8 @@ package com.wenbo.piao.domain;
 
 import org.jsoup.nodes.Document;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class OrderParameter {
 
 	private Document document;
@@ -12,10 +14,8 @@ public class OrderParameter {
 	
 	private String message;
 	
-	private String secretStr;
+	private JSONObject trainObject;
 	
-	private String ticketNum;
-
 	public Document getDocument() {
 		return document;
 	}
@@ -48,20 +48,12 @@ public class OrderParameter {
 		this.message = message;
 	}
 
-	public String getSecretStr() {
-		return secretStr;
+	public JSONObject getTrainObject() {
+		return trainObject;
 	}
 
-	public void setSecretStr(String secretStr) {
-		this.secretStr = secretStr;
-	}
-
-	public String getTicketNum() {
-		return ticketNum;
-	}
-
-	public void setTicketNum(String ticketNum) {
-		this.ticketNum = ticketNum;
+	public void setTrainObject(JSONObject trainObject) {
+		this.trainObject = trainObject;
 	}
 	
 }

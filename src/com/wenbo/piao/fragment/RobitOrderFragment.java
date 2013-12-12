@@ -92,6 +92,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private EditText trainCode;
 	private MyReceiver myReceiver;
 	private TextView dialogTextView;
+	private static 	final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座","其它"};
+	private static 	final String[] seatNames = { "swz", "tz", "zy", "ze", "gr", "rw","yw", "rz", "yz", "wz","qt"};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -461,7 +463,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 
 	private void showSeatDialog() {
 		if (selectSeatDialog == null) {
-			final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座" };
 			final boolean[] selectSeats = new boolean[seats.length];
 			if(StringUtils.isNotBlank(selectSeatText.getText())){
 				String [] seatNames = StringUtils.split(selectSeatText.getText().toString(),",");
@@ -691,7 +692,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			}
 			switch (status) {
 			case 1:
-				LoginDialog.newInstance("系统维护中！").show(
+				LoginDialog.newInstance("23:00-07:00系统维护时间！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			case 2:

@@ -143,24 +143,13 @@ public class RobitOrderService extends Service {
 			paraMap.put("leftTicketDTO.from_station",configInfo.getFromStation());
 			paraMap.put("leftTicketDTO.to_station",configInfo.getToStation());
 			paraMap.put("purpose_codes","ADULT");
-			info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
-			while(StringUtils.isBlank(info)){
-				if(!isBegin){
-					return;
-				}
+			while(isBegin){
+				info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
 				orderParameter = checkTickeAndOrder(info, date,serverDate);
-				if(StringUtils.isEmpty(orderParameter.getTicketType())){
+				if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
 					sendInfo("没有余票,继续刷票",InfoCodeEnum.INFO_TIPS);
-					info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
-					if(StringUtils.contains(info, "系统维护中")){
-						sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
-						return;
-					}
-					if("-10".equals(info)){
-						Log.i("searchTicket","刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
-						sendInfo("刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒",InfoCodeEnum.INFO_TIPS);
-						Thread.sleep(configInfo.getSearchWatiTime()*1000);
-					}
+				}else{
+					break;
 				}
 			}
 			Log.i("searchTicket","有票了，开始订票~~~~~~~~~");
@@ -192,22 +181,29 @@ public class RobitOrderService extends Service {
 			if(jsonObject.containsKey("data")){
 				JSONArray jsonArray = jsonObject.getJSONArray("data");
 				JSONObject object = null;
+				JSONObject trainObject = null;
 				boolean isCheckTrainNo = false;
 				String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
 				if(StringUtils.isNotEmpty(configInfo.getTrainNo())){
 					isCheckTrainNo = true;
 				}
+				if(jsonArray.size() > 0 && StringUtils.contains(jsonArray.getJSONObject(0).getString("buttonTextInfo"),"系统维护时间")){
+					sendInfo("23:00-07:00系统维护时间",InfoCodeEnum.INFO_NOTIFICATION);
+					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
+					return orderParameter;
+				}
 				for(int i = 0; i < jsonArray.size(); i++){
 					object = jsonArray.getJSONObject(i);
+					trainObject = object.getJSONObject("queryLeftNewDTO");
 					if(isCheckTrainNo){
-						if(!object.getString("train_no").equals(configInfo.getTrainNo())){
+						if(!trainObject.getString("train_no").equals(configInfo.getTrainNo())){
 							continue;
 						}
 					}
 					int isSeat = 0;
 					int isNoSeat = 0;
 					for(String seat:orderSeats){
-						String seatState = object.getString(seat);
+						String seatState = trainObject.getString(seat+"_num");
 						if("--".equals(seatState)){
 							isSeat++;
 						}else if("无".equals(seatState)){
@@ -215,8 +211,7 @@ public class RobitOrderService extends Service {
 						}else{
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
-							orderParameter.setSecretStr(object.getString("secretStr"));
-							orderParameter.setTicketNum(seatState);
+							orderParameter.setTrainObject(trainObject);
 						}
 					}
 					if(isSeat == orderSeats.length
