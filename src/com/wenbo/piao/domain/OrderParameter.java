@@ -6,9 +6,15 @@ public class OrderParameter {
 
 	private Document document;
 	
-	private int ticketType;
+	private String ticketType;
 	
 	private String[] parameters;
+	
+	private String message;
+	
+	private String secretStr;
+	
+	private String ticketNum;
 
 	public Document getDocument() {
 		return document;
@@ -18,11 +24,11 @@ public class OrderParameter {
 		this.document = document;
 	}
 
-	public int getTicketType() {
+	public String getTicketType() {
 		return ticketType;
 	}
 
-	public void setTicketType(int ticketType) {
+	public void setTicketType(String ticketType) {
 		this.ticketType = ticketType;
 	}
 
@@ -33,6 +39,29 @@ public class OrderParameter {
 	public void setParameters(String[] parameters) {
 		this.parameters = parameters;
 	}
-	
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getSecretStr() {
+		return secretStr;
+	}
+
+	public void setSecretStr(String secretStr) {
+		this.secretStr = secretStr;
+	}
+
+	public String getTicketNum() {
+		return ticketNum;
+	}
+
+	public void setTicketNum(String ticketNum) {
+		this.ticketNum = ticketNum;
+	}
 	
 }

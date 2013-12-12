@@ -1,8 +1,8 @@
 package com.wenbo.piao.activity;
 
+import java.util.HashMap;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Map;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -29,8 +29,11 @@ import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.fragment.AboutFargment;
 import com.wenbo.piao.fragment.CompletedOrderListFragment;
 import com.wenbo.piao.fragment.ContactFragment;
@@ -43,7 +46,6 @@ import com.wenbo.piao.sqllite.service.SearchInfoService;
 import com.wenbo.piao.sqllite.util.SqlLiteUtil;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.util.HttpClientUtil;
-import com.wenbo.piao.util.OperationUtil;
 
 public class UserActivity extends Activity implements OnTouchListener{
 	
@@ -364,13 +366,15 @@ public class UserActivity extends Activity implements OnTouchListener{
 				new AsyncTask<Integer,Integer,String>(){
 					@Override
 					protected String doInBackground(Integer... arg0) {
-						return OperationUtil.checkLogin();
+						Map<String,String> paraMap = new HashMap<String, String>();
+						return HttpClientUtil.doGet(UrlNewEnum.CHECKUSER,paraMap,0);
 					}
 					@Override
 					protected void onPostExecute(String result) {
 						progressDialog.dismiss();
 						try {
-							if(!StringUtils.contains(result,"waitTime")){
+							JSONObject jsonObject = JSON.parseObject(result);
+							if(!jsonObject.containsKey("data") && !jsonObject.getJSONObject("data").getBooleanValue("flag")){
 								LoginDialog.newInstance("登录已超时，请重新登录！").show(getFragmentManager(),"dialog"); 
 								Intent intent = new Intent();
 					            intent.setClass(UserActivity.this,MainActivity.class);

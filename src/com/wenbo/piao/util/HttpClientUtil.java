@@ -369,6 +369,28 @@ public class HttpClientUtil {
 		return null;
 	}
 	
+	public static String getServerHead(String key,int num){
+		HttpResponse response = null;
+		// 获取验证码
+		try {
+			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
+			httpGet.setURI(new URI(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.CHECKUSER.getPath()));
+			response = httpClient.execute(httpGet);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				return response.getHeaders("Date")[0].getValue();
+			}
+		}catch(SocketTimeoutException e){
+			Log.e("doGet","网络连接超时!action:"+UrlNewEnum.CHECKUSER.getPath(),e);
+			if(num < 5){
+				num++;
+				getServerHead(key,num);
+			}
+		}catch (Exception e) {
+			Log.e("doGet","网络操作出错!action:"+UrlNewEnum.CHECKUSER.getPath(),e);
+		}
+		return null;
+	}
+	
 	public static Account getAccount(){
 		return HttpClientUtil.account;
 	}
