@@ -1,29 +1,20 @@
 package com.wenbo.piao.task;
 
-import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.dialog.LoginDialog;
-import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.fragment.ContactFragment;
 import com.wenbo.piao.fragment.RobitOrderFragment;
 import com.wenbo.piao.sqllite.domain.Account;
@@ -73,8 +64,7 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 					return null;
 				}
 		    	JSONObject jsonObject = JSON.parseObject(info);
-		    	userInfos = JSONArray.parseArray(
-						jsonObject.getString("rows"), UserInfo.class);
+		    	userInfos = JSONArray.parseArray(jsonObject.getJSONObject("data").getString("datas"),UserInfo.class);
 		    	isInit = true;
 			}
 			if (userInfos != null && !userInfos.isEmpty()) {
@@ -132,41 +122,10 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 	 * @throws URISyntaxException
 	 */
 	private String getOrderPerson() {
-		HttpResponse response = null;
-		HttpPost httpPost = null;
-		try {
-			HttpClient httpClient = HttpClientUtil.getHttpClient();
-//			URI uri = new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.GET_ORDER_PERSON.getPath());
-			httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_PERSON);
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method", "getPagePassengerAll"));
-			parameters.add(new BasicNameValuePair("pageIndex",
-					"0"));
-			parameters.add(new BasicNameValuePair("pageSize",
-					"100"));
-			parameters.add(new BasicNameValuePair("passenger_name",
-					"请输入汉字或拼音首字母"));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
-			httpPost.setEntity(uef);
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				count = 0;
-				return EntityUtils.toString(response.getEntity());
-			}
-		} catch (SocketTimeoutException e) {
-			Log.e("GetPersonConstanct","getOrderPerson data timeout!",e);
-			if(count < 5){
-				count++;
-				return getOrderPerson();
-			}
-		} catch (Exception e) {
-			Log.e("GetPersonConstanct","getOrderPerson error!",e);
-		} finally {
-			Log.i("GetPersonConstanct","close getOrderPerson");
-			httpPost.abort();
-		}
-		return null;
+		Map<String,String> paraMap = new HashMap<String, String>();
+		paraMap.put("pageIndex","1");
+		paraMap.put("pageSize","100");
+		return HttpClientUtil.doPost(UrlNewEnum.GET_ORDER_PERSON, paraMap,0);
 	}
 
 }

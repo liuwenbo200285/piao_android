@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -33,6 +33,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.domain.OrderParameter;
@@ -41,6 +42,7 @@ import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.TrainSeatEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
@@ -129,59 +131,32 @@ public class RobitOrderService extends Service {
 	 * @throws URISyntaxException
 	 **/
 	public void searchTicket(String date) {
-		HttpResponse response = null;
 		String info = null;
 		OrderParameter orderParameter = null;
+		Date serverDate = null;
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method","queryLeftTicket"));
-			parameters.add(new BasicNameValuePair("orderRequest.train_date",date));
-			parameters.add(new BasicNameValuePair("orderRequest.from_station_telecode",configInfo.getFromStation()));
-			parameters.add(new BasicNameValuePair("orderRequest.to_station_telecode",configInfo.getToStation()));
-			if (StringUtils.isNotEmpty(configInfo.getTrainNo())) {
-				parameters.add(new BasicNameValuePair("orderRequest.train_no",configInfo.getTrainNo()));
-			} else {
-				parameters.add(new BasicNameValuePair("orderRequest.train_no",""));
-			}
-			parameters.add(new BasicNameValuePair("trainPassType","QB"));
-			parameters.add(new BasicNameValuePair("trainClass",configInfo.getTrainClass()));
-			parameters.add(new BasicNameValuePair("includeStudent","00"));
-			parameters.add(new BasicNameValuePair("seatTypeAndNum",""));
-			parameters.add(new BasicNameValuePair("orderRequest.start_time_str",configInfo.getOrderTime()));
-			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
-			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET);
-			httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
-			response = httpClient.execute(httpGet);
-			Date serverDate = null;
-			if(response.getStatusLine().getStatusCode() == 200){
-				String dateStr = response.getHeaders("Date")[0].getValue();
-				dateStr = StringUtils.replace(dateStr,",","");
-				serverDate =  new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss z",Locale.ENGLISH).parse(dateStr);
-				info = EntityUtils.toString(response.getEntity());
-			}
-			while(StringUtils.isBlank(info) || (orderParameter=checkTickeAndOrder(info, date,serverDate)) == null){
-				if(!isBegin){
-					return;
-				}
-				sendInfo("没有余票,休息100毫秒，继续刷票",InfoCodeEnum.INFO_TIPS);
-				Thread.sleep(100);
-				response = httpClient.execute(httpGet);
-				info = EntityUtils.toString(response.getEntity());
-				if(StringUtils.contains(info, "系统维护中")){
-					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
-					return;
-				}
-				if("-10".equals(info)){
-					Log.i("searchTicket","刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒");
-					sendInfo("刷新太过频繁，休息"+configInfo.getSearchWatiTime()+"秒",InfoCodeEnum.INFO_TIPS);
-					Thread.sleep(configInfo.getSearchWatiTime()*1000);
+			String dateStr = HttpClientUtil.getServerHead("Date",0);
+			dateStr = StringUtils.replace(dateStr,",","");
+			serverDate =  new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss z",Locale.ENGLISH).parse(dateStr);
+			Map<String, String> paraMap = new HashMap<String, String>();
+			paraMap.put("leftTicketDTO.train_date",date);
+			paraMap.put("leftTicketDTO.from_station",configInfo.getFromStation());
+			paraMap.put("leftTicketDTO.to_station",configInfo.getToStation());
+			paraMap.put("purpose_codes","ADULT");
+			while(isBegin){
+				info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
+				orderParameter = checkTickeAndOrder(info, date,serverDate);
+				if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
+					sendInfo("没有余票,继续刷票",InfoCodeEnum.INFO_TIPS);
+				}else{
+					break;
 				}
 			}
 			Log.i("searchTicket","有票了，开始订票~~~~~~~~~");
 			params = JsoupUtil.getTicketInfo(orderParameter.getDocument());
 			HttpClientUtil.setParams(params);
 			Log.i("searchTicket","ticketType:" + orderParameter.getTicketType());
-			orderTicket(date, params, orderParameter.getTicketType());
+//			orderTicket(date, params, orderParameter.getTicketType());
 		} catch (Exception e) {
 			Log.e("searchTicket","searchTicket error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
@@ -200,69 +175,53 @@ public class RobitOrderService extends Service {
 	 * @throws IllegalStateException
 	 */
 	public OrderParameter checkTickeAndOrder(String message, String date,Date serverDate) {
-		Document document = null;
 		OrderParameter orderParameter = null;
 		try {
-			message = StringUtils.remove(message, "&nbsp;");
-			if (StringUtils.isEmpty(message)) {
-				Log.w("checkTickeAndOrder","车次配置错误，没有查询到车次！");
-				sendStatus(StatusCodeEnum.TRAIN_NO_ERROR);
-				return null;
-			}
-			int m = 1;
-			int n = 0;
-			int lastIndex = 0;
-			boolean isLast = false;
-			boolean isHave = false;
-			String trainInfo = null;
-			int ticketType = 0;
-			int allNoSeat = 1;
-			String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
-			while ((n = StringUtils.indexOf(message, m + ",<span")) != -1
-					|| !isLast) {
-				if(!isBegin){
-					break;
+			JSONObject jsonObject = JSON.parseObject(message);
+			if(jsonObject.containsKey("data")){
+				JSONArray jsonArray = jsonObject.getJSONArray("data");
+				JSONObject object = null;
+				JSONObject trainObject = null;
+				boolean isCheckTrainNo = false;
+				String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
+				if(StringUtils.isNotEmpty(configInfo.getTrainNo())){
+					isCheckTrainNo = true;
 				}
-				isHave = false;
-				if (n == -1) {
-					trainInfo = StringUtils.substring(message, lastIndex,
-							message.length());
-					isLast = true;
-				} else {
-					trainInfo = StringUtils.substring(message, lastIndex, n);
+				if(jsonArray.size() > 0 && StringUtils.contains(jsonArray.getJSONObject(0).getString("buttonTextInfo"),"系统维护时间")){
+					sendInfo("23:00-07:00系统维护时间",InfoCodeEnum.INFO_NOTIFICATION);
+					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
+					return orderParameter;
 				}
-				int i = StringUtils.lastIndexOf(trainInfo,"<br>");
-				String str1 = StringUtils.substring(trainInfo,i+4,trainInfo.length());
-				String[] strs = StringUtils.split(str1,",");
-				for(String orderSeat:orderSeats){
-					if(!"--".equals(strs[Integer.parseInt(orderSeat)])){
-						isHave = true;
+				for(int i = 0; i < jsonArray.size(); i++){
+					object = jsonArray.getJSONObject(i);
+					trainObject = object.getJSONObject("queryLeftNewDTO");
+					if(isCheckTrainNo){
+						if(!trainObject.getString("train_no").equals(configInfo.getTrainNo())){
+							continue;
+						}
 					}
-				}
-				if(!isHave){
-					allNoSeat++;
-				}else{
-					document = Jsoup.parse(trainInfo);
-					ticketType = JsoupUtil.checkHaveTicket(document,configInfo.getOrderSeat(),this,serverDate);
-					if (ticketType > 0) {
-						break;
-					}else if(ticketType < 0){
+					int isSeat = 0;
+					int isNoSeat = 0;
+					for(String seat:orderSeats){
+						String seatState = trainObject.getString(seat+"_num");
+						if("--".equals(seatState)){
+							isSeat++;
+						}else if("无".equals(seatState)){
+							isNoSeat++;
+						}else{
+							orderParameter = new OrderParameter();
+							orderParameter.setTicketType(seat);
+							orderParameter.setTrainObject(trainObject);
+							orderParameter.setTicketNum(seatState);
+						}
+					}
+					if(isSeat == orderSeats.length
+							&& isCheckTrainNo){
 						isBegin = false;
-						sendStatus(StatusCodeEnum.NO_ORDER);
-						return null;
+						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
+						break;
 					}
 				}
-				document = null;
-				m++;
-				lastIndex = n;
-			}
-			if (document != null) {
-				orderParameter = new OrderParameter();
-				orderParameter.setDocument(document);
-				orderParameter.setTicketType(ticketType);
-			}else if(allNoSeat == m){
-				isBegin = false;
-				sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 			}
 		} catch (Exception e) {
 			Log.e("checkTickeAndOrder","checkTickeAndOrder error!", e);
