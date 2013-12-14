@@ -152,11 +152,7 @@ public class RobitOrderService extends Service {
 					break;
 				}
 			}
-			Log.i("searchTicket","有票了，开始订票~~~~~~~~~");
-			params = JsoupUtil.getTicketInfo(orderParameter.getDocument());
-			HttpClientUtil.setParams(params);
-			Log.i("searchTicket","ticketType:" + orderParameter.getTicketType());
-//			orderTicket(date, params, orderParameter.getTicketType());
+			submitOrderRequest(date,orderParameter);
 		} catch (Exception e) {
 			Log.e("searchTicket","searchTicket error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
@@ -239,101 +235,25 @@ public class RobitOrderService extends Service {
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 */
-	public void orderTicket(String date, String[] params, int ticketType)
+	public void submitOrderRequest(String date,OrderParameter orderParameter)
 			throws IllegalStateException, IOException {
-		HttpPost httpPost = null;
-		OutputStream outputStream = null;
-		HttpResponse response = null;
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method",
-					"submutOrderRequest"));
-			parameters.add(new BasicNameValuePair("arrive_time", params[6]));
-			parameters.add(new BasicNameValuePair("from_station_name",
-					params[7]));
-			parameters
-					.add(new BasicNameValuePair("from_station_no", params[9]));
-			parameters.add(new BasicNameValuePair("from_station_telecode",
-					params[4]));
-			parameters.add(new BasicNameValuePair("from_station_telecode_name",
-					params[7]));
-			parameters.add(new BasicNameValuePair("include_student", "00"));
-			parameters.add(new BasicNameValuePair("lishi", params[1]));
-			parameters.add(new BasicNameValuePair("locationCode", params[13]));
-			parameters.add(new BasicNameValuePair("mmStr", params[12]));
-			parameters.add(new BasicNameValuePair("round_start_time_str",configInfo.getOrderTime()));
-			parameters.add(new BasicNameValuePair("round_train_date", date));
-			parameters.add(new BasicNameValuePair("seattype_num", ""));
-			parameters.add(new BasicNameValuePair("single_round_type", "1"));
-			parameters.add(new BasicNameValuePair("start_time_str",configInfo.getOrderTime()));
-			parameters.add(new BasicNameValuePair("station_train_code",
-					params[0]));
-			parameters
-					.add(new BasicNameValuePair("to_station_name", params[8]));
-			parameters.add(new BasicNameValuePair("to_station_no", params[10]));
-			parameters.add(new BasicNameValuePair("to_station_telecode",
-					params[5]));
-			parameters.add(new BasicNameValuePair("to_station_telecode_name",
-					params[8]));
-			parameters.add(new BasicNameValuePair("train_class_arr", configInfo
-					.getTrainClass()));
-			parameters.add(new BasicNameValuePair("train_date", date));
-			parameters.add(new BasicNameValuePair("train_pass_type", "QB"));
-			parameters
-					.add(new BasicNameValuePair("train_start_time", params[2]));
-			parameters.add(new BasicNameValuePair("trainno4", params[3]));
-			parameters.add(new BasicNameValuePair("ypInfoDetail", params[11]));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
-			httpPost = HttpClientUtil.getHttpPost(UrlEnum.BOOK_TICKET);
-			httpPost.setEntity(uef);
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 302) {
-//				Header locationHeader = response.getFirstHeader("Location");
-			} else if (response.getStatusLine().getStatusCode() == 200) {
-				HttpEntity httpEntity = response.getEntity();
-				Document document = JsoupUtil.getPageDocument(httpEntity
-						.getContent());
-				Element element = document.getElementById("left_ticket");
-				if (element != null) {
-					ticketNo = element.attr("value");
-					HttpClientUtil.setTicketNo(ticketNo);
-					Log.i("orderTicket:orderTicket",ticketNo);
-				} else {
-					sendStatus(StatusCodeEnum.HAVA_NO_DETAIL_ORDER);
-					return;
-				}
-				element = document.getElementById("passenger_1_seat");
-				if (element != null) {
-					TrainSeatEnum trainSeatEnum = HttpClientUtil.getSeatEnum(ticketType);
-					if (trainSeatEnum == null) {
-						Log.w("orderTicket","预订坐席填写不正确，请重新填写!");
-						sendStatus(StatusCodeEnum.ORDER_SEAT_ERROR);
-						return;
-					}
-					Elements elements = element
-							.getElementsContainingOwnText(trainSeatEnum
-									.getName());
-					seatNum = elements.get(0).attr("value");
-					HttpClientUtil.setSeatNum(seatNum);
-					Log.i("orderTicket:seatNum",seatNum);
-				}
-				Elements elements = document.getElementsByAttributeValue(
-						"name", "org.apache.struts.taglib.html.TOKEN");
-				if (elements != null) {
-					token = elements.get(0).attr("value");
-					HttpClientUtil.setToken(token);
-				}
-				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
-				return;
-			} else {
-				Log.w("orderTicket",EntityUtils.toString(response.getEntity()));
-			}
+			Map<String,String> paraMap = new HashMap<String, String>();
+			paraMap.put("secretStr",orderParameter.getSecretStr());
+			paraMap.put("train_date",date);
+			paraMap.put("back_train_date","2013-12-13");
+			paraMap.put("tour_flag","dc");
+			paraMap.put("purpose_codes","ADULT");
+			paraMap.put("query_from_station_name",orderParameter.getTrainObject().getString("from_station_name"));
+			paraMap.put("query_to_station_name",orderParameter.getTrainObject().getString("to_station_name"));
+			paraMap.put("undefined","");
+			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
+			System.out.println(info);
 		} catch (Exception e) {
 			Log.e("orderTicket","orderTicket error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
 		} finally {
-			IOUtils.closeQuietly(outputStream);
+			
 		}
 	}
 

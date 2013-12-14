@@ -16,6 +16,8 @@ public class OrderParameter {
 	
 	private JSONObject trainObject;
 	
+	private String secretStr;
+	
 	public Document getDocument() {
 		return document;
 	}
@@ -54,6 +56,14 @@ public class OrderParameter {
 
 	public void setTrainObject(JSONObject trainObject) {
 		this.trainObject = trainObject;
+	}
+
+	public String getSecretStr() {
+		return secretStr;
+	}
+
+	public void setSecretStr(String secretStr) {
+		this.secretStr = secretStr;
 	}
 	
 }

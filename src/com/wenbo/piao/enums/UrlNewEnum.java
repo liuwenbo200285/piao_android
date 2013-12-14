@@ -8,10 +8,12 @@ public enum UrlNewEnum {
 			"application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest"),
 	//获取人物信息url
 	GET_ORDER_PERSON("passengers/query","*/*","https://kyfw.12306.cn/otn/passengers/init","application/x-www-form-urlencoded","XMLHttpRequest"),
-	SEARCH_TICKET("leftTicket/query","*/*","https://kyfw.12306.cn/otn/leftTicket/init","application/x-www-form-urlencoded","XMLHttpRequest"),
+	SEARCH_TICKET("leftTicket/query","*/*","https://kyfw.12306.cn/otn/leftTicket/init?random=1386904914465","application/x-www-form-urlencoded","XMLHttpRequest"),
 	GET_ORDER_RANGCODE("passcodeNew/getPassCodeNew?module=passenger&rand=randp","image/webp,*/*;q=0.8","https://kyfw.12306.cn/otn/confirmPassenger/initDc","",""),
 	QUERY_MYORDER_NOCOMPLETE("queryOrder/queryMyOrderNoComplete","*/*","https://kyfw.12306.cn/otn/queryOrder/initNoComplete","application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest"),
-	CHECKUSER("login/checkUser","*/*","https://kyfw.12306.cn/otn/leftTicket/init","application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest");
+	CHECKUSER("login/checkUser","*/*","https://kyfw.12306.cn/otn/leftTicket/init","application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest"),
+	SUBMITORDERREQUEST("leftTicket/submitOrderRequest","*/*","https://kyfw.12306.cn/otn/leftTicket/init","application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest"),
+	checkOrderInfo("confirmPassenger/checkOrderInfo","application/json, text/javascript, */*; q=0.01","https://kyfw.12306.cn/otn/confirmPassenger/initDc","application/x-www-form-urlencoded; charset=UTF-8","XMLHttpRequest");
 
 	private String path;
 	

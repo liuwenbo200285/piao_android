@@ -351,7 +351,7 @@ public class HttpClientUtil {
 				parameters.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
 			}
 			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
-			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
+			HttpGet httpGet = HttpClientUtil.getNewHttpGet(urlNewEnum);
 			httpGet.setURI(new URI(UrlNewEnum.DO_MAIN.getPath()+urlNewEnum.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
@@ -373,7 +373,7 @@ public class HttpClientUtil {
 		HttpResponse response = null;
 		// 获取验证码
 		try {
-			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
+			HttpGet httpGet = HttpClientUtil.getNewHttpGet(UrlNewEnum.CHECKUSER);
 			httpGet.setURI(new URI(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.CHECKUSER.getPath()));
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
