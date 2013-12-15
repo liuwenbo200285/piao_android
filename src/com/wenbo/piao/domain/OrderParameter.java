@@ -18,6 +18,8 @@ public class OrderParameter {
 	
 	private String secretStr;
 	
+	private String backDate;
+	
 	public Document getDocument() {
 		return document;
 	}
@@ -64,6 +66,14 @@ public class OrderParameter {
 
 	public void setSecretStr(String secretStr) {
 		this.secretStr = secretStr;
+	}
+
+	public String getBackDate() {
+		return backDate;
+	}
+
+	public void setBackDate(String backDate) {
+		this.backDate = backDate;
 	}
 	
 }

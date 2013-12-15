@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -136,15 +139,21 @@ public class RobitOrderService extends Service {
 		Date serverDate = null;
 		try {
 			String dateStr = HttpClientUtil.getServerHead("Date",0);
+			while(dateStr == null){
+				dateStr = HttpClientUtil.getServerHead("Date",0);
+			}
 			dateStr = StringUtils.replace(dateStr,",","");
 			serverDate =  new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss z",Locale.ENGLISH).parse(dateStr);
-			Map<String, String> paraMap = new HashMap<String, String>();
+			Map<String, String> paraMap = new LinkedHashMap<String, String>();
 			paraMap.put("leftTicketDTO.train_date",date);
 			paraMap.put("leftTicketDTO.from_station",configInfo.getFromStation());
 			paraMap.put("leftTicketDTO.to_station",configInfo.getToStation());
 			paraMap.put("purpose_codes","ADULT");
 			while(isBegin){
 				info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
+				if(info == null){
+					continue;
+				}
 				orderParameter = checkTickeAndOrder(info, date,serverDate);
 				if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
 					sendInfo("没有余票,继续刷票",InfoCodeEnum.INFO_TIPS);
@@ -152,7 +161,13 @@ public class RobitOrderService extends Service {
 					break;
 				}
 			}
-			submitOrderRequest(date,orderParameter);
+			if(orderParameter != null){
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(serverDate);
+				calendar.add(Calendar.DAY_OF_MONTH,1);
+				orderParameter.setBackDate(calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH));
+				submitOrderRequest(date,orderParameter);
+			}
 		} catch (Exception e) {
 			Log.e("searchTicket","searchTicket error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
@@ -207,6 +222,7 @@ public class RobitOrderService extends Service {
 						}else{
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
+							orderParameter.setSecretStr(object.getString("secretStr"));
 							orderParameter.setTrainObject(trainObject);
 						}
 					}
@@ -238,17 +254,22 @@ public class RobitOrderService extends Service {
 	public void submitOrderRequest(String date,OrderParameter orderParameter)
 			throws IllegalStateException, IOException {
 		try {
-			Map<String,String> paraMap = new HashMap<String, String>();
-			paraMap.put("secretStr",orderParameter.getSecretStr());
+			Map<String,String> paraMap = new LinkedHashMap<String, String>();
+			paraMap.put("secretStr",URLDecoder.decode(orderParameter.getSecretStr()));
 			paraMap.put("train_date",date);
-			paraMap.put("back_train_date","2013-12-13");
+			paraMap.put("back_train_date",orderParameter.getBackDate());
 			paraMap.put("tour_flag","dc");
 			paraMap.put("purpose_codes","ADULT");
-			paraMap.put("query_from_station_name",orderParameter.getTrainObject().getString("from_station_name"));
-			paraMap.put("query_to_station_name",orderParameter.getTrainObject().getString("to_station_name"));
+			paraMap.put("query_from_station_name","深圳");
+			paraMap.put("query_to_station_name","益阳");
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
-			System.out.println(info);
+			JSONObject object = JSON.parseObject(info);
+			if(object.getBooleanValue("status")){
+				
+			}else{
+				sendInfo(object.getString("messages"),InfoCodeEnum.INFO_TIPS);
+			}
 		} catch (Exception e) {
 			Log.e("orderTicket","orderTicket error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);

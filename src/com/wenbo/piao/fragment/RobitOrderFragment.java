@@ -237,8 +237,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					String[] seats = StringUtils.split(selectSeatText.getText()
 							.toString(), ",");
 					for (String seat : seats) {
-						sbBuilder.append(HttpClientUtil.getSeatMap().get(seat)
-								+ ",");
+						sbBuilder.append(HttpClientUtil.getSeatMap().get(seat)+ ",");
 					}
 					configInfo.setOrderSeat(sbBuilder.toString());
 					configInfo.setOrderTime(selectTimeText.getText().toString());

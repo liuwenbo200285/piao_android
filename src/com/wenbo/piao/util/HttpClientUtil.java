@@ -20,6 +20,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -457,16 +458,17 @@ public class HttpClientUtil {
 	public static Map<String, String> getSeatMap() {
 		if(seatMap == null){
 			seatMap = new HashMap<String, String>();
-			seatMap.put("商务座","1");
-			seatMap.put("特等座","2");
-			seatMap.put("一等座","3");
-			seatMap.put("二等座","4");
-			seatMap.put("高级软卧","5");
-			seatMap.put("软卧","6");
-			seatMap.put("硬卧","7");
-			seatMap.put("软座","8");
-			seatMap.put("硬座","9");
-			seatMap.put("无座","10");
+			seatMap.put("商务座","swz");
+			seatMap.put("特等座","tz");
+			seatMap.put("一等座","zy");
+			seatMap.put("二等座","ze");
+			seatMap.put("高级软卧","gr");
+			seatMap.put("软卧","rw");
+			seatMap.put("硬卧","yw");
+			seatMap.put("软座","rz");
+			seatMap.put("硬座","yz");
+			seatMap.put("无座","wz");
+			seatMap.put("其它","qt");
 		}
 		return seatMap;
 	}
