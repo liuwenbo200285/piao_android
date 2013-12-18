@@ -1,6 +1,5 @@
 package com.wenbo.piao.domain;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.jsoup.nodes.Document;
@@ -30,6 +29,12 @@ public class OrderParameter {
 	private String orderCode;
 	
 	private String token;
+	
+	private String passenger;
+	
+	private String oldPassengerStr;
+	
+	private String searchDate;
 	
 	public Document getDocument() {
 		return document;
@@ -118,4 +123,29 @@ public class OrderParameter {
 	public void setToken(String token) {
 		this.token = token;
 	}
+
+	public String getPassenger() {
+		return passenger;
+	}
+
+	public void setPassenger(String passenger) {
+		this.passenger = passenger;
+	}
+
+	public String getOldPassengerStr() {
+		return oldPassengerStr;
+	}
+
+	public void setOldPassengerStr(String oldPassengerStr) {
+		this.oldPassengerStr = oldPassengerStr;
+	}
+
+	public String getSearchDate() {
+		return searchDate;
+	}
+
+	public void setSearchDate(String searchDate) {
+		this.searchDate = searchDate;
+	}
+	
 }

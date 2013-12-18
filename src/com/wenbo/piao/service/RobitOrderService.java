@@ -28,14 +28,14 @@ import com.wenbo.piao.enums.InfoCodeEnum;
 import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.StatusCodeEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
+import com.wenbo.piao.fragment.RobitOrderFragment;
 import com.wenbo.piao.sqllite.domain.UserInfo;
-import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
 
 public class RobitOrderService extends Service {
 	
-	private ConfigInfo configInfo;
+	private static ConfigInfo configInfo;
 	
 	private Map<String,UserInfo> userInfoMap;
 	
@@ -196,6 +196,7 @@ public class RobitOrderService extends Service {
 							orderParameter.setTicketType(seat);
 							orderParameter.setSecretStr(object.getString("secretStr"));
 							orderParameter.setTrainObject(trainObject);
+							orderParameter.setSearchDate(date);
 						}
 					}
 					if(isSeat == orderSeats.length
@@ -227,7 +228,7 @@ public class RobitOrderService extends Service {
 			throws IllegalStateException, IOException {
 		try {
 			Map<String,String> paraMap = new LinkedHashMap<String, String>();
-			paraMap.put("secretStr",URLDecoder.decode(orderParameter.getSecretStr()));
+			paraMap.put("secretStr",URLDecoder.decode(orderParameter.getSecretStr(),"utf-8"));
 			paraMap.put("train_date",date);
 			paraMap.put("back_train_date",orderParameter.getBackDate());
 			paraMap.put("tour_flag","dc");
@@ -283,11 +284,42 @@ public class RobitOrderService extends Service {
 	 */
 	public void checkOrderInfo(OrderParameter orderParameter) {
 		try {
+			String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
+			if(peoples == null || peoples.length ==0){
+				sendStatus(StatusCodeEnum.NOT_HAVE_PERSON);
+				return;
+			}
 			Map<String,String> paraMap = new LinkedHashMap<String, String>();
 			paraMap.put("cancel_flag","2");
 			paraMap.put("bed_level_order_num","000000000000000000000000000000");
-			paraMap.put("passengerTicketStr","1,0,1,刘文波,1,430981198702272830,18606521059,N");
-			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
+			StringBuilder passengerBuilder = new StringBuilder();
+			StringBuilder oldPassengerBuilder = new StringBuilder();
+			String seatid = orderParameter.getSeatMap().get(RobitOrderFragment.seatMaps.get(orderParameter.getTicketType()));
+			for(int i = 0; i < peoples.length; i++){
+				UserInfo userInfo = userInfoMap.get(peoples[i]);
+				if(i == 0){
+					passengerBuilder.append(seatid+",");
+					oldPassengerBuilder.append(userInfo.getPassenger_name()+",");
+				}else{
+					passengerBuilder.append("N_"+seatid+",");
+					oldPassengerBuilder.append("1_"+userInfo.getPassenger_name()+",");
+				}
+				oldPassengerBuilder.append(userInfo.getPassenger_flag()+",")
+				.append(userInfo.getPassenger_id_no()+",");
+				passengerBuilder.append(userInfo.getPassenger_flag()+",")
+								.append(userInfo.getPassenger_id_type_code()+",")
+								.append(userInfo.getPassenger_name()+",")
+								.append(userInfo.getPassenger_type()+",")
+								.append(userInfo.getPassenger_id_no()+","+userInfo.getMobile_no()+",");
+			}
+			passengerBuilder.append("N");
+			oldPassengerBuilder.append("1_");
+//			paraMap.put("passengerTicketStr","1,0,1,刘文波,1,430981198702272830,18606521059,N");
+			orderParameter.setPassenger(passengerBuilder.toString());
+			orderParameter.setOldPassengerStr(oldPassengerBuilder.toString());
+			paraMap.put("passengerTicketStr",orderParameter.getPassenger());
+			paraMap.put("oldPassengerStr",orderParameter.getOldPassengerStr());
+//			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
 			paraMap.put("tour_flag","dc");
 			paraMap.put("randCode",orderCode);
 			paraMap.put("_json_att","");
@@ -303,6 +335,8 @@ public class RobitOrderService extends Service {
 					sendInfo(message,InfoCodeEnum.INFO_TIPS);
 					if(StringUtils.contains(message,"验证码输入错误")){
 						sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+					}else{
+						sendStatus(StatusCodeEnum.CANCEL_ORDER_MANY);
 					}
 				}else{
 					sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
@@ -328,7 +362,7 @@ public class RobitOrderService extends Service {
 			Map<String,String> paraMap = new LinkedHashMap<String, String>();
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			simpleDateFormat.setTimeZone(TimeZone.getDefault());
-			paraMap.put("train_date",simpleDateFormat.parse("2013-12-26").toGMTString());
+			paraMap.put("train_date",simpleDateFormat.parse(orderParameter.getSearchDate()).toGMTString());
 			paraMap.put("train_no",orderParameter.getTrainObject().getString("train_no"));
 			paraMap.put("stationTrainCode",orderParameter.getTrainObject().getString("station_train_code"));
 			paraMap.put("seatType","1");
@@ -366,8 +400,8 @@ public class RobitOrderService extends Service {
 	public void confirmSingleForQueue(OrderParameter orderParameter,String ticket) {
 		try {
 			Map<String,String> paraMap = new LinkedHashMap<String, String>();
-			paraMap.put("passengerTicketStr","1,0,1,刘文波,1,430981198702272830,18606521059,N");
-			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
+			paraMap.put("passengerTicketStr",orderParameter.getPassenger());
+			paraMap.put("oldPassengerStr",orderParameter.getOldPassengerStr());
 			paraMap.put("randCode",orderCode);
 			paraMap.put("purpose_codes","00");
 			paraMap.put("key_check_isChange",orderParameter.getKeyCheck());

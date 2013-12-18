@@ -1,6 +1,7 @@
 package com.wenbo.piao.fragment;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,6 @@ import com.wenbo.piao.adapter.StationAdapter;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.ParameterEnum;
-import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.SqlliteHelper;
@@ -95,11 +95,23 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private TextView dialogTextView;
 	public static 	final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座","其它"};
 	public static 	final String[] seatNames = { "swz", "tz", "zy", "ze", "gr", "rw","yw", "rz", "yz", "wz","qt"};
+	public static   final Map<String,String> seatMaps = new HashMap<String, String>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		seatMaps.put("swz","商务座");
+		seatMaps.put("tz","特等座");
+		seatMaps.put("zy","一等座");
+		seatMaps.put("ze","二等座");
+		seatMaps.put("gr","高级软卧");
+		seatMaps.put("rw","软卧");
+		seatMaps.put("yw","硬卧");
+		seatMaps.put("rz","软座");
+		seatMaps.put("yz","硬座");
+		seatMaps.put("wz","无座");
+		seatMaps.put("qt","其它");
 		return inflater.inflate(R.layout.activity_info2, container, false);
 	}
 
