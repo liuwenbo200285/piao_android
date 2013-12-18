@@ -14,7 +14,11 @@ public class ConfigInfo {
 	
 	private String fromStation;
 	
+	private String fromStationName;
+	
 	private String toStation;
+	
+	private String toStationName;
 	
 	private String trainNo;
 	
@@ -134,5 +138,21 @@ public class ConfigInfo {
 
 	public void setRangeCode(String rangeCode) {
 		this.rangeCode = rangeCode;
+	}
+
+	public String getFromStationName() {
+		return fromStationName;
+	}
+
+	public void setFromStationName(String fromStationName) {
+		this.fromStationName = fromStationName;
+	}
+
+	public String getToStationName() {
+		return toStationName;
+	}
+
+	public void setToStationName(String toStationName) {
+		this.toStationName = toStationName;
 	}
 }

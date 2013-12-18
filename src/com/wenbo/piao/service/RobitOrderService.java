@@ -1,34 +1,18 @@
 package com.wenbo.piao.service;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import android.app.Service;
 import android.content.Intent;
@@ -43,16 +27,13 @@ import com.wenbo.piao.domain.OrderParameter;
 import com.wenbo.piao.enums.InfoCodeEnum;
 import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.StatusCodeEnum;
-import com.wenbo.piao.enums.TrainSeatEnum;
-import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
+import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.JsoupUtil;
 
 public class RobitOrderService extends Service {
-	
-	private HttpClient httpClient;
 	
 	private ConfigInfo configInfo;
 	
@@ -60,16 +41,13 @@ public class RobitOrderService extends Service {
 	
 	private UserInfo userInfo;
 	
-	private String ticketNo;
-	private String seatNum;
-	private String token;
-	private String[] params;
-	
 	private boolean isBegin;
 	
 	private int status;
 	
 	private String orderCode;
+	
+	private static OrderParameter orderParameter;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -93,15 +71,10 @@ public class RobitOrderService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("RobitOrderService","onStartCommand");
-		httpClient = HttpClientUtil.getHttpClient();
 		userInfoMap = HttpClientUtil.getUserInfoMap();
 		isBegin = true;
-		params = HttpClientUtil.getParams();
 		status = intent.getExtras().getInt(ParameterEnum.ROBIT_STATE.getValue());
 		configInfo = HttpClientUtil.getConfigInfo();
-		seatNum = HttpClientUtil.getSeatNum();
-		token = HttpClientUtil.getToken();
-		ticketNo = HttpClientUtil.getTicketNo();
 		orderCode = intent.getExtras().getString(ParameterEnum.RANGECODE.getValue());
 		configInfo.setSearchWatiTime(10);
 		new Thread(new Runnable() {
@@ -110,7 +83,7 @@ public class RobitOrderService extends Service {
 				while(isBegin){
 					try {
 						if(status == StatusCodeEnum.INPUT_ORDERCODE.getCode()){
-							checkOrderInfo(ticketNo, seatNum, token,configInfo.getOrderDate());
+							checkOrderInfo(orderParameter);
 						}else{
 							searchTicket(configInfo.getOrderDate());
 						}
@@ -135,7 +108,6 @@ public class RobitOrderService extends Service {
 	 **/
 	public void searchTicket(String date) {
 		String info = null;
-		OrderParameter orderParameter = null;
 		Date serverDate = null;
 		try {
 			String dateStr = HttpClientUtil.getServerHead("Date",0);
@@ -162,10 +134,10 @@ public class RobitOrderService extends Service {
 				}
 			}
 			if(orderParameter != null){
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(serverDate);
-				calendar.add(Calendar.DAY_OF_MONTH,1);
-				orderParameter.setBackDate(calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH));
+//				Calendar calendar = Calendar.getInstance();
+//				calendar.setTime(serverDate);
+//				calendar.add(Calendar.DAY_OF_MONTH,1);
+//				orderParameter.setBackDate(calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH));
 				submitOrderRequest(date,orderParameter);
 			}
 		} catch (Exception e) {
@@ -260,13 +232,32 @@ public class RobitOrderService extends Service {
 			paraMap.put("back_train_date",orderParameter.getBackDate());
 			paraMap.put("tour_flag","dc");
 			paraMap.put("purpose_codes","ADULT");
-			paraMap.put("query_from_station_name","深圳");
-			paraMap.put("query_to_station_name","益阳");
+			paraMap.put("query_from_station_name",configInfo.getFromStationName());
+			paraMap.put("query_to_station_name",configInfo.getToStationName());
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
 			JSONObject object = JSON.parseObject(info);
 			if(object.getBooleanValue("status")){
-				
+				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
+				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
+				info = StringUtils.substring(str,n+27,n+59);
+				orderParameter.setToken(info);
+				n = StringUtils.indexOf(str,"init_seatTypes");
+				int m = StringUtils.indexOf(str,";",n);
+				String ticket = StringUtils.substring(str,n+15,n+(m-n));
+				JSONArray seatObjectArray = JSON.parseArray(ticket);
+				if(seatObjectArray.size() > 0){
+					Map<String, String> seatMap = new HashMap<String, String>();
+					for(int i = 0; i < seatObjectArray.size(); i++){
+						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
+						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
+					}
+					orderParameter.setSeatMap(seatMap);
+				}
+				n = StringUtils.indexOf(str,"key_check_isChange");
+				String key_check_isChange = StringUtils.substring(str,n+21,n+77);
+				orderParameter.setKeyCheck(key_check_isChange);
+				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
 			}else{
 				sendInfo(object.getString("messages"),InfoCodeEnum.INFO_TIPS);
 			}
@@ -290,143 +281,39 @@ public class RobitOrderService extends Service {
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 */
-	public void checkOrderInfo(String ticketNo, String seatNum, String token,String date) {
-		HttpResponse response = null;
+	public void checkOrderInfo(OrderParameter orderParameter) {
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method", "checkOrderInfo"));
-			parameters.add(new BasicNameValuePair(
-					"org.apache.struts.taglib.html.TOKEN", token));
-			parameters.add(new BasicNameValuePair("leftTicketStr", ticketNo));
-			parameters.add(new BasicNameValuePair("textfield", "中文或拼音首字母"));
-			// 一个人只有一个checkbox0
-			parameters.add(new BasicNameValuePair("orderRequest.train_date",
-					date));
-			parameters.add(new BasicNameValuePair("orderRequest.train_no",
-					params[3]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.station_train_code", params[0]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.from_station_telecode", params[4]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.to_station_telecode", params[5]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.seat_type_code", ""));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.ticket_type_order_num", ""));
-
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.bed_level_order_num",
-					"000000000000000000000000000000"));
-			parameters.add(new BasicNameValuePair("orderRequest.start_time",
-					params[2]));
-			parameters.add(new BasicNameValuePair("orderRequest.end_time",
-					params[6]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.from_station_name", params[7]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.to_station_name", params[8]));
-			parameters.add(new BasicNameValuePair("orderRequest.cancel_flag",
-					"1"));
-			parameters.add(new BasicNameValuePair("orderRequest.id_mode", "Y"));
-			if(userInfoMap.isEmpty()){
-				sendStatus(StatusCodeEnum.NOT_HAVE_PERSON);
-				return;
-			}
-			// 处理订票信息
-			if (!StringUtils.contains(configInfo.getOrderPerson(), ",")) {
-				Log.w("checkOrderInfo","订票人格式填写不正确！");
-				sendStatus(StatusCodeEnum.ORDER_PERSON_ERROR);
-				Thread.interrupted();
-				return;
-			}
-			String[] orders = StringUtils.split(configInfo.getOrderPerson(),
-					",");
-			if (orders.length == 0) {
-				Log.w("checkOrderInfo","订票人格式填写不正确！");
-				sendStatus(StatusCodeEnum.ORDER_PERSON_ERROR);
-				Thread.interrupted();
-				return;
-			}
-			if (orders.length > 5) {
-				Log.w("checkOrderInfo","一个账号最多只能预定5张火车票！");
-				sendStatus(StatusCodeEnum.ORDER_NUM_ERROR);
-				Thread.interrupted();
-				return;
-			}
-			int n = 1;
-			for (int i = 0; i < orders.length; i++) {
-				userInfo = userInfoMap.get(orders[i]);
-				if (userInfo == null) {
-					Log.w("checkOrderInfo","this name is not have!name:" + orders[i]);
-					continue;
-				}
-				parameters.add(new BasicNameValuePair("checkbox"
-						+ userInfo.getIndex(), "" + userInfo.getIndex()));
-				parameters
-						.add(new BasicNameValuePair("passengerTickets", seatNum
-								+ ",0,1," + userInfo.getPassenger_name()
-								+ ",1," + userInfo.getPassenger_id_no() + ",,Y"));
-				parameters.add(new BasicNameValuePair("oldPassengers", userInfo
-						.getPassenger_name()
-						+ ",1,"
-						+ userInfo.getPassenger_id_no() + ""));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_seat", seatNum));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_ticket", "1"));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_name", userInfo.getPassenger_name()));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_cardtype", "1"));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_cardno", userInfo.getPassenger_id_no()));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_mobileno", ""));
-				parameters.add(new BasicNameValuePair("checkbox9", "Y"));
-			}
-			parameters.add(new BasicNameValuePair("orderRequest.reserve_flag",
-					"A"));
-			parameters.add(new BasicNameValuePair("tFlag", "dc"));
-			parameters.add(new BasicNameValuePair("rand",orderCode));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
-			HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.GET_ORDER_INFO);
-			httpPost.setEntity(uef);
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				JSONObject jsonObject = JSON.parseObject(EntityUtils
-						.toString(response.getEntity()));
-				if (jsonObject != null
-						&& "Y".equals(jsonObject.getString("errMsg"))) {
-					String msg = jsonObject.getString("msg");
-					if (StringUtils.isNotEmpty(msg)) {
-						if(StringUtils.contains(msg,"由于您取消次数过多")){
-							sendStatus(StatusCodeEnum.CANCEL_ORDER_MANY);
-							return;
-						}
-						Log.i("checkOrderInfo",msg);
-					} else {
-						checkTicket(ticketNo, seatNum, token, date,orderCode);
-					}
-				} else {
-					String errorMessage = jsonObject.getString("errMsg");
-					Log.i("checkOrderInfo",errorMessage);
-					if(StringUtils.contains(errorMessage,"验证码不正确")){
+			Map<String,String> paraMap = new LinkedHashMap<String, String>();
+			paraMap.put("cancel_flag","2");
+			paraMap.put("bed_level_order_num","000000000000000000000000000000");
+			paraMap.put("passengerTicketStr","1,0,1,刘文波,1,430981198702272830,18606521059,N");
+			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
+			paraMap.put("tour_flag","dc");
+			paraMap.put("randCode",orderCode);
+			paraMap.put("_json_att","");
+			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
+			String info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
+			JSONObject jsonObject = JSON.parseObject(info);
+			if(jsonObject.getBooleanValue("status")
+					&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
+				getQueueCount(orderParameter);
+			}else{
+				if(jsonObject.containsKey("data")){
+					String message = jsonObject.getJSONObject("data").getString("errMsg");
+					sendInfo(message,InfoCodeEnum.INFO_TIPS);
+					if(StringUtils.contains(message,"验证码输入错误")){
 						sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
-						return;
-					}else if(StringUtils.contains(errorMessage,"验证码 必须输入")){
-						sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
-						return;
 					}
-					checkOrderInfo(ticketNo, seatNum, token, date);
+				}else{
+					sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
+					sendStatus(StatusCodeEnum.SYSTEM_ERROR);
 				}
 			}
 		} catch (Exception e) {
 			Log.e("checkOrderInfo","checkOrderInfo error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
 		} finally {
-//			HttpClientUtils.closeQuietly(response);
+
 		}
 	}
 
@@ -436,27 +323,37 @@ public class RobitOrderService extends Service {
 	 * @param ticketNo
 	 * @param params
 	 */
-	public void checkTicket(String ticketNo, String seatNum, String token, String date, String rangCode) {
-		HttpResponse response = null;
+	public void getQueueCount(OrderParameter orderParameter) {
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method","getQueueCount"));
-			parameters.add(new BasicNameValuePair("train_date",date));
-			parameters.add(new BasicNameValuePair("train_no",params[3]));
-			parameters.add(new BasicNameValuePair("station",params[0]));
-			parameters.add(new BasicNameValuePair("seat",seatNum));
-			parameters.add(new BasicNameValuePair("from",params[4]));
-			parameters.add(new BasicNameValuePair("to",params[5]));
-			parameters.add(new BasicNameValuePair("ticket",ticketNo));
-			UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(parameters);
-			HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_TICKET_INFO);
-			httpGet.setURI(new URI(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET_INFO.getPath()+"?"+EntityUtils.toString(urlEncodedFormEntity)));
-			response = httpClient.execute(httpGet);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				Log.i("checkTicket",EntityUtils.toString(response.getEntity()));
-				Thread.sleep(1000);
-				orderTicketToQueue(ticketNo, seatNum, token, date,
-						rangCode);
+			Map<String,String> paraMap = new LinkedHashMap<String, String>();
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			simpleDateFormat.setTimeZone(TimeZone.getDefault());
+			paraMap.put("train_date",simpleDateFormat.parse("2013-12-26").toGMTString());
+			paraMap.put("train_no",orderParameter.getTrainObject().getString("train_no"));
+			paraMap.put("stationTrainCode",orderParameter.getTrainObject().getString("station_train_code"));
+			paraMap.put("seatType","1");
+			paraMap.put("fromStationTelecode",orderParameter.getTrainObject().getString("from_station_telecode"));
+			paraMap.put("toStationTelecode",orderParameter.getTrainObject().getString("to_station_telecode"));
+			paraMap.put("leftTicket",orderParameter.getTrainObject().getString("yp_info"));
+			paraMap.put("purpose_codes","00");
+			paraMap.put("_json_att","");
+			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
+			String info = HttpClientUtil.doPost(UrlNewEnum.GETQUEUECOUNT, paraMap,0);
+			JSONObject jsonObject = JSON.parseObject(info);
+			if(jsonObject.getBooleanValue("status")){
+				confirmSingleForQueue(orderParameter,jsonObject.getJSONObject("data").getString("ticket"));
+			}else{
+				if(jsonObject.containsKey("data")){
+					String message = jsonObject.getJSONObject("data").getString("errMsg");
+					sendInfo(message,InfoCodeEnum.INFO_TIPS);
+					if(StringUtils.contains(message,"验证码输入错误")){
+						sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+					}
+				}else{
+					sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
+					sendStatus(StatusCodeEnum.SYSTEM_ERROR);
+				}
+				Log.i("getQueueCount", info);
 			}
 		} catch (Exception e) {
 			Log.e("checkTicket","checkTicket error!", e);
@@ -466,138 +363,31 @@ public class RobitOrderService extends Service {
 		}
 	}
 
-	public void orderTicketToQueue(String ticketNo, String seatNum,
-			String token, String date, String rangCode) {
-		HttpResponse response = null;
-		HttpPost httpPost = null;
+	public void confirmSingleForQueue(OrderParameter orderParameter,String ticket) {
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method",
-					"confirmSingleForQueue"));
-			parameters.add(new BasicNameValuePair(
-					"org.apache.struts.taglib.html.TOKEN", token));
-			parameters.add(new BasicNameValuePair("leftTicketStr", ticketNo));
-			parameters.add(new BasicNameValuePair("textfield", "中文或拼音首字母"));
-			// 一个人只有一个checkbox0
-			parameters.add(new BasicNameValuePair("orderRequest.train_date",
-					date));
-			parameters.add(new BasicNameValuePair("orderRequest.train_no",
-					params[3]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.station_train_code", params[0]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.from_station_telecode", params[4]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.to_station_telecode", params[5]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.seat_type_code", ""));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.ticket_type_order_num", ""));
-
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.bed_level_order_num",
-					"000000000000000000000000000000"));
-			parameters.add(new BasicNameValuePair("orderRequest.start_time",
-					params[2]));
-			parameters.add(new BasicNameValuePair("orderRequest.end_time",
-					params[6]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.from_station_name", params[7]));
-			parameters.add(new BasicNameValuePair(
-					"orderRequest.to_station_name", params[8]));
-			parameters.add(new BasicNameValuePair("orderRequest.cancel_flag",
-					"1"));
-			parameters.add(new BasicNameValuePair("orderRequest.id_mode", "Y"));
-
-			// 订票人信息 第一个人
-			String[] orders = StringUtils.split(configInfo.getOrderPerson(),
-					",");
-			int n = 1;
-			for (int i = 0; i < orders.length; i++) {
-				userInfo = userInfoMap.get(orders[i]);
-				if (userInfo == null) {
-					Log.w("orderTicketToQueue","this name is not have!name:" + orders[i]);
-					continue;
-				}
-				parameters.add(new BasicNameValuePair("checkbox"
-						+ userInfo.getIndex(), "" + userInfo.getIndex()));
-				parameters
-						.add(new BasicNameValuePair("passengerTickets", seatNum
-								+ ",0,1," + userInfo.getPassenger_name()
-								+ ",1," + userInfo.getPassenger_id_no() + ",,Y"));
-				parameters.add(new BasicNameValuePair("oldPassengers", userInfo
-						.getPassenger_name()
-						+ ",1,"
-						+ userInfo.getPassenger_id_no() + ""));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_seat", seatNum));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_ticket", "1"));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_name", userInfo.getPassenger_name()));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_cardtype", "1"));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_cardno", userInfo.getPassenger_id_no()));
-				parameters.add(new BasicNameValuePair("passenger_" + n
-						+ "_mobileno", ""));
-				parameters.add(new BasicNameValuePair("checkbox9", "Y"));
-			}
-			parameters.add(new BasicNameValuePair("orderRequest.reserve_flag",
-					"A"));
-			parameters.add(new BasicNameValuePair("randCode", rangCode));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
-			httpPost = new HttpPost(UrlEnum.DO_MAIN.getPath()+UrlEnum.SEARCH_TICKET_INFO.getPath());
-			httpPost.setEntity(uef);
-			httpPost.addHeader("Accept",
-					"application/json, text/javascript, */*");
-			httpPost.addHeader("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3");
-			httpPost.addHeader("Connection", "keep-alive");
-			httpPost.addHeader("Content-Type",
-					"application/x-www-form-urlencoded");
-			httpPost.addHeader("Origin", "https://dynamic.12306.cn");
-			httpPost.addHeader("Accept-Language", "zh-CN,zh;q=0.8");
-			httpPost.addHeader("Host", "dynamic.12306.cn");
-			httpPost.addHeader("Referer",
-					"https://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=init");
-			httpPost.addHeader("X-Requested-With", "XMLHttpRequest");
-			httpPost.addHeader(
-					"User-Agent",
-					"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				HttpEntity entity = response.getEntity();
-				JSONObject jsonObject = JSONObject.parseObject(EntityUtils
-						.toString(entity));
-//				HttpClientUtils.closeQuietly(response);
-				Log.i("orderTicketToQueue",jsonObject.toJSONString());
-				String errorMessage = jsonObject.getString("errMsg");
-				if("席别不能为空！".equals(errorMessage)){
-					searchTicket(date);
-				}else if("请不要重复提交！".equals(errorMessage)){
-					searchTicket(date);
-				}else if ("Y".equals(errorMessage)
-						|| StringUtils.isEmpty(errorMessage)) {
-					Log.i("orderTicketToQueue","订票成功了，赶紧付款吧!");
-					sendStatus(StatusCodeEnum.ORDER_SUCCESS);
-				} else if (StringUtils.contains(errorMessage, "验证码")) {
-					sendStatus(StatusCodeEnum.ORDER_CODE_ERROR);
-				} else if (StringUtils.contains(errorMessage, "排队人数现已超过余票数")) {
-					sendStatus(StatusCodeEnum.TICKET_IS_NOT_ENOUGH);
-				} else if (StringUtils.contains(errorMessage, "非法的订票请求")) {
-					sendStatus(StatusCodeEnum.NO_ALLOW_ORDER);
-				} else {
-					Log.i("orderTicketToQueue",errorMessage);
-					searchTicket(date);
-				}
+			Map<String,String> paraMap = new LinkedHashMap<String, String>();
+			paraMap.put("passengerTicketStr","1,0,1,刘文波,1,430981198702272830,18606521059,N");
+			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
+			paraMap.put("randCode",orderCode);
+			paraMap.put("purpose_codes","00");
+			paraMap.put("key_check_isChange",orderParameter.getKeyCheck());
+			paraMap.put("leftTicketStr",ticket);
+			paraMap.put("train_location",orderParameter.getTrainObject().getString("location_code"));
+			paraMap.put("_json_att","");
+			String info = HttpClientUtil.doPost(UrlNewEnum.CONFIRMSINGLEFORQUEUE, paraMap,0);
+			JSONObject jsonObject = JSON.parseObject(info);
+			if(jsonObject.getBooleanValue("status")){
+				orderParameter = null;
+				sendStatus(StatusCodeEnum.ORDER_SUCCESS);
+			}else{
+				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+				Log.i("confirmSingleForQueue",jsonObject.getString("messages"));
 			}
 		} catch (Exception e) {
 			Log.e("orderTicketToQueue","orderTicketToQueue error!", e);
 			sendStatus(StatusCodeEnum.NET_ERROR);
-			httpPost.abort();
 		} finally {
-//			HttpClientUtils.closeQuietly(response);
+			
 		}
 	}
 	

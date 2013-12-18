@@ -41,6 +41,7 @@ import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.ParameterEnum;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.service.RobitOrderService;
 import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.SearchInfo;
@@ -92,8 +93,8 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	private EditText trainCode;
 	private MyReceiver myReceiver;
 	private TextView dialogTextView;
-	private static 	final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座","其它"};
-	private static 	final String[] seatNames = { "swz", "tz", "zy", "ze", "gr", "rw","yw", "rz", "yz", "wz","qt"};
+	public static 	final String[] seats = { "商务座", "特等座", "一等座", "二等座", "高级软卧", "软卧","硬卧", "软座", "硬座", "无座","其它"};
+	public static 	final String[] seatNames = { "swz", "tz", "zy", "ze", "gr", "rw","yw", "rz", "yz", "wz","qt"};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -628,6 +629,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			fromStation.requestFocus();
 			return false;
 		}
+		configInfo.setFromStationName(from);
 		configInfo.setFromStation(dbFromStation.getSimpleCode());
 		String to = toStation.getText().toString();
 		if(StringUtils.isBlank(to)){
@@ -652,6 +654,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			toStation.requestFocus();
 			return false;
 		}
+		configInfo.setToStationName(to);
 		configInfo.setToStation(dbFromStation.getSimpleCode());
 		String date = trainDate.getText().toString();
 		if(StringUtils.isBlank(date)){
@@ -740,13 +743,11 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					@Override
 					public void onClick(View view) {
 						GetRandCodeTask getRandCode = new GetRandCodeTask(activity,imageView,2);
-						getRandCode.execute(UrlEnum.DO_MAIN.getPath()
-								+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
+						getRandCode.execute(UrlNewEnum.DO_MAIN.getPath()+ UrlNewEnum.GET_ORDER_RANGCODE.getPath());
 					}
 				});
 				GetRandCodeTask getRandCode = new GetRandCodeTask(activity,imageView,2);
-				getRandCode.execute(UrlEnum.DO_MAIN.getPath()
-						+ UrlEnum.LOGIN_RANGCODE_URL.getPath());
+				getRandCode.execute(UrlNewEnum.DO_MAIN.getPath()+ UrlNewEnum.GET_ORDER_RANGCODE.getPath());
 				rangeCode = (EditText) orderCodeView
 						.findViewById(R.id.orderCode);
 				activity.showNotification("已经有票，赶紧入验证码！",true);
@@ -796,6 +797,10 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				break;
 			case 16:
 				LoginDialog.newInstance("该日期车次未到预售期，请重新选择时间！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
+			case 17:
+				LoginDialog.newInstance("系统忙，请稍后重试！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			default:

@@ -7,6 +7,8 @@ package com.wenbo.piao.enums;
  */
 public enum StatusCodeEnum {
 	//没有到预定日期
+	SYSTEM_ERROR(17),
+	//没有到预定日期
 	NO_ORDER(16),
 	//没有此席位
 	NO_TRAIN_SEAT(15),

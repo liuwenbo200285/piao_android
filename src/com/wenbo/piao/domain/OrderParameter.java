@@ -1,5 +1,8 @@
 package com.wenbo.piao.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jsoup.nodes.Document;
 
 import com.alibaba.fastjson.JSONObject;
@@ -18,7 +21,15 @@ public class OrderParameter {
 	
 	private String secretStr;
 	
-	private String backDate;
+	private String backDate = "2013-12-31";
+	
+	private String keyCheck;
+	
+	private Map<String,String> seatMap;
+	
+	private String orderCode;
+	
+	private String token;
 	
 	public Document getDocument() {
 		return document;
@@ -75,5 +86,36 @@ public class OrderParameter {
 	public void setBackDate(String backDate) {
 		this.backDate = backDate;
 	}
-	
+
+	public String getKeyCheck() {
+		return keyCheck;
+	}
+
+	public void setKeyCheck(String keyCheck) {
+		this.keyCheck = keyCheck;
+	}
+
+	public Map<String, String> getSeatMap() {
+		return seatMap;
+	}
+
+	public void setSeatMap(Map<String, String> seatMap) {
+		this.seatMap = seatMap;
+	}
+
+	public String getOrderCode() {
+		return orderCode;
+	}
+
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 }
