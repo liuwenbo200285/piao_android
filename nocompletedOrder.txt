@@ -1,0 +1,148 @@
+{
+    "validateMessagesShowId": "_validatorMessage",
+    "status": true,
+    "httpstatus": 200,
+    "data": {
+        "orderDBList": [
+            {
+                "sequence_no": "E418850555",
+                "order_date": "2013-12-19 20:07:22",
+                "ticket_totalnum": 2,
+                "ticket_price_all": 77700,
+                "cancel_flag": "Y",
+                "resign_flag": "N",
+                "return_flag": "N",
+                "print_eticket_flag": "N",
+                "pay_flag": "Y",
+                "pay_resign_flag": "N",
+                "confirm_flag": "N",
+                "tickets": [
+                    {
+                        "stationTrainDTO": {
+                            "trainDTO": {},
+                            "station_train_code": "G6028",
+                            "from_station_telecode": "IOQ",
+                            "from_station_name": "深圳北",
+                            "start_time": "1970-01-01 19:50:00",
+                            "to_station_telecode": "CWQ",
+                            "to_station_name": "长沙南",
+                            "arrive_time": "1970-01-01 23:24:00",
+                            "distance": "809"
+                        },
+                        "passengerDTO": {
+                            "passenger_name": "刘淑兰",
+                            "passenger_id_type_code": "1",
+                            "passenger_id_type_name": "二代身份证",
+                            "passenger_id_no": "432302196504120048"
+                        },
+                        "ticket_no": "E418850555102006A",
+                        "sequence_no": "E418850555",
+                        "batch_no": "1",
+                        "train_date": "2013-12-29 00:00:00",
+                        "coach_no": "02",
+                        "coach_name": "02",
+                        "seat_no": "006A",
+                        "seat_name": "06A号",
+                        "seat_flag": "0",
+                        "seat_type_code": "O",
+                        "seat_type_name": "二等座",
+                        "ticket_type_code": "1",
+                        "ticket_type_name": "成人票",
+                        "reserve_time": "2013-12-19 20:07:22",
+                        "limit_time": "2013-12-19 20:07:22",
+                        "lose_time": "2013-12-19 20:52:22",
+                        "pay_limit_time": "2013-12-19 20:52:22",
+                        "ticket_price": 38850,
+                        "print_eticket_flag": "N",
+                        "resign_flag": "N",
+                        "return_flag": "N",
+                        "confirm_flag": "N",
+                        "pay_mode_code": "Y",
+                        "ticket_status_code": "i",
+                        "ticket_status_name": "待支付",
+                        "cancel_flag": "Y",
+                        "amount_char": 0,
+                        "trade_mode": "",
+                        "start_train_date_page": "2013-12-29 19:50",
+                        "str_ticket_price_page": "388.5",
+                        "come_go_traveller_ticket_page": "N"
+                    },
+                    {
+                        "stationTrainDTO": {
+                            "trainDTO": {},
+                            "station_train_code": "G6028",
+                            "from_station_telecode": "IOQ",
+                            "from_station_name": "深圳北",
+                            "start_time": "1970-01-01 19:50:00",
+                            "to_station_telecode": "CWQ",
+                            "to_station_name": "长沙南",
+                            "arrive_time": "1970-01-01 23:24:00",
+                            "distance": "809"
+                        },
+                        "passengerDTO": {
+                            "passenger_name": "刘双",
+                            "passenger_id_type_code": "1",
+                            "passenger_id_type_name": "二代身份证",
+                            "passenger_id_no": "430981198908301860"
+                        },
+                        "ticket_no": "E418850555102006B",
+                        "sequence_no": "E418850555",
+                        "batch_no": "1",
+                        "train_date": "2013-12-29 00:00:00",
+                        "coach_no": "02",
+                        "coach_name": "02",
+                        "seat_no": "006B",
+                        "seat_name": "06B号",
+                        "seat_flag": "0",
+                        "seat_type_code": "O",
+                        "seat_type_name": "二等座",
+                        "ticket_type_code": "1",
+                        "ticket_type_name": "成人票",
+                        "reserve_time": "2013-12-19 20:07:22",
+                        "limit_time": "2013-12-19 20:07:22",
+                        "lose_time": "2013-12-19 20:52:22",
+                        "pay_limit_time": "2013-12-19 20:52:22",
+                        "ticket_price": 38850,
+                        "print_eticket_flag": "N",
+                        "resign_flag": "N",
+                        "return_flag": "N",
+                        "confirm_flag": "N",
+                        "pay_mode_code": "Y",
+                        "ticket_status_code": "i",
+                        "ticket_status_name": "待支付",
+                        "cancel_flag": "Y",
+                        "amount_char": 0,
+                        "trade_mode": "",
+                        "start_train_date_page": "2013-12-29 19:50",
+                        "str_ticket_price_page": "388.5",
+                        "come_go_traveller_ticket_page": "N"
+                    }
+                ],
+                "reserve_flag_query": "p",
+                "if_show_resigning_info": "N",
+                "recordCount": "1",
+                "isNeedSendMailAndMsg": "N",
+                "array_passser_name_page": [
+                    "刘双",
+                    "刘淑兰"
+                ],
+                "from_station_name_page": [
+                    "深圳北"
+                ],
+                "to_station_name_page": [
+                    "长沙南"
+                ],
+                "start_train_date_page": "2013-12-29 19:50",
+                "start_time_page": "19:50",
+                "arrive_time_page": "23:24",
+                "train_code_page": "G6028",
+                "ticket_total_price_page": "777.0",
+                "come_go_traveller_order_page": "N",
+                "canOffLinePay": "N"
+            }
+        ],
+        "to_page": "db"
+    },
+    "messages": [],
+    "validateMessages": {}
+}

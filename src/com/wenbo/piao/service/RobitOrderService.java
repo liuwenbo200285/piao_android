@@ -175,7 +175,11 @@ public class RobitOrderService extends Service {
 					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
 					return orderParameter;
 				}
+				boolean isCheck = true;
 				for(int i = 0; i < jsonArray.size(); i++){
+					if(!isCheck){
+						break;
+					}
 					object = jsonArray.getJSONObject(i);
 					trainObject = object.getJSONObject("queryLeftNewDTO");
 					if(isCheckTrainNo){
@@ -192,11 +196,14 @@ public class RobitOrderService extends Service {
 						}else if("无".equals(seatState)){
 							isNoSeat++;
 						}else{
+							isCheck = false;
+							sendInfo(trainObject.getString("station_train_code")+"有票!",InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
 							orderParameter.setSecretStr(object.getString("secretStr"));
 							orderParameter.setTrainObject(trainObject);
 							orderParameter.setSearchDate(date);
+							break;
 						}
 					}
 					if(isSeat == orderSeats.length
@@ -238,7 +245,7 @@ public class RobitOrderService extends Service {
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
 			JSONObject object = JSON.parseObject(info);
-			if(object.getBooleanValue("status")){
+			if(object.containsKey("status") && object.getBooleanValue("status")){
 				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
 				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
 				info = StringUtils.substring(str,n+27,n+59);
@@ -261,6 +268,7 @@ public class RobitOrderService extends Service {
 				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
 			}else{
 				sendInfo(object.getString("messages"),InfoCodeEnum.INFO_TIPS);
+				isBegin = false;
 			}
 		} catch (Exception e) {
 			Log.e("orderTicket","orderTicket error!", e);
@@ -284,6 +292,7 @@ public class RobitOrderService extends Service {
 	 */
 	public void checkOrderInfo(OrderParameter orderParameter) {
 		try {
+			sendInfo(orderParameter.getTrainObject().getString("station_train_code")+"有票,正在提交订单...",InfoCodeEnum.INFO_NOTIFICATION);
 			String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
 			if(peoples == null || peoples.length ==0){
 				sendStatus(StatusCodeEnum.NOT_HAVE_PERSON);

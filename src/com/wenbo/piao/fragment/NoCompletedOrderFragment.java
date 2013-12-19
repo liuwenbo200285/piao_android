@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -37,14 +37,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.PayInfo;
-import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
-import com.wenbo.piao.util.JsoupUtil;
 import com.wenbo.piao.util.OperationUtil;
 
 public class NoCompletedOrderFragment extends Fragment {
@@ -97,13 +98,26 @@ public class NoCompletedOrderFragment extends Fragment {
 		new AsyncTask<Integer,Integer,Integer>() {
 			@Override
 			protected Integer doInBackground(Integer... params) {
-				HttpResponse response = null;
 				try {
-					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.NO_NOTCOMPLETE);
-					response = HttpClientUtil.getHttpClient().execute(httpGet);
-					if (response.getStatusLine().getStatusCode() == 200) {
-						noCompletedOrders = JsoupUtil.getNoCompleteOrders(response.getEntity().getContent());
-//						noCompletedOrders = JsoupUtil.getNoCompleteOrders(activity.getAssets().open("Noname5.txt"));
+					String info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDERNOCOMPLETE,new HashMap<String, String>(),0);
+					if(StringUtils.isNotEmpty(info)){
+						JSONObject jsonObject = JSONObject.parseObject(info);
+						if(jsonObject.containsKey("status") && jsonObject.getBooleanValue("status")){
+							JSONArray array = jsonObject.getJSONObject("data").getJSONArray("orderDBList");
+							noCompletedOrders = new ArrayList<Order>();
+							Order order = null;
+							JSONObject ordeObject = null;
+							for(int i = 0; i < array.size(); i++){
+								ordeObject = array.getJSONObject(i);
+								order = new Order();
+								order.setAllMoney(ordeObject.getDoubleValue("ticket_price_all")/100);
+								order.setOrderDate(ordeObject.getString("order_date"));
+								order.setOrderNo(ordeObject.getString("sequence_no"));
+								order.setOrderNum(ordeObject.getString("ticket_totalnum"));
+								order.setTrainInfo("");
+								noCompletedOrders.add(order);
+							}
+						}
 						HttpClientUtil.setNoCompletedOrders(noCompletedOrders);
 					}
 				} catch (Exception e) {
