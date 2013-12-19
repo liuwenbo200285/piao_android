@@ -43,6 +43,7 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
+import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
@@ -114,7 +115,27 @@ public class NoCompletedOrderFragment extends Fragment {
 								order.setOrderDate(ordeObject.getString("order_date"));
 								order.setOrderNo(ordeObject.getString("sequence_no"));
 								order.setOrderNum(ordeObject.getString("ticket_totalnum"));
-								order.setTrainInfo("");
+								order.setTrainInfo(ordeObject.getString("start_train_date_page")+"开 "+ordeObject.getString("train_code_page")
+										+" "+ordeObject.getString("from_station_name_page")+"-"+ordeObject.getString("to_station_name_page"));
+//								order.setOrderStatus(ordeObject.getJSONArray("tickets").getJSONObject(0).getString("ticket_status_name"));
+								OrderInfo orderInfo = null;
+								List<OrderInfo> orderInfos = new ArrayList<OrderInfo>();
+								JSONArray perpleArray = ordeObject.getJSONArray("tickets");
+								for(int j = 0; j < perpleArray.size(); j++){
+									JSONObject perpleObject = perpleArray.getJSONObject(j);
+									order.setOrderStatus(perpleObject.getString("ticket_status_name"));
+									orderInfo = new OrderInfo();
+									orderInfo.setPassengersInfo(perpleObject.getJSONObject("passengerDTO").getString("passenger_name")
+											+"\n"+perpleObject.getJSONObject("passengerDTO").getString("passenger_id_type_name"));
+									orderInfo.setSeatInfo(perpleObject.getString("coach_name")+"\n"+perpleObject.getString("seat_name")+"\n"+
+											perpleObject.getString("seat_type_name"));
+									orderInfo.setStatusInfo(perpleObject.getString("ticket_status_name"));
+									orderInfo.setTicketNo(perpleObject.getString("ticket_no"));
+									orderInfo.setTrainInfo(perpleObject.getString("start_train_date_page")+" 开\n"+perpleObject.getJSONObject("stationTrainDTO").getString("station_train_code")
+											+"\n"+perpleObject.getJSONObject("stationTrainDTO").getString("from_station_name")+"-"+perpleObject.getJSONObject("stationTrainDTO").getString("to_station_name"));
+									orderInfos.add(orderInfo);
+								}
+								order.setOrderInfos(orderInfos);
 								noCompletedOrders.add(order);
 							}
 						}
