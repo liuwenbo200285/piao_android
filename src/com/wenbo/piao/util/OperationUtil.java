@@ -181,10 +181,38 @@ public class OperationUtil {
 	 * @param inputStream
 	 * @return
 	 */
-    public static InputStream toPaySubmit(PayInfo payInfo){
+    public static InputStream toPaySubmit(String info){
     	HttpResponse response = null;
     	HttpPost httpPost = null;
 		try {
+			PayInfo payInfo = new PayInfo();
+			String data = null;
+			int n = StringUtils.indexOf(info,"interfaceName");
+			int m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+17,m-1);
+			payInfo.setInterfaceName(data);
+			n = StringUtils.indexOf(info,"interfaceVersion");
+			m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+20,m-1);
+			payInfo.setInterfaceVersion(data);
+			n = StringUtils.indexOf(info,"tranData");
+			m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+12,m-1);
+			data = StringUtils.replace(data,"\\r\\n","");
+			payInfo.setTranData(data);
+			n = StringUtils.indexOf(info,"merSignMsg");
+			m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+14,m-1);
+			data = StringUtils.replace(data,"\\r\\n","");
+			payInfo.setMerSignMsg(data);
+			n = StringUtils.indexOf(info,"appId");
+			m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+9,m-1);
+			payInfo.setAppId(data);
+			n = StringUtils.indexOf(info,"transType");
+			m = StringUtils.indexOf(info,";",n);
+			data = StringUtils.substring(info,n+13,m-1);
+			payInfo.setTransType(data);
 			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 			parameters.add(new BasicNameValuePair("interfaceName",payInfo.getInterfaceName()));
 			parameters.add(new BasicNameValuePair("interfaceVersion",payInfo.getInterfaceVersion()));
@@ -192,7 +220,7 @@ public class OperationUtil {
 			parameters.add(new BasicNameValuePair("merSignMsg",payInfo.getMerSignMsg()));
 			parameters.add(new BasicNameValuePair("appId",payInfo.getAppId()));
 			parameters.add(new BasicNameValuePair("transType",payInfo.getTransType()));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters);
 			httpPost = new HttpPost(UrlEnum.TO_PAY.getPath());
 			httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
 			httpPost.setEntity(uef);
@@ -204,7 +232,7 @@ public class OperationUtil {
 			}
 		}catch(SocketTimeoutException socketTimeoutException){
 			Log.e("OperationUtil","getLastTime",socketTimeoutException);
-			return toPaySubmit(payInfo);
+			return toPaySubmit(info);
 		}catch (Exception e) {
 			Log.e("OperationUtil","toPaySubmit",e);
 			return null;

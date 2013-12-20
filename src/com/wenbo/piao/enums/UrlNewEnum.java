@@ -19,7 +19,10 @@ public enum UrlNewEnum {
 	GETQUEUECOUNT("confirmPassenger/getQueueCount","","https://kyfw.12306.cn/otn/confirmPassenger/initDc","",""),
 	PASSENGER_RANGCODE("passcodeNew/getPassCodeNew.do?module=passenger&rand=randp&0.15299957408569753","image/webp,*/*;q=0.8","https://kyfw.12306.cn/otn/confirmPassenger/initDc","",""),
 	CONFIRMSINGLEFORQUEUE("confirmPassenger/confirmSingleForQueue","application/json, text/javascript, */*; q=0.01","https://kyfw.12306.cn/otn/confirmPassenger/initDc","",""),
-	QUERYMYORDERNOCOMPLETE("queryOrder/queryMyOrderNoComplete","*/*","https://kyfw.12306.cn/otn/queryOrder/initNoComplete","","");
+	QUERYMYORDERNOCOMPLETE("queryOrder/queryMyOrderNoComplete","*/*","https://kyfw.12306.cn/otn/queryOrder/initNoComplete","",""),
+	CONTINUE_PAY_NOCOMPLETEMYORDER("queryOrder/continuePayNoCompleteMyOrder","*/*","https://kyfw.12306.cn/otn/payfinish/init","",""),
+	PAYORDER_INIT("payOrder/init","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8","https://kyfw.12306.cn/otn/payfinish/init","",""),
+	CANCELNOCOMPLETEMYORDER("queryOrder/cancelNoCompleteMyOrder","*/*","","","");
 	private String path;
 	
 	private String accept;

@@ -195,6 +195,8 @@ public class RobitOrderService extends Service {
 							isSeat++;
 						}else if("无".equals(seatState)){
 							isNoSeat++;
+						}else if("*".equals(seatState)){
+							sendInfo(trainObject.getString("station_train_code")+" "+object.getString("buttonTextInfo"),InfoCodeEnum.INFO_TIPS);
 						}else{
 							isCheck = false;
 							sendInfo(trainObject.getString("station_train_code")+"有票!",InfoCodeEnum.INFO_NOTIFICATION);
@@ -213,6 +215,9 @@ public class RobitOrderService extends Service {
 						break;
 					}
 				}
+			}else{
+				sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
+				sendStatus(StatusCodeEnum.NO_ORDER);
 			}
 		} catch (Exception e) {
 			Log.e("checkTickeAndOrder","checkTickeAndOrder error!", e);

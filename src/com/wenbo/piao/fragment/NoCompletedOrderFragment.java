@@ -6,8 +6,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -37,6 +40,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
@@ -44,7 +48,6 @@ import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
-import com.wenbo.piao.domain.PayInfo;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.OperationUtil;
@@ -59,6 +62,8 @@ public class NoCompletedOrderFragment extends Fragment {
 	private ListView listView;
 	
 	private AlertDialog cancelDialog;
+	
+	private String initInfo;
 	
 	private FragmentManager fm;
 	@Override
@@ -103,7 +108,8 @@ public class NoCompletedOrderFragment extends Fragment {
 					String info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDERNOCOMPLETE,new HashMap<String, String>(),0);
 					if(StringUtils.isNotEmpty(info)){
 						JSONObject jsonObject = JSONObject.parseObject(info);
-						if(jsonObject.containsKey("status") && jsonObject.getBooleanValue("status")){
+						if(jsonObject.containsKey("status") && jsonObject.getBooleanValue("status")
+								&& jsonObject.containsKey("data")){
 							JSONArray array = jsonObject.getJSONObject("data").getJSONArray("orderDBList");
 							noCompletedOrders = new ArrayList<Order>();
 							Order order = null;
@@ -263,16 +269,22 @@ public class NoCompletedOrderFragment extends Fragment {
 											@Override
 											protected String doInBackground(
 													String... params) {
-												return OperationUtil.canelOrder(order.getOrderNo(),order.getToken());
+												Map<String,String> paraMap = new LinkedHashMap<String, String>();
+												paraMap.put("sequence_no",order.getOrderNo());
+												paraMap.put("cancel_flag","cancel_order");
+												return HttpClientUtil.doPost(UrlNewEnum.CANCELNOCOMPLETEMYORDER, paraMap,0);
 											}
 
 											@Override
 											protected void onPostExecute(
 													String result) {
 												progressDialog.dismiss();
-												if(result.equals(OperationUtil.OPERATION_SUCCESS)){
+												JSONObject jsonObject = JSON.parseObject(result);
+												if(jsonObject.containsKey("status")
+														&& jsonObject.getBooleanValue("status")){
 													LoginDialog.newInstance( "取消订单成功！").show(activity.getFragmentManager(),"dialog");
 													HttpClientUtil.setNoCompletedOrders(null);
+													initInfo = null;
 													noCompletedOrders.clear();
 													OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
 													listView.setAdapter(adapter);
@@ -317,12 +329,21 @@ public class NoCompletedOrderFragment extends Fragment {
 											@Override
 											protected String doInBackground(
 													String... params) {
-												 PayInfo payInfo = OperationUtil.toPayinit(order.getOrderNo(),order.getToken(),
-														order.getOrderInfos().get(0).getTicketNo());
-												if(payInfo == null){
-													return null;
+												if(initInfo == null){
+													Map<String, String> paraMap = new LinkedHashMap<String, String>();
+													paraMap.put("sequence_no",order.getOrderNo());
+													paraMap.put("pay_flag","pay");
+													String info = HttpClientUtil.doPost(UrlNewEnum.CONTINUE_PAY_NOCOMPLETEMYORDER, paraMap,0);
+													JSONObject jsonObject = JSON.parseObject(info);
+													if(jsonObject.containsKey("status")
+															&& jsonObject.getBooleanValue("status")){
+														info = HttpClientUtil.doPost(UrlNewEnum.PAYORDER_INIT,new LinkedHashMap<String, String>(),0);
+														if(StringUtils.isNotBlank(info)){
+															initInfo = info;
+														}
+													}
 												}
-												InputStream inputStream = OperationUtil.toPaySubmit(payInfo);
+												InputStream inputStream = OperationUtil.toPaySubmit(initInfo);
 												if(inputStream == null){
 													return null;
 												}
@@ -420,8 +441,24 @@ public class NoCompletedOrderFragment extends Fragment {
 									@Override
 									protected String doInBackground(
 											String... params) {
-										return OperationUtil.getLastTime(order.getOrderNo(),order.getToken(),
-												order.getOrderInfos().get(0).getTicketNo());
+										Map<String, String> paraMap = new LinkedHashMap<String, String>();
+										paraMap.put("sequence_no",order.getOrderNo());
+										paraMap.put("pay_flag","pay");
+										String info = HttpClientUtil.doPost(UrlNewEnum.CONTINUE_PAY_NOCOMPLETEMYORDER, paraMap,0);
+										JSONObject jsonObject = JSON.parseObject(info);
+										if(jsonObject.containsKey("status")
+												&& jsonObject.getBooleanValue("status")){
+											info = HttpClientUtil.doPost(UrlNewEnum.PAYORDER_INIT,new LinkedHashMap<String, String>(),0);
+											if(StringUtils.isNotBlank(info)){
+												initInfo = info;
+												int n = StringUtils.indexOf(info,"loseTime");
+												if(n != -1){
+													info = StringUtils.substring(info,n+11,n+24);
+													return info;
+												}
+											}
+										}
+										return null;
 									}
 
 									@Override
@@ -434,7 +471,9 @@ public class NoCompletedOrderFragment extends Fragment {
 											OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);
 											listView.setAdapter(adapter);
 										}else{
-											LoginDialog.newInstance( "剩余付款时间为："+result+"分钟！").show(activity.getFragmentManager(),"dialog");
+											long losetime = Long.parseLong(result);
+											losetime = losetime-new Date().getTime();
+											LoginDialog.newInstance( "剩余付款时间为："+(losetime/(1000*60))+"分钟！").show(activity.getFragmentManager(),"dialog");
 										}
 										super.onPostExecute(result);
 									}
