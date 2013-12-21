@@ -135,11 +135,21 @@ public class CompletedOrderListFragment extends Fragment {
 					}
 					TextView orderInfo = (TextView) view
 							.findViewById(R.id.orderTextView);
-					orderInfo.setText(order.getOrderDate()+"\n订  单  号： "+order.getOrderNo()+"\n车次信息： "+order.getTrainInfo().trim()
+					orderInfo.setText("订单日期："+order.getOrderDate()+"\n订  单  号： "+order.getOrderNo()+"\n车次信息： "+formatTrainInfo(order.getTrainInfo()).trim()
 							+"\n总  价  格： "+order.getAllMoney()+"元\n总  张  数： "+order.getOrderNum()+"张\n订单状态： "+order.getOrderStatus());
 				}
 			}
 			return view;
+		}
+		
+		private String formatTrainInfo(String info){
+			if(StringUtils.isNotEmpty(info) && StringUtils.isNotBlank(info)){
+				info = StringUtils.replace(info,"\"","");
+				info = StringUtils.replace(info,"[","");
+				info = StringUtils.replace(info,"]","");
+				return info;
+			}
+			return "";
 		}
 	}
 

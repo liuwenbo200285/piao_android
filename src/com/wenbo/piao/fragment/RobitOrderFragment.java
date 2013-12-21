@@ -241,9 +241,14 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 						return;
 					}
 					if ("全部".equals(trainType)) {
-						configInfo.setTrainClass("QB#D#Z#T#K#QT#");
+						configInfo.setTrainClass(new String[]{"QB"});
 					} else {
-						configInfo.setTrainClass(HttpClientUtil.getTrainTypeMap().get(selectTrainTypeText.getText().toString())+ "#");
+						String [] types = StringUtils.split(selectTrainTypeText.getText().toString(),",");
+						StringBuilder sbBuilder = new StringBuilder();
+						for(String type:types){
+							sbBuilder.append(HttpClientUtil.getTrainTypeMap().get(type)+",");
+						}
+						configInfo.setTrainClass(StringUtils.split(sbBuilder.toString(),","));
 					}
 					Bundle bundle = new Bundle();
 					StringBuilder sbBuilder = new StringBuilder();
@@ -407,37 +412,64 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 	};
 
 	private void showTrainTypeDialog() {
-		if (selectTrainTypeDialog == null) {
-			final String[] trainType = { "全部", "动车", "Z字头", "T字头", "K字头", "其它" };
-			String trainText = selectTrainTypeText.getText().toString();
-			int i = 0;
-			if(StringUtils.isNotBlank(trainText)){
-				for(; i < trainType.length; i++){
-					if(trainText.equals(trainType[i])){
+		final String[] trainType = { "全部","高铁/城际","动车", "Z字头", "T字头", "K字头", "其它" };
+		String trainText = selectTrainTypeText.getText().toString();
+		final boolean[] trainTypeChecked = new boolean[trainType.length];
+		if(StringUtils.isNotBlank(trainText)){
+			String [] trainTypeNames = StringUtils.split(trainText,",");
+			for(String name:trainTypeNames){
+				for(int i = 0; i < trainType.length;i++){
+					if(name.equals(trainType[i])){
+						trainTypeChecked[i] = true;
 						break;
 					}
 				}
 			}
-			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-					.setSingleChoiceItems(trainType,i,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									selectTrainTypeText
-											.setText(trainType[which]);
-									selectTrainTypeText.clearFocus();
-									selectTrainTypeDialog.dismiss();
-//									closeSoftInput();
-								}
-							}).setIcon(android.R.drawable.btn_star)
-							.setCancelable(false);
-			builder.setTitle("选择车次类型");
-			selectTrainTypeDialog = builder.create();
-			selectTrainTypeDialog.show();
-		} else {
-			selectTrainTypeDialog.show();
 		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+				.setMultiChoiceItems(trainType, trainTypeChecked,new OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+						if(isChecked && which == 0){
+							for(int i = 1; i < trainType.length;i++){
+								trainTypeChecked[i] = false;
+							}
+							selectTrainTypeText.setText(trainType[which]);
+							selectTrainTypeText.clearFocus();
+							selectTrainTypeDialog.dismiss();
+						}
+					}
+				})
+				.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						StringBuilder sbBuilder = new StringBuilder();
+						for (int i = 1; i < trainType.length; i++) {
+							if (trainTypeChecked[i]) {
+								sbBuilder.append(trainType[i] + ",");
+							}
+						}
+						trainTypeChecked[0] = false;
+						selectTrainTypeText.setText(sbBuilder.toString());
+						selectTrainTypeText.clearFocus();
+						selectTrainTypeDialog.dismiss();
+					}
+					
+				})
+				.setNegativeButton("取消",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								selectTrainTypeText.clearFocus();
+								selectTrainTypeDialog.dismiss();
+							}
+						})
+				.setIcon(android.R.drawable.btn_star)
+				.setCancelable(false);
+		builder.setTitle("选择车次类型");
+		selectTrainTypeDialog = builder.create();
+		selectTrainTypeDialog.show();
 	}
 
 	private void showTimeDialog() {
@@ -507,8 +539,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 							}
 							selectSeatText.setText(sbBuilder.toString());
 							selectSeatText.clearFocus();
-//							trainCode.requestFocus();
-//							closeSoftInput();
 						}
 						
 					})
@@ -519,7 +549,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 										int which) {
 									selectSeatText.clearFocus();
 									trainCode.requestFocus();
-//									closeSoftInput();
 								}
 							})
 					.setCancelable(false);
@@ -581,8 +610,6 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 								}
 								orderPeople.setText(sbBuilder.toString());
 								orderPeople.clearFocus();
-//								trainCode.requestFocus();
-//								closeSoftInput();
 							}
 							
 						})
@@ -682,6 +709,22 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			return false;
 		}
 		configInfo.setOrderTime(time);
+		String trainType = selectTrainTypeText.getText().toString();
+		if(StringUtils.isBlank(trainType)){
+			LoginDialog.newInstance("请选择坐席！").show(
+					activity.getFragmentManager(), "dialog");
+			return false;
+		}
+		if ("全部".equals(trainType)) {
+			configInfo.setTrainClass(new String[]{"QB"});
+		} else {
+			String [] types = StringUtils.split(selectTrainTypeText.getText().toString(),",");
+			StringBuilder sbBuilder = new StringBuilder();
+			for(String type:types){
+				sbBuilder.append(HttpClientUtil.getTrainTypeMap().get(type)+",");
+			}
+			configInfo.setTrainClass(StringUtils.split(sbBuilder.toString(),","));
+		}
 		HttpClientUtil.setConfigInfo(configInfo);
 		return true;
 	}

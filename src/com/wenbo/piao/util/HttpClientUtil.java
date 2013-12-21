@@ -481,6 +481,7 @@ public class HttpClientUtil {
 		if(trainTypeMap == null){
 			trainTypeMap = new HashMap<String, String>();
 			trainTypeMap.put("全部","QB");
+			trainTypeMap.put("高铁/城际","G");
 			trainTypeMap.put("动车","D");
 			trainTypeMap.put("Z字头","Z");
 			trainTypeMap.put("T字头","T");

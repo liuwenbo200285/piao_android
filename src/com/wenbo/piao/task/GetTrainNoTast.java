@@ -65,16 +65,36 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			return null;
 		}
 		JSONArray arry = JSONArray.parseArray(info);
-		String[] infos = new String[arry.size()+1];
-		infos[0] = "不选择车次";
+		List<String> trains = new ArrayList<String>();
 		trainCodeMap = new HashMap<String, String>();
+		boolean isALl = false;
+		if(configInfo.getTrainClass().length == 1
+				&& "QB".equals(configInfo.getTrainClass()[0])){
+			isALl = true;
+		}
 		for(int i = 1; i <= arry.size(); i++){
 			JSONObject object = arry.getJSONObject(i-1);
+			if(!isALl){
+				boolean isHave = false;
+				for(String type:configInfo.getTrainClass()){
+					if(StringUtils.contains(object.getString("id"),type)){
+						isHave = true;
+					}
+				}
+				if(!isHave){
+					continue;
+				}
+			}
 			String str=object.getString("value")+"("+object.getString("start_station_name")+object.getString("start_time")
 					+"→"+object.getString("end_station_name")+object.getString("end_time")+")";
 			trainCodeMap.put(object.getString("value"),object.getString("id"));
-			infos[i] = str;
+			trains.add(str);
 		}
+		if(trains.size() > 0){
+			trains.add(0,"不选择车次");
+		}
+		String[] infos = new String[trains.size()];
+		trains.toArray(infos);
 		return infos;
 	}
 
@@ -83,7 +103,8 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		progressDialog.dismiss();
 		final EditText editText = (EditText)activity.findViewById(R.id.startTrainNo);
 		editText.setInputType(InputType.TYPE_NULL);
-		if(result == null){
+		if(result == null
+				|| result.length == 0){
 			LoginDialog.newInstance("没有找到可以乘坐的车次！").show(
 					activity.getFragmentManager(), "dialog");
 			editText.clearFocus();
@@ -99,6 +120,9 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
 				if(arg2 != 0){
 					String info = result[arg2];
+					if(info == null){
+						return;
+					}
 					String trainNo = StringUtils.split(info,"(")[0];
 					editText.setText(info);
 					String code = trainCodeMap.get(trainNo.trim());

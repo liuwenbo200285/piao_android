@@ -176,6 +176,15 @@ public class RobitOrderService extends Service {
 					return orderParameter;
 				}
 				boolean isCheck = true;
+				boolean isALl = false;
+				if(configInfo.getTrainClass().length == 1
+						&& "QB".equals(configInfo.getTrainClass()[0])){
+					isALl = true;
+				}
+				boolean isAllTime = false;
+				if(("00:00--24:00").equals(configInfo.getOrderTime())){
+					isAllTime = true;
+				}
 				for(int i = 0; i < jsonArray.size(); i++){
 					if(!isCheck){
 						break;
@@ -184,6 +193,27 @@ public class RobitOrderService extends Service {
 					trainObject = object.getJSONObject("queryLeftNewDTO");
 					if(isCheckTrainNo){
 						if(!trainObject.getString("train_no").equals(configInfo.getTrainNo())){
+							continue;
+						}
+					}
+					if(!isALl){
+						boolean isHave = false;
+						for(String type:configInfo.getTrainClass()){
+							if(StringUtils.contains(trainObject.getString("train_no"),type)){
+								isHave = true;
+							}
+						}
+						if(!isHave){
+							continue;
+						}
+					}
+					if(!isAllTime){
+						String [] times = StringUtils.split(configInfo.getOrderTime(),"--");
+						int beginTime = Integer.parseInt(StringUtils.split(times[0],":")[0]);
+						int endTime = Integer.parseInt(StringUtils.split(times[1],":")[0]);
+						int trainStartTime = Integer.parseInt(StringUtils.split(trainObject.getString("start_time"),":")[0]);
+						if(trainStartTime < beginTime
+								|| trainStartTime > endTime){
 							continue;
 						}
 					}
@@ -208,8 +238,7 @@ public class RobitOrderService extends Service {
 							break;
 						}
 					}
-					if(isSeat == orderSeats.length
-							&& isCheckTrainNo){
+					if(isSeat == orderSeats.length){
 						isBegin = false;
 						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 						break;

@@ -22,7 +22,7 @@ public class ConfigInfo {
 	
 	private String trainNo;
 	
-	private String trainClass;
+	private String[] trainClass;
 	
 	private String orderPerson;
 	
@@ -84,11 +84,11 @@ public class ConfigInfo {
 		this.trainNo = trainNo;
 	}
 
-	public String getTrainClass() {
+	public String[] getTrainClass() {
 		return trainClass;
 	}
 
-	public void setTrainClass(String trainClass) {
+	public void setTrainClass(String[] trainClass) {
 		this.trainClass = trainClass;
 	}
 

@@ -244,7 +244,7 @@ public class NoCompletedOrderFragment extends Fragment {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
 					TextView orderInfo = (TextView) view.findViewById(R.id.orderTextView);
 					StringBuilder sbBuilder = new StringBuilder();
-					sbBuilder.append(order.getOrderDate());
+					sbBuilder.append("订单日期："+order.getOrderDate());
 					Button refundButton = (Button)view.findViewById(R.id.refund);
 					Button payButton = (Button)view.findViewById(R.id.pay);
 					Button lastTimeButton = (Button)view.findViewById(R.id.lastTimeButton);
@@ -487,13 +487,23 @@ public class NoCompletedOrderFragment extends Fragment {
 							}
 						});
 					}
-					sbBuilder.append("\n车次信息： "+order.getTrainInfo()
+					sbBuilder.append("\n车次信息： "+formatTrainInfo(order.getTrainInfo())
 							+"\n总  张  数： "+order.getOrderNum()+"张\n总  价  格： "+order.getAllMoney()+"元\n订单状态： "+order.getOrderStatus());
 					orderInfo.setText(sbBuilder.toString());
 				}
 			}
 			return view;
 		}
+	}
+	
+	private String formatTrainInfo(String info){
+		if(StringUtils.isNotEmpty(info) && StringUtils.isNotBlank(info)){
+			info = StringUtils.replace(info,"\"","");
+			info = StringUtils.replace(info,"[","");
+			info = StringUtils.replace(info,"]","");
+			return info;
+		}
+		return "";
 	}
 	
 	public void closeSoftInput(){
