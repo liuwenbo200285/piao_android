@@ -373,8 +373,14 @@ public class UserActivity extends Activity implements OnTouchListener{
 					protected void onPostExecute(String result) {
 						progressDialog.dismiss();
 						try {
-							JSONObject jsonObject = JSON.parseObject(result);
-							if(!jsonObject.containsKey("data") && !jsonObject.getJSONObject("data").getBooleanValue("flag")){
+							boolean isLogin = false;
+							if(result != null){
+								JSONObject jsonObject = JSON.parseObject(result);
+								if(jsonObject.containsKey("data") && jsonObject.getJSONObject("data").getBooleanValue("flag")){
+									isLogin = true;
+								}
+							}
+							if(!isLogin){
 								LoginDialog.newInstance("登录已超时，请重新登录！").show(getFragmentManager(),"dialog"); 
 								Intent intent = new Intent();
 					            intent.setClass(UserActivity.this,MainActivity.class);

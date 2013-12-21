@@ -7,11 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -37,15 +32,18 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.activity.UserActivity;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.Order;
-import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.domain.OrderInfo;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
 import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.util.HttpClientUtil;
-import com.wenbo.piao.util.JsoupUtil;
 
 public class CompletedOrderFragment extends Fragment implements OnCheckedChangeListener,OnFocusChangeListener,
 OnClickListener,android.view.View.OnClickListener {
@@ -216,37 +214,66 @@ OnClickListener,android.view.View.OnClickListener {
 		new AsyncTask<Integer,Integer,List<Order>>() {
 			@Override
 			protected List<Order> doInBackground(Integer... params) {
-				HttpResponse response = null;
 				List<Order> orders = null;
 				try {
-					HttpGet httpGet = HttpClientUtil.getHttpGet(UrlEnum.SEARCH_COMPLETED_ORDER_INIT);
-					response = HttpClientUtil.getHttpClient().execute(httpGet);
-					if (response.getStatusLine().getStatusCode() == 200) {
-						String token = JsoupUtil.getMyOrderInit(response.getEntity().getContent(),1);
-						HttpClientUtil.setToken(token);
-						List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-						parameters.add(new BasicNameValuePair("method","queryMyOrder"));
-						parameters.add(new BasicNameValuePair("org.apache.struts.taglib.html.TOKEN",token));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.location_code",""));
-						parameters.add(new BasicNameValuePair("leftmenu","Y"));
-						parameters.add(new BasicNameValuePair("queryDataFlag",""+flag));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.from_order_date",orderTimeText.getText().toString()));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.to_order_date",endTimeText.getText().toString()));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.sequence_no",orderNoText.getText().toString()));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.train_code",trainNoText.getText().toString()));
-						parameters.add(new BasicNameValuePair("queryOrderDTO.name",passengersNameText.getText().toString()));
-						UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,"UTF-8");
-						HttpPost httpPost = HttpClientUtil.getHttpPost(UrlEnum.SEARCH_COMPLETED_ORDER);
-						httpPost.setEntity(uef);
-						response = HttpClientUtil.getHttpClient().execute(httpPost);
-						if (response.getStatusLine().getStatusCode() == 200) {
-							orders = JsoupUtil.myOrders(response.getEntity().getContent());
+					Map<String, String> paraMap = new HashMap<String, String>();
+					paraMap.put("queryType",flag+"");
+					paraMap.put("queryStartDate",orderTimeText.getText().toString());
+					paraMap.put("queryEndDate",endTimeText.getText().toString());
+					paraMap.put("come_from_flag","my_order");
+					paraMap.put("pageSize","100");
+					paraMap.put("pageIndex","0");
+					paraMap.put("sequeue_train_name","");
+					String info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDER, paraMap,0);
+					if(StringUtils.isNotEmpty(info)){
+						JSONObject jsonObject = JSON.parseObject(info);
+						if(jsonObject.containsKey("status")
+								&& jsonObject.getBooleanValue("status")){
+							orders = new ArrayList<Order>();
+							if(jsonObject.containsKey("data")){
+								JSONObject object = jsonObject.getJSONObject("data");
+								int n = object.getIntValue("order_total_number");
+								if(n >= 0){
+									JSONArray array = object.getJSONArray("OrderDTODataList");
+									OrderInfo orderInfo = null;
+									JSONObject ordeObject = null;
+									Order order = null;
+									for(int i = 0; i < n; i++){
+										ordeObject = array.getJSONObject(i);
+										order = new Order();
+										order.setAllMoney(ordeObject.getDoubleValue("ticket_price_all")/100);
+										order.setOrderDate(ordeObject.getString("order_date"));
+										order.setOrderNo(ordeObject.getString("sequence_no"));
+										order.setOrderNum(ordeObject.getString("ticket_totalnum"));
+										order.setTrainInfo(ordeObject.getString("start_train_date_page")+"开 "+ordeObject.getString("train_code_page")
+												+" "+ordeObject.getString("from_station_name_page")+"-"+ordeObject.getString("to_station_name_page"));
+//										order.setOrderStatus(ordeObject.getJSONArray("tickets").getJSONObject(0).getString("ticket_status_name"));
+										List<OrderInfo> orderInfos = new ArrayList<OrderInfo>();
+										JSONArray perpleArray = ordeObject.getJSONArray("tickets");
+										for(int j = 0; j < perpleArray.size(); j++){
+											JSONObject perpleObject = perpleArray.getJSONObject(j);
+											order.setOrderStatus(perpleObject.getString("ticket_status_name"));
+											orderInfo = new OrderInfo();
+											orderInfo.setPassengersInfo(perpleObject.getJSONObject("passengerDTO").getString("passenger_name")
+													+"\n"+perpleObject.getJSONObject("passengerDTO").getString("passenger_id_type_name"));
+											orderInfo.setSeatInfo(perpleObject.getString("coach_name")+"\n"+perpleObject.getString("seat_name")+"\n"+
+													perpleObject.getString("seat_type_name"));
+											orderInfo.setStatusInfo(perpleObject.getString("ticket_status_name"));
+											orderInfo.setTicketNo(perpleObject.getString("ticket_no"));
+											orderInfo.setTrainInfo(perpleObject.getString("start_train_date_page")+" 开\n"+perpleObject.getJSONObject("stationTrainDTO").getString("station_train_code")
+													+"\n"+perpleObject.getJSONObject("stationTrainDTO").getString("from_station_name")+"-"+perpleObject.getJSONObject("stationTrainDTO").getString("to_station_name"));
+											orderInfos.add(orderInfo);
+										}
+										order.setOrderInfos(orderInfos);
+										orders.add(order);
+									}
+								}
+							}
 						}
 					}
 				} catch (Exception e) {
 					Log.e("CompletedOrderFragment","checkTicket error!", e);
 				} finally {
-//					HttpClientUtils.closeQuietly(response);
 				}
 				return orders;
 			}

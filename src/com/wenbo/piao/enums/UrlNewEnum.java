@@ -22,7 +22,8 @@ public enum UrlNewEnum {
 	QUERYMYORDERNOCOMPLETE("queryOrder/queryMyOrderNoComplete","*/*","https://kyfw.12306.cn/otn/queryOrder/initNoComplete","",""),
 	CONTINUE_PAY_NOCOMPLETEMYORDER("queryOrder/continuePayNoCompleteMyOrder","*/*","https://kyfw.12306.cn/otn/payfinish/init","",""),
 	PAYORDER_INIT("payOrder/init","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8","https://kyfw.12306.cn/otn/payfinish/init","",""),
-	CANCELNOCOMPLETEMYORDER("queryOrder/cancelNoCompleteMyOrder","*/*","","","");
+	CANCELNOCOMPLETEMYORDER("queryOrder/cancelNoCompleteMyOrder","*/*","","",""),
+	QUERYMYORDER("queryOrder/queryMyOrder","*/*","https://kyfw.12306.cn/otn/queryOrder/init","","");
 	private String path;
 	
 	private String accept;
