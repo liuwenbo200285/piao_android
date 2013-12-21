@@ -789,6 +789,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			case 11:
 				LoginDialog.newInstance("订票成功，请十秒后查看订单！").show(
 						activity.getFragmentManager(), "dialog");
+				activity.cancelNotification();
 				break;
 			case 12:
 				LayoutInflater li = LayoutInflater.from(activity);

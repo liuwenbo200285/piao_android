@@ -343,6 +343,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 	@Override
 	protected void onDestroy() {
 		Log.i("UserActivity","onDestroy");
+		cancelNotification();
 		super.onDestroy();
 	}
 
