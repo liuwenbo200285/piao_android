@@ -83,7 +83,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.2)");
+		actionBarText.setText("无忧火车票(V0.3)");
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		if(HttpClientUtil.getAccount() != null){
@@ -167,7 +167,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarButton.setVisibility(View.INVISIBLE);
 		actionBarView.setVisibility(View.VISIBLE);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.2)");
+		actionBarText.setText("无忧火车票(V0.3)");
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:

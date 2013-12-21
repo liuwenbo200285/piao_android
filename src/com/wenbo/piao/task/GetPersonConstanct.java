@@ -93,8 +93,8 @@ public class GetPersonConstanct extends AsyncTask<String,Integer,String>{
 		if(fragment != null){
 			progressDialog.dismiss();
 			if(fragment.getClass() == RobitOrderFragment.class){
-				RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
-				robitOrderFragment.showDialog();
+//				RobitOrderFragment robitOrderFragment = (RobitOrderFragment)fragment;
+//				robitOrderFragment.showDialog();
 			}else if(fragment.getClass() == ContactFragment.class){
 				ContactFragment contactFragment = (ContactFragment)fragment;
 				contactFragment.showView();

@@ -71,8 +71,8 @@
 	<string name="endTimeSearch">结束日期</string>
 	<string name="orderNoSearch">订单号</string>
 	<string name="trainNoSearch">车次</string>
-	<string name="passengersNameSearch">乘客姓名</string>
-	<string name="search">查询</string>
+	<string name="passengersNameSearch">订单号/车次/乘客姓名</string>
+	<string name="search">查    询</string>
 	<string name="refundButton">退票</string>
 	<string name="payButton">付款</string>
 	<string name="lastTime">剩余时间</string>

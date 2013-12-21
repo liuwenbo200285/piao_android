@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-	<LinearLayout 
+    android:orientation="vertical" >
+
+    <LinearLayout
         android:id="@+id/focusableLayout"
-        android:focusable="true" 
-       	android:focusableInTouchMode="true"
-       	android:layout_width="0px"
-       	android:layout_height="0px"
-       	/>
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
     <CheckBox
         android:id="@+id/orderTimeCheckBox"
         android:layout_width="150dp"
@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:checked="true"
         android:text="@string/orderTimeSearch" />
-    
+
     <CheckBox
         android:id="@+id/takeTrainTimeCheckBox"
         android:layout_width="wrap_content"
@@ -37,9 +37,9 @@
         android:layout_alignRight="@+id/orderTimeCheckBox"
         android:layout_below="@+id/orderTimeCheckBox"
         android:layout_marginTop="15dp"
-        android:inputType="date"
+        android:ems="10"
         android:hint="@string/beginTimeSearch"
-        android:ems="10" />
+        android:inputType="date" />
 
     <EditText
         android:id="@+id/endTimeText"
@@ -49,33 +49,10 @@
         android:layout_alignBottom="@+id/orderTimeText"
         android:layout_alignLeft="@+id/takeTrainTimeCheckBox"
         android:layout_alignRight="@+id/takeTrainTimeCheckBox"
-        android:inputType="date"
-         android:hint="@string/endTimeSearch"
-        android:ems="10" >
+        android:ems="10"
+        android:hint="@string/endTimeSearch"
+        android:inputType="date" >
     </EditText>
-
-    <EditText
-        android:id="@+id/orderNoText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/orderTimeText"
-        android:layout_marginTop="15dp"
-        android:layout_toLeftOf="@+id/endTimeText"
-        android:inputType="textCapCharacters"
-        android:hint="@string/orderNoSearch"
-        android:ems="10" />
-
-    <EditText
-        android:id="@+id/trainNoText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/orderNoText"
-        android:layout_alignBottom="@+id/orderNoText"
-        android:layout_alignLeft="@+id/endTimeText"
-        android:inputType="textCapCharacters"
-        android:hint="@string/trainNoSearch"
-        android:ems="10" />
 
     <EditText
         android:id="@+id/passengersNameText"
@@ -83,18 +60,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/orderNoText"
+        android:layout_below="@+id/orderTimeText"
         android:layout_marginTop="15dp"
-        android:inputType="text"
+        android:ems="10"
         android:hint="@string/passengersNameSearch"
-        android:ems="10" />
+        android:inputType="text" />
 
     <Button
         android:id="@+id/orderSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
         android:layout_below="@+id/passengersNameText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="57dp"
         android:text="@string/search" />
+
 </RelativeLayout>

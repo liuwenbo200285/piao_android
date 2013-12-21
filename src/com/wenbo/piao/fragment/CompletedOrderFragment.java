@@ -42,7 +42,6 @@ import com.wenbo.piao.domain.Order;
 import com.wenbo.piao.domain.OrderInfo;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.domain.UserInfo;
-import com.wenbo.piao.task.GetPersonConstanct;
 import com.wenbo.piao.util.HttpClientUtil;
 
 public class CompletedOrderFragment extends Fragment implements OnCheckedChangeListener,OnFocusChangeListener,
@@ -52,8 +51,6 @@ OnClickListener,android.view.View.OnClickListener {
 	private CheckBox takeTrainTimeCheckBox;
 	private EditText orderTimeText;
 	private EditText endTimeText;
-	private EditText orderNoText;
-	private EditText trainNoText;
 	private EditText passengersNameText;
 	private Button orderSearch;
 	private int mYear;
@@ -89,8 +86,6 @@ OnClickListener,android.view.View.OnClickListener {
 		setDateTime(endTimeText);
 		orderTimeText.setOnFocusChangeListener(this);
 		endTimeText.setOnFocusChangeListener(this);
-		orderNoText = (EditText)activity.findViewById(R.id.orderNoText);
-		trainNoText = (EditText)activity.findViewById(R.id.trainNoText);
 		passengersNameText = (EditText)activity.findViewById(R.id.passengersNameText);
 		passengersNameText.setOnFocusChangeListener(this);
 		orderSearch = (Button)activity.findViewById(R.id.orderSearch);
@@ -223,7 +218,7 @@ OnClickListener,android.view.View.OnClickListener {
 					paraMap.put("come_from_flag","my_order");
 					paraMap.put("pageSize","100");
 					paraMap.put("pageIndex","0");
-					paraMap.put("sequeue_train_name","");
+					paraMap.put("sequeue_train_name",passengersNameText.getText().toString());
 					String info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDER, paraMap,0);
 					if(StringUtils.isNotEmpty(info)){
 						JSONObject jsonObject = JSON.parseObject(info);
@@ -309,12 +304,6 @@ OnClickListener,android.view.View.OnClickListener {
 		}.execute(0);
 	}
 	
-	private void getPersonInfo() {
-		GetPersonConstanct getPersonConstanct = new GetPersonConstanct(
-				activity, userInfoMap, this);
-		getPersonConstanct.execute("");
-	}
-	
 	public void showDialog() {
 		if (dialog == null) {
 			try {
@@ -376,16 +365,6 @@ OnClickListener,android.view.View.OnClickListener {
 				datePickerDialog.show();
 				break;
 			case R.id.passengersNameText:
-				userInfoMap = HttpClientUtil.getUserInfoMap();
-				if (userInfoMap == null) {
-					userInfoMap = new HashMap<String, UserInfo>();
-					getPersonInfo();
-				} else {
-					if (userInfoMap.isEmpty()) {
-						getPersonInfo();
-					}
-				}
-				showDialog();
 				break;
 			default:
 				break;
