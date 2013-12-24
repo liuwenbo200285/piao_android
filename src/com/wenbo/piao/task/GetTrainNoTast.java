@@ -3,6 +3,7 @@ package com.wenbo.piao.task;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +29,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
 import com.wenbo.piao.enums.UrlEnum;
+import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 
 public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
@@ -64,20 +67,34 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		if(info == null || StringUtils.isBlank(info)){
 			return null;
 		}
-		JSONArray arry = JSONArray.parseArray(info);
+		JSONObject jsonObject = JSON.parseObject(info);
+		if(!jsonObject.getBooleanValue("status")){
+			return null;
+		}
+		if(!jsonObject.containsKey("data")){
+			return null;
+		}
+		JSONArray arry = jsonObject.getJSONArray("data");
+		if(arry == null){
+			return null;
+		}
 		List<String> trains = new ArrayList<String>();
 		trainCodeMap = new HashMap<String, String>();
 		boolean isALl = false;
+		boolean isAllTime = false;
 		if(configInfo.getTrainClass().length == 1
 				&& "QB".equals(configInfo.getTrainClass()[0])){
 			isALl = true;
 		}
-		for(int i = 1; i <= arry.size(); i++){
-			JSONObject object = arry.getJSONObject(i-1);
+		if(("00:00--24:00").equals(configInfo.getOrderTime())){
+			isAllTime = true;
+		}
+		for(int i = 0; i < arry.size(); i++){
+			JSONObject object = arry.getJSONObject(i).getJSONObject("queryLeftNewDTO");
+			boolean isHave = false;
 			if(!isALl){
-				boolean isHave = false;
 				for(String type:configInfo.getTrainClass()){
-					if(StringUtils.contains(object.getString("id"),type)){
+					if(StringUtils.contains(object.getString("station_train_code"),type)){
 						isHave = true;
 					}
 				}
@@ -85,9 +102,19 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 					continue;
 				}
 			}
-			String str=object.getString("value")+"("+object.getString("start_station_name")+object.getString("start_time")
-					+"→"+object.getString("end_station_name")+object.getString("end_time")+")";
-			trainCodeMap.put(object.getString("value"),object.getString("id"));
+			if(!isAllTime){
+				String [] times = StringUtils.split(configInfo.getOrderTime(),"--");
+				int beginTime = Integer.parseInt(StringUtils.split(times[0],":")[0]);
+				int endTime = Integer.parseInt(StringUtils.split(times[1],":")[0]);
+				int trainStartTime = Integer.parseInt(StringUtils.split(object.getString("start_time"),":")[0]);
+				if(trainStartTime < beginTime
+						|| trainStartTime > endTime){
+					continue;
+				}
+			}
+			String str=object.getString("station_train_code")+"("+object.getString("start_station_name")+object.getString("start_time")
+					+"→"+object.getString("to_station_name")+object.getString("arrive_time")+")";
+			trainCodeMap.put(object.getString("station_train_code"),object.getString("train_no"));
 			trains.add(str);
 		}
 		if(trains.size() > 0){
@@ -151,33 +178,17 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 	}
 	
 	public String getTrainNo(){
-		HttpResponse response = null;
-		HttpPost httpPost = null;
 		try {
-			List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-			parameters.add(new BasicNameValuePair("method","queryststrainall"));
-			parameters.add(new BasicNameValuePair("date",configInfo.getOrderDate()));
-			parameters.add(new BasicNameValuePair("fromstation",configInfo.getFromStation()));
-			parameters.add(new BasicNameValuePair("tostation",configInfo.getToStation()));
-			parameters.add(new BasicNameValuePair("starttime",configInfo.getOrderTime()));
-			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters,
-					"UTF-8");
-			httpPost = HttpClientUtil.getHttpPost(UrlEnum.SEARCH_TRAINNO);
-			httpPost.setEntity(uef);
-			response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				count = 0;
-				return EntityUtils.toString(response.getEntity());
-			}
-		}catch(SocketTimeoutException e){
-			if(count < 5){
-				count++;
-				return getTrainNo();
-			}
+			Map<String, String> paraMap = new LinkedHashMap<String, String>();
+			paraMap.put("leftTicketDTO.train_date",configInfo.getOrderDate());
+			paraMap.put("leftTicketDTO.from_station",configInfo.getFromStation());
+			paraMap.put("leftTicketDTO.to_station",configInfo.getToStation());
+			paraMap.put("purpose_codes","ADULT");
+			return HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
 		}catch (Exception e) {
 			Log.e("getTrainNo","search trainNo error!", e);
 		}finally{
-			httpPost.abort();
+			
 		}
 		return null;
 	}

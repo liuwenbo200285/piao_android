@@ -244,7 +244,7 @@ public class NoCompletedOrderFragment extends Fragment {
 				if(StringUtils.isNotBlank(order.getOrderDate())){
 					TextView orderInfo = (TextView) view.findViewById(R.id.orderTextView);
 					StringBuilder sbBuilder = new StringBuilder();
-					sbBuilder.append("订单日期："+order.getOrderDate());
+					sbBuilder.append("订单日期： "+order.getOrderDate());
 					Button refundButton = (Button)view.findViewById(R.id.refund);
 					Button payButton = (Button)view.findViewById(R.id.pay);
 					Button lastTimeButton = (Button)view.findViewById(R.id.lastTimeButton);

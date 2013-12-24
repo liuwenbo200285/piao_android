@@ -226,10 +226,12 @@ public class RobitOrderService extends Service {
 						}else if("无".equals(seatState)){
 							isNoSeat++;
 						}else if("*".equals(seatState)){
-							sendInfo(trainObject.getString("station_train_code")+" "+object.getString("buttonTextInfo"),InfoCodeEnum.INFO_TIPS);
+							sendInfo(trainObject.getString("station_train_code")+" "+
+										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
+							Thread.sleep(1000);
 						}else{
 							isCheck = false;
-							sendInfo(trainObject.getString("station_train_code")+"有票!",InfoCodeEnum.INFO_NOTIFICATION);
+							sendInfo(trainObject.getString("station_train_code")+"有"+RobitOrderFragment.seatMaps.get(seat)+"票!",InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
 							orderParameter.setSecretStr(object.getString("secretStr"));
