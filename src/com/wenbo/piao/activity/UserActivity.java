@@ -68,6 +68,8 @@ public class UserActivity extends Activity implements OnTouchListener{
 	private Notification  m_Notification;
 	
 	private PendingIntent m_PendingIntent;
+	
+	private static final String title = "无忧火车票(V0.3.1)";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +85,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarView = LayoutInflater.from(this).inflate(R.layout.action_bar,null);
 		getActionBar().setCustomView(actionBarView);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.3)");
+		actionBarText.setText(title);
 		actionBarButton = (Button)actionBarView.findViewById(R.id.actionBarSkipButton);
 		searchInfoService = SqlLiteUtil.getSearchInfoService(this);
 		if(HttpClientUtil.getAccount() != null){
@@ -167,7 +169,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 		actionBarButton.setVisibility(View.INVISIBLE);
 		actionBarView.setVisibility(View.VISIBLE);
 		actionBarText = (TextView)actionBarView.findViewById(R.id.textView1);
-		actionBarText.setText("无忧火车票(V0.3)");
+		actionBarText.setText(title);
 		boolean isNew = false;
 		switch (item.getItemId()) {
 		case R.id.tab1:

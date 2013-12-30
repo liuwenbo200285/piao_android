@@ -121,14 +121,16 @@ public class RobitOrderService extends Service {
 			paraMap.put("leftTicketDTO.from_station",configInfo.getFromStation());
 			paraMap.put("leftTicketDTO.to_station",configInfo.getToStation());
 			paraMap.put("purpose_codes","ADULT");
+			int num = 0;
 			while(isBegin){
 				info = HttpClientUtil.doGet(UrlNewEnum.SEARCH_TICKET, paraMap,0);
 				if(info == null){
 					continue;
 				}
 				orderParameter = checkTickeAndOrder(info, date,serverDate);
+				num++;
 				if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
-					sendInfo("没有余票,继续刷票",InfoCodeEnum.INFO_TIPS);
+					sendInfo("没有余票,继续刷票!第"+num+"次刷票!",InfoCodeEnum.INFO_TIPS);
 				}else{
 					break;
 				}
@@ -226,6 +228,7 @@ public class RobitOrderService extends Service {
 						}else if("无".equals(seatState)){
 							isNoSeat++;
 						}else if("*".equals(seatState)){
+							isNoSeat++;
 							sendInfo(trainObject.getString("station_train_code")+" "+
 										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
 							Thread.sleep(1000);
@@ -240,7 +243,8 @@ public class RobitOrderService extends Service {
 							break;
 						}
 					}
-					if(isSeat == orderSeats.length){
+					if(isSeat == orderSeats.length
+							&& isNoSeat == 0){
 						isBegin = false;
 						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 						break;

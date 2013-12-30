@@ -22,7 +22,6 @@ import android.widget.ImageView;
 
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
-import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.sqllite.SqlliteHelper;
 import com.wenbo.piao.sqllite.domain.Account;

@@ -1,6 +1,5 @@
 package com.wenbo.piao.task;
 
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,12 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,7 +29,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.domain.ConfigInfo;
-import com.wenbo.piao.enums.UrlEnum;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
 
