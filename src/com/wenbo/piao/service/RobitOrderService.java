@@ -187,6 +187,8 @@ public class RobitOrderService extends Service {
 				if(("00:00--24:00").equals(configInfo.getOrderTime())){
 					isAllTime = true;
 				}
+				int isSeat = 0;
+				int isNoSeat = 0;
 				for(int i = 0; i < jsonArray.size(); i++){
 					if(!isCheck){
 						break;
@@ -219,8 +221,6 @@ public class RobitOrderService extends Service {
 							continue;
 						}
 					}
-					int isSeat = 0;
-					int isNoSeat = 0;
 					for(String seat:orderSeats){
 						String seatState = trainObject.getString(seat+"_num");
 						if("--".equals(seatState)){
@@ -243,12 +243,11 @@ public class RobitOrderService extends Service {
 							break;
 						}
 					}
-					if(isSeat == orderSeats.length
-							&& isNoSeat == 0){
-						isBegin = false;
-						sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
-						break;
-					}
+				}
+				if(isSeat == orderSeats.length
+						&& isNoSeat == 0){
+					isBegin = false;
+					sendStatus(StatusCodeEnum.NO_TRAIN_SEAT);
 				}
 			}else{
 				sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
