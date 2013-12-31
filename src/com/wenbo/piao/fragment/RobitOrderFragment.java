@@ -56,6 +56,7 @@ import com.wenbo.piao.task.GetTrainNoTast;
 import com.wenbo.piao.util.CommonUtil;
 import com.wenbo.piao.util.HttpClientUtil;
 import com.wenbo.piao.util.SearchInfoUtil;
+import com.wenbo.piao.util.gifview.GifView;
 
 public class RobitOrderFragment extends Fragment implements OnFocusChangeListener{
 
@@ -794,7 +795,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 			case 12:
 				LayoutInflater li = LayoutInflater.from(activity);
 				View orderCodeView = li.inflate(R.layout.rangcodeview, null);
-				final ImageView imageView = (ImageView) orderCodeView.findViewById(R.id.orderCodeImg);
+				final GifView imageView = (GifView) orderCodeView.findViewById(R.id.orderCodeImg);
 				imageView.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View view) {

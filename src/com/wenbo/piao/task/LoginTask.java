@@ -81,10 +81,12 @@ public class LoginTask extends AsyncTask<String,Integer,String> {
 			activity.startActivity(intent);
 			activity.finish();
 		}else{
-			rangCodeEditText.setText("");
-			rangCodeEditText.requestFocus();
-			GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,null,1);
-			getRandCodeTask.execute(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.LOGIN_RANGCODE_URL.getPath());
+			if(!StringUtils.contains(result,"系统维护时间")){
+				GetRandCodeTask getRandCodeTask = new GetRandCodeTask(activity,null,1);
+				getRandCodeTask.execute(UrlNewEnum.DO_MAIN.getPath()+UrlNewEnum.LOGIN_RANGCODE_URL.getPath());
+				rangCodeEditText.setText("");
+				rangCodeEditText.requestFocus();
+			}
 			LoginDialog.newInstance(result).show(activity.getFragmentManager(),"dialog"); 
 		}
 	}

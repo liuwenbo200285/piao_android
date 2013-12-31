@@ -19,6 +19,8 @@ import com.wenbo.piao.R;
 import com.wenbo.piao.dialog.LoginDialog;
 import com.wenbo.piao.enums.UrlNewEnum;
 import com.wenbo.piao.util.HttpClientUtil;
+import com.wenbo.piao.util.gifview.GifFrame;
+import com.wenbo.piao.util.gifview.GifView;
 
 /**
  * 获取验证码task
@@ -35,6 +37,8 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	
 	private ProgressDialog progressDialog;
 	
+	private GifView gifView;
+	
 	private static DefaultHttpClient httpClient = null;
 	
 	
@@ -43,6 +47,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 		this.activity = activity;
 		this.type = type;
 		this.imageView = imageView;
+		gifView = new GifView(activity);
 	}
 
 	@Override
@@ -88,12 +93,16 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	private Bitmap getRandCode(UrlNewEnum urlEnum) {
 		HttpGet httpGet = HttpClientUtil.getNewHttpGet(urlEnum);
 		HttpResponse response = null;
-		Bitmap bitmap = null;
 		try {
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				byte[] bb = EntityUtils.toByteArray(response.getEntity());
-				bitmap = BitmapFactory.decodeByteArray(bb, 0, bb.length);
+				byte[] bb= EntityUtils.toByteArray(response.getEntity());
+				gifView.setGifImage(bb);
+				GifFrame gifFrame = null;
+				while(gifFrame == null){
+					gifFrame = gifView.getGifDecoder().getFrame(4);
+				}
+				return gifFrame.image;
 			} else {
 				getRandCode(urlEnum);
 			}
@@ -103,7 +112,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 		} finally {
 			httpGet.abort();
 		}
-		return bitmap;
+		return null;
 	}
 	
 }
