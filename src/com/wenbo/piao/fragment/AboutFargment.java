@@ -1,6 +1,7 @@
 package com.wenbo.piao.fragment;
 
 import com.wenbo.piao.R;
+import com.wenbo.piao.activity.UserActivity;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -29,7 +30,7 @@ public class AboutFargment extends Fragment {
 		activity = getActivity();
 //		closeSoftInput();
 		textView = (TextView)activity.findViewById(R.id.aboutTextView);
-		textView.setText("无忧火车票V0.3\n\n新浪微博:http://weibo.com/wenbol");
+		textView.setText("无忧火车票"+UserActivity.title+"\n\n新浪微博:http://weibo.com/wenbol");
 		super.onActivityCreated(savedInstanceState);
 	}
 
