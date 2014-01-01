@@ -39,8 +39,6 @@ public class RobitOrderService extends Service {
 	
 	private Map<String,UserInfo> userInfoMap;
 	
-	private UserInfo userInfo;
-	
 	private boolean isBegin;
 	
 	private int status;
@@ -231,10 +229,22 @@ public class RobitOrderService extends Service {
 							isNoSeat++;
 							sendInfo(trainObject.getString("station_train_code")+" "+
 										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
-							Thread.sleep(1000);
+							Thread.sleep(500);
 						}else{
 							isCheck = false;
-							sendInfo(trainObject.getString("station_train_code")+"有"+RobitOrderFragment.seatMaps.get(seat)+"票!",InfoCodeEnum.INFO_NOTIFICATION);
+							String info = trainObject.getString("station_train_code");
+							if(StringUtils.isNumeric(seatState)){
+								info = info+"有"+RobitOrderFragment.seatMaps.get(seat)+"票"+seatState+"张!";
+								String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
+								if(Integer.parseInt(seatState) < peoples.length){
+									sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
+									Thread.sleep(200);
+									continue;
+								}
+							}else{
+								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
+							}
+							sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
 							orderParameter.setSecretStr(object.getString("secretStr"));
