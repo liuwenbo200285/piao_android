@@ -65,6 +65,8 @@ public class NoCompletedOrderFragment extends Fragment {
 	
 	private String initInfo;
 	
+	private String message;
+	
 	private FragmentManager fm;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -111,6 +113,13 @@ public class NoCompletedOrderFragment extends Fragment {
 						if(jsonObject.containsKey("status") && jsonObject.getBooleanValue("status")
 								&& jsonObject.containsKey("data")){
 							JSONArray array = jsonObject.getJSONObject("data").getJSONArray("orderDBList");
+							if(array == null){
+								JSONObject cacheObject = jsonObject.getJSONObject("data").getJSONObject("orderCacheDTO");
+								if(cacheObject.containsKey("message")){
+									message = cacheObject.getJSONObject("message").getString("message");
+									return null;
+								}
+							}
 							noCompletedOrders = new ArrayList<Order>();
 							Order order = null;
 							JSONObject ordeObject = null;
@@ -173,7 +182,11 @@ public class NoCompletedOrderFragment extends Fragment {
 	private void showView(){
 		if(noCompletedOrders == null || noCompletedOrders.isEmpty()){
     		noCompletedOrders = null;
-			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
+    		if(StringUtils.isNotBlank(message)){
+    			LoginDialog.newInstance("购票失败："+message).show(activity.getFragmentManager(),"dialog"); 
+    		}else{
+    			LoginDialog.newInstance( "没有未付款订单！").show(activity.getFragmentManager(),"dialog"); 
+    		}
 			return;
 		}
 		OrderAdapter adapter = new OrderAdapter(activity,0,noCompletedOrders);

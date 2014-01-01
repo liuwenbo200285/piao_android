@@ -804,8 +804,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				});
 				GetRandCodeTask getRandCode = new GetRandCodeTask(activity,imageView,2);
 				getRandCode.execute(UrlNewEnum.DO_MAIN.getPath()+ UrlNewEnum.GET_ORDER_RANGCODE.getPath());
-				rangeCode = (EditText) orderCodeView
-						.findViewById(R.id.orderCode);
+				rangeCode = (EditText) orderCodeView.findViewById(R.id.orderCode);
 				activity.showNotification("已经有票，赶紧入验证码！",true);
 				AlertDialog.Builder orderCodeBuilder = new AlertDialog.Builder(activity);
 				orderCodeBuilder.setTitle("请输入验证码！")
