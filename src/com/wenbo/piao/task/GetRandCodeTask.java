@@ -66,7 +66,7 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 	protected void onPostExecute(Bitmap result) {
 		progressDialog.dismiss();
 		if(result == null){
-			LoginDialog.newInstance("请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 
+			LoginDialog.newInstance("获取验证码失败，请检测网络是否正常！").show(activity.getFragmentManager(),"dialog"); 
 			return;
 		}
 		imageView.setImageBitmap(result);
