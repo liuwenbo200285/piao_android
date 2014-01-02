@@ -96,13 +96,14 @@ public class GetRandCodeTask extends AsyncTask<String,Integer,Bitmap> {
 		try {
 			response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				byte[] bb= EntityUtils.toByteArray(response.getEntity());
-				gifView.setGifImage(bb);
-				GifFrame gifFrame = null;
-				while(gifFrame == null){
-					gifFrame = gifView.getGifDecoder().getFrame(4);
-				}
-				return gifFrame.image;
+//				byte[] bb= EntityUtils.toByteArray(response.getEntity());
+//				gifView.setGifImage(bb);
+//				GifFrame gifFrame = null;
+//				while(gifFrame == null){
+//					gifFrame = gifView.getGifDecoder().getFrame(4);
+//				}
+//				return gifFrame.image;
+				return BitmapFactory.decodeStream(response.getEntity().getContent());
 			} else {
 				getRandCode(urlEnum);
 			}

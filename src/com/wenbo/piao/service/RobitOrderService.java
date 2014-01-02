@@ -293,6 +293,9 @@ public class RobitOrderService extends Service {
 			paraMap.put("query_to_station_name",configInfo.getToStationName());
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
+			while(info == null && isBegin){
+				info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
+			}
 			JSONObject object = JSON.parseObject(info);
 			if(object.containsKey("status") && object.getBooleanValue("status")){
 				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
@@ -383,6 +386,9 @@ public class RobitOrderService extends Service {
 			paraMap.put("_json_att","");
 			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
 			String info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
+			while(info == null && isBegin){
+				info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
+			}
 			JSONObject jsonObject = JSON.parseObject(info);
 			if(jsonObject.getBooleanValue("status")
 					&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
@@ -431,6 +437,9 @@ public class RobitOrderService extends Service {
 			paraMap.put("_json_att","");
 			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
 			String info = HttpClientUtil.doPost(UrlNewEnum.GETQUEUECOUNT, paraMap,0);
+			while(info == null && isBegin){
+				info = HttpClientUtil.doPost(UrlNewEnum.GETQUEUECOUNT, paraMap,0);
+			}
 			JSONObject jsonObject = JSON.parseObject(info);
 			if(jsonObject.getBooleanValue("status")){
 				confirmSingleForQueue(orderParameter,jsonObject.getJSONObject("data").getString("ticket"));
@@ -467,6 +476,9 @@ public class RobitOrderService extends Service {
 			paraMap.put("train_location",orderParameter.getTrainObject().getString("location_code"));
 			paraMap.put("_json_att","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.CONFIRMSINGLEFORQUEUE, paraMap,0);
+			while(info == null && isBegin){
+				info = HttpClientUtil.doPost(UrlNewEnum.CONFIRMSINGLEFORQUEUE, paraMap,0);
+			}
 			JSONObject jsonObject = JSON.parseObject(info);
 			if(jsonObject.getBooleanValue("status")){
 				orderParameter = null;

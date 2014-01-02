@@ -108,6 +108,9 @@ public class NoCompletedOrderFragment extends Fragment {
 			protected Integer doInBackground(Integer... params) {
 				try {
 					String info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDERNOCOMPLETE,new HashMap<String, String>(),0);
+					while(info == null){
+						info = HttpClientUtil.doPost(UrlNewEnum.QUERYMYORDERNOCOMPLETE,new HashMap<String, String>(),0);
+					}
 					if(StringUtils.isNotEmpty(info)){
 						JSONObject jsonObject = JSONObject.parseObject(info);
 						if(jsonObject.containsKey("status") && jsonObject.getBooleanValue("status")
