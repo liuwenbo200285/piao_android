@@ -69,7 +69,7 @@ public class UserActivity extends Activity implements OnTouchListener{
 	
 	private PendingIntent m_PendingIntent;
 	
-	public static final String title = "无忧火车票(V0.3.4)";
+	public static final String title = "无忧火车票(V0.3.5)";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
