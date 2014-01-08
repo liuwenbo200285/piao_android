@@ -81,7 +81,7 @@ public class RobitOrderService extends Service {
 				while(isBegin){
 					try {
 						if(status == StatusCodeEnum.INPUT_ORDERCODE.getCode()){
-							checkOrderInfo(orderParameter);
+							getQueueCount(orderParameter);
 						}else{
 							searchTicket(configInfo.getOrderDate());
 						}
@@ -132,6 +132,7 @@ public class RobitOrderService extends Service {
 				}else{
 					break;
 				}
+				Thread.sleep(2000);
 			}
 			if(orderParameter != null){
 //				Calendar calendar = Calendar.getInstance();
