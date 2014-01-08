@@ -149,12 +149,12 @@ public class HttpClientUtil {
                 HttpProtocolParams.setContentCharset(params, HTTP.DEFAULT_CONTENT_CHARSET);
                 HttpProtocolParams.setUseExpectContinue(params, true);
                 //设置连接管理器的超时
-                ConnManagerParams.setTimeout(params, 1000);
+                ConnManagerParams.setTimeout(params, 60000);
                 
                 //设置连接超时
-                HttpConnectionParams.setConnectionTimeout(params,5000);
+                HttpConnectionParams.setConnectionTimeout(params,60000);
                 //设置Socket超时
-                HttpConnectionParams.setSoTimeout(params,5000);
+                HttpConnectionParams.setSoTimeout(params,60000);
                 SSLContext ctx = SSLContext.getInstance("TLS");
                 X509TrustManager tm = new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() {
