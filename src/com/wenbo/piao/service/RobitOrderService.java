@@ -81,7 +81,7 @@ public class RobitOrderService extends Service {
 				while(isBegin){
 					try {
 						if(status == StatusCodeEnum.INPUT_ORDERCODE.getCode()){
-							getQueueCount(orderParameter);
+							checkOrderInfo(orderParameter);
 						}else{
 							searchTicket(configInfo.getOrderDate());
 						}
@@ -132,7 +132,7 @@ public class RobitOrderService extends Service {
 				}else{
 					break;
 				}
-				Thread.sleep(2000);
+				Thread.sleep(500);
 			}
 			if(orderParameter != null){
 //				Calendar calendar = Calendar.getInstance();
@@ -356,7 +356,11 @@ public class RobitOrderService extends Service {
 			paraMap.put("bed_level_order_num","000000000000000000000000000000");
 			StringBuilder passengerBuilder = new StringBuilder();
 			StringBuilder oldPassengerBuilder = new StringBuilder();
-			String seatid = orderParameter.getSeatMap().get(RobitOrderFragment.seatMaps.get(orderParameter.getTicketType()));
+			String seatName = RobitOrderFragment.seatMaps.get(orderParameter.getTicketType());
+			if("无座".equals(seatName)){
+				seatName = "硬座";
+			}
+			String seatid = orderParameter.getSeatMap().get(seatName);
 			for(int i = 0; i < peoples.length; i++){
 				UserInfo userInfo = userInfoMap.get(peoples[i]);
 				if(i == 0){
@@ -480,6 +484,7 @@ public class RobitOrderService extends Service {
 			while(info == null && isBegin){
 				info = HttpClientUtil.doPost(UrlNewEnum.CONFIRMSINGLEFORQUEUE, paraMap,0);
 			}
+			Log.i("confirmSingleForQueue info:",info);
 			JSONObject jsonObject = JSON.parseObject(info);
 			if(jsonObject.getBooleanValue("status")){
 				orderParameter = null;
