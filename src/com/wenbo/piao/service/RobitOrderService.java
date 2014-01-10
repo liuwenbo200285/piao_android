@@ -221,15 +221,8 @@ public class RobitOrderService extends Service {
 					}
 					for(String seat:orderSeats){
 						String seatState = trainObject.getString(seat+"_num");
-						if("--".equals(seatState)){
-							isSeat++;
-						}else if("无".equals(seatState)){
+						if("无".equals(seatState)){
 							isNoSeat++;
-						}else if("*".equals(seatState)){
-							isNoSeat++;
-							sendInfo(trainObject.getString("station_train_code")+" "+
-										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
-							Thread.sleep(500);
 						}else{
 							isCheck = false;
 							String info = trainObject.getString("station_train_code");
@@ -241,8 +234,6 @@ public class RobitOrderService extends Service {
 									Thread.sleep(200);
 									continue;
 								}
-							}else{
-								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
 							}
 							sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
@@ -299,21 +290,33 @@ public class RobitOrderService extends Service {
 			JSONObject object = JSON.parseObject(info);
 			if(object.containsKey("status") && object.getBooleanValue("status")){
 				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
-				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
-				info = StringUtils.substring(str,n+27,n+59);
-				orderParameter.setToken(info);
-				n = StringUtils.indexOf(str,"init_seatTypes");
+				int n = StringUtils.indexOf(str,"init_seatTypes");
 				int m = StringUtils.indexOf(str,";",n);
 				String ticket = StringUtils.substring(str,n+15,n+(m-n));
 				JSONArray seatObjectArray = JSON.parseArray(ticket);
-				if(seatObjectArray.size() > 0){
-					Map<String, String> seatMap = new HashMap<String, String>();
-					for(int i = 0; i < seatObjectArray.size(); i++){
-						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
-						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
+				while(seatObjectArray.size() == 0 && isBegin){
+					Thread.sleep(500);
+					str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
+					if(StringUtils.isBlank(str)){
+						continue;
 					}
-					orderParameter.setSeatMap(seatMap);
+					n = StringUtils.indexOf(str,"init_seatTypes");
+					m = StringUtils.indexOf(str,";",n);
+					ticket = StringUtils.substring(str,n+15,n+(m-n));
+					seatObjectArray = JSON.parseArray(ticket);
 				}
+				if(seatObjectArray.size() == 0){
+					return;
+				}
+				Map<String, String> seatMap = new HashMap<String, String>();
+				for(int i = 0; i < seatObjectArray.size(); i++){
+					JSONObject jsonObject = seatObjectArray.getJSONObject(i);
+					seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
+				}
+				orderParameter.setSeatMap(seatMap);
+				n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
+				info = StringUtils.substring(str,n+27,n+59);
+				orderParameter.setToken(info);
 				n = StringUtils.indexOf(str,"key_check_isChange");
 				String key_check_isChange = StringUtils.substring(str,n+21,n+77);
 				orderParameter.setKeyCheck(key_check_isChange);
@@ -480,11 +483,13 @@ public class RobitOrderService extends Service {
 				info = HttpClientUtil.doPost(UrlNewEnum.CONFIRMSINGLEFORQUEUE, paraMap,0);
 			}
 			JSONObject jsonObject = JSON.parseObject(info);
-			if(jsonObject.getBooleanValue("status")){
+			if(jsonObject.getBooleanValue("status")
+					&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
 				orderParameter = null;
 				sendStatus(StatusCodeEnum.ORDER_SUCCESS);
 			}else{
 				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+				sendInfo(jsonObject.getString("messages"),InfoCodeEnum.INFO_TIPS);
 				Log.i("confirmSingleForQueue",jsonObject.getString("messages"));
 			}
 		} catch (Exception e) {
