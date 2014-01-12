@@ -1,5 +1,6 @@
 package com.wenbo.piao.domain;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jsoup.nodes.Document;
@@ -35,6 +36,18 @@ public class OrderParameter {
 	private String oldPassengerStr;
 	
 	private String searchDate;
+	
+	public OrderParameter(){
+		seatMap = new HashMap<String, String>();
+		seatMap.put("软卧","4");
+		seatMap.put("硬卧","3");
+		seatMap.put("硬座","1");
+		seatMap.put("软座","2");
+		seatMap.put("特等座","P");
+		seatMap.put("商务座", "9");
+		seatMap.put("一等座","M");
+		seatMap.put("二等座","O");
+	}
 	
 	public Document getDocument() {
 		return document;

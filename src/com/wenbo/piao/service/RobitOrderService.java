@@ -224,27 +224,20 @@ public class RobitOrderService extends Service {
 						String seatState = trainObject.getString(seat+"_num");
 						if("--".equals(seatState)){
 							isSeat++;
-						}else if("无".equals(seatState)){
-							isNoSeat++;
-						}else if("*".equals(seatState)){
-							isNoSeat++;
-							sendInfo(trainObject.getString("station_train_code")+" "+
-										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
-							Thread.sleep(500);
 						}else{
 							isCheck = false;
-							String info = trainObject.getString("station_train_code");
-							if(StringUtils.isNumeric(seatState)){
-								info = info+"有"+RobitOrderFragment.seatMaps.get(seat)+"票"+seatState+"张!";
-								String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
-								if(Integer.parseInt(seatState) < peoples.length){
-									sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
-									Thread.sleep(200);
-									continue;
-								}
-							}else{
-								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
-							}
+							String info = "正在预定"+trainObject.getString("station_train_code")+RobitOrderFragment.seatMaps.get(seat)+"票";
+//							if(StringUtils.isNumeric(seatState)){
+//								info = info+"有"+RobitOrderFragment.seatMaps.get(seat)+"票"+seatState+"张!";
+//								String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
+//								if(Integer.parseInt(seatState) < peoples.length){
+//									sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
+//									Thread.sleep(200);
+//									continue;
+//								}
+//							}else{
+//								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
+//							}
 							sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
@@ -303,18 +296,18 @@ public class RobitOrderService extends Service {
 				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
 				info = StringUtils.substring(str,n+27,n+59);
 				orderParameter.setToken(info);
-				n = StringUtils.indexOf(str,"init_seatTypes");
-				int m = StringUtils.indexOf(str,";",n);
-				String ticket = StringUtils.substring(str,n+15,n+(m-n));
-				JSONArray seatObjectArray = JSON.parseArray(ticket);
-				if(seatObjectArray.size() > 0){
-					Map<String, String> seatMap = new HashMap<String, String>();
-					for(int i = 0; i < seatObjectArray.size(); i++){
-						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
-						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
-					}
-					orderParameter.setSeatMap(seatMap);
-				}
+//				n = StringUtils.indexOf(str,"init_seatTypes");
+//				int m = StringUtils.indexOf(str,";",n);
+//				String ticket = StringUtils.substring(str,n+15,n+(m-n));
+//				JSONArray seatObjectArray = JSON.parseArray(ticket);
+//				if(seatObjectArray.size() > 0){
+//					Map<String, String> seatMap = new HashMap<String, String>();
+//					for(int i = 0; i < seatObjectArray.size(); i++){
+//						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
+//						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
+//					}
+//					orderParameter.setSeatMap(seatMap);
+//				}
 				n = StringUtils.indexOf(str,"key_check_isChange");
 				String key_check_isChange = StringUtils.substring(str,n+21,n+77);
 				orderParameter.setKeyCheck(key_check_isChange);
@@ -391,8 +384,11 @@ public class RobitOrderService extends Service {
 			paraMap.put("_json_att","");
 			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
 			String info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
-			while(info == null && isBegin){
+			while(checkGoing(info,orderParameter) && isBegin){
 				info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
+			}
+			if(!isBegin){
+				return;
 			}
 			JSONObject jsonObject = JSON.parseObject(info);
 			if(jsonObject.getBooleanValue("status")
@@ -404,6 +400,8 @@ public class RobitOrderService extends Service {
 					sendInfo(message,InfoCodeEnum.INFO_TIPS);
 					if(StringUtils.contains(message,"验证码输入错误")){
 						sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+					}else if(StringUtils.contains(message,"非法的席别")){
+						sendStatus(StatusCodeEnum.ORDER_SEAT_ERROR);
 					}else{
 						sendStatus(StatusCodeEnum.CANCEL_ORDER_MANY);
 					}
@@ -418,6 +416,25 @@ public class RobitOrderService extends Service {
 		} finally {
 
 		}
+	}
+	
+	public boolean checkGoing(String info,OrderParameter orderParameter) throws InterruptedException{
+		if(StringUtils.isBlank(info)){
+			return true;
+		}
+		JSONObject jsonObject = JSONObject.parseObject(info);
+		String message = jsonObject.getJSONObject("data").getString("errMsg");
+		if(StringUtils.contains(message,"非法的席别")){
+			String str = "正在等待"+orderParameter.getTrainObject().getString("station_train_code")+"出票！";
+			Thread.sleep(200);
+			sendInfo(str,InfoCodeEnum.INFO_NOTIFICATION);
+			return true;
+		}
+		if(jsonObject.getBooleanValue("status")
+				&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -486,7 +503,8 @@ public class RobitOrderService extends Service {
 			}
 			Log.i("confirmSingleForQueue info:",info);
 			JSONObject jsonObject = JSON.parseObject(info);
-			if(jsonObject.getBooleanValue("status")){
+			if(jsonObject.getBooleanValue("status")
+					&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
 				orderParameter = null;
 				sendStatus(StatusCodeEnum.ORDER_SUCCESS);
 			}else{
