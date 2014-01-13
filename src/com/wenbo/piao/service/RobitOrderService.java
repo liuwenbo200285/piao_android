@@ -287,10 +287,11 @@ public class RobitOrderService extends Service {
 			paraMap.put("query_to_station_name",configInfo.getToStationName());
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
-			while(info == null && isBegin){
+			JSONObject object = checkSubmitOrder(info);
+			while(object == null && isBegin){
 				info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
+				object = checkSubmitOrder(info);
 			}
-			JSONObject object = JSON.parseObject(info);
 			if(object.containsKey("status") && object.getBooleanValue("status")){
 				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
 				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
@@ -322,6 +323,21 @@ public class RobitOrderService extends Service {
 		} finally {
 			
 		}
+	}
+	
+	/**
+	 * 检测是否可以点击预定
+	 * @param info
+	 * @return
+	 */
+	public JSONObject checkSubmitOrder(String info){
+		if(StringUtils.isNotBlank(info)){
+			JSONObject object = JSON.parseObject(info);
+			if(object.getBooleanValue("status")){
+				return object;
+			}
+		}
+		return null;
 	}
 
 	/**
