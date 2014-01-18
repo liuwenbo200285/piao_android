@@ -132,7 +132,7 @@ public class RobitOrderService extends Service {
 				}else{
 					break;
 				}
-				Thread.sleep(500);
+				Thread.sleep(2000);
 			}
 			if(orderParameter != null){
 //				Calendar calendar = Calendar.getInstance();
@@ -224,20 +224,27 @@ public class RobitOrderService extends Service {
 						String seatState = trainObject.getString(seat+"_num");
 						if("--".equals(seatState)){
 							isSeat++;
+						}else if("无".equals(seatState)){
+							isNoSeat++;
+						}else if("*".equals(seatState)){
+							isNoSeat++;
+							sendInfo(trainObject.getString("station_train_code")+" "+
+										StringUtils.replace(object.getString("buttonTextInfo"),"<br/>",""),InfoCodeEnum.INFO_TIPS);
+							Thread.sleep(500);
 						}else{
 							isCheck = false;
-							String info = "正在预定"+trainObject.getString("station_train_code")+RobitOrderFragment.seatMaps.get(seat)+"票";
-//							if(StringUtils.isNumeric(seatState)){
-//								info = info+"有"+RobitOrderFragment.seatMaps.get(seat)+"票"+seatState+"张!";
-//								String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
-//								if(Integer.parseInt(seatState) < peoples.length){
-//									sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
-//									Thread.sleep(200);
-//									continue;
-//								}
-//							}else{
-//								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
-//							}
+							String info = trainObject.getString("station_train_code");
+							if(StringUtils.isNumeric(seatState)){
+								info = info+"有"+RobitOrderFragment.seatMaps.get(seat)+"票"+seatState+"张!";
+								String[] peoples = StringUtils.split(configInfo.getOrderPerson(),",");
+								if(Integer.parseInt(seatState) < peoples.length){
+									sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
+									Thread.sleep(200);
+									continue;
+								}
+							}else{
+								info = info+"有大量的"+RobitOrderFragment.seatMaps.get(seat)+"票";
+							}
 							sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
 							orderParameter = new OrderParameter();
 							orderParameter.setTicketType(seat);
@@ -288,7 +295,7 @@ public class RobitOrderService extends Service {
 			paraMap.put("undefined","");
 			String info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
 			JSONObject object = checkSubmitOrder(info);
-			while(object == null){
+			while(object == null && isBegin){
 				info = HttpClientUtil.doPost(UrlNewEnum.SUBMITORDERREQUEST, paraMap,0);
 				object = checkSubmitOrder(info);
 			}
@@ -297,22 +304,22 @@ public class RobitOrderService extends Service {
 			}
 			if(object.containsKey("status") && object.getBooleanValue("status")){
 				String str = HttpClientUtil.doGet(UrlNewEnum.INITDC,new HashMap<String, String>(),0);
-				int n = StringUtils.indexOf(str,"init_seatTypes");
-				int m = StringUtils.indexOf(str,";",n);
-				String ticket = StringUtils.substring(str,n+15,n+(m-n));
-				JSONArray seatObjectArray = JSON.parseArray(ticket);
-				if(seatObjectArray.size() > 0){
-					Map<String, String> seatMap = new HashMap<String, String>();
-					for(int i = 0; i < seatObjectArray.size(); i++){
-						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
-						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
-					}
-					String seatName = RobitOrderFragment.seatMaps.get(orderParameter.getTicketType());
-					if(!seatMap.containsKey(seatName)){
-						submitOrderRequest(date, orderParameter);
-					}
-				}
-				n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
+//				int n = StringUtils.indexOf(str,"init_seatTypes");
+//				int m = StringUtils.indexOf(str,";",n);
+//				String ticket = StringUtils.substring(str,n+15,n+(m-n));
+//				JSONArray seatObjectArray = JSON.parseArray(ticket);
+//				if(seatObjectArray.size() > 0){
+//					Map<String, String> seatMap = new HashMap<String, String>();
+//					for(int i = 0; i < seatObjectArray.size(); i++){
+//						JSONObject jsonObject = seatObjectArray.getJSONObject(i);
+//						seatMap.put(URLDecoder.decode(jsonObject.getString("value"),"utf-8"),jsonObject.getString("id"));
+//					}
+//					String seatName = RobitOrderFragment.seatMaps.get(orderParameter.getTicketType());
+//					if(!seatMap.containsKey(seatName)){
+//						submitOrderRequest(date, orderParameter);
+//					}
+//				}
+				int n = StringUtils.indexOf(str,"globalRepeatSubmitToken");
 				info = StringUtils.substring(str,n+27,n+59);
 				orderParameter.setToken(info);
 				n = StringUtils.indexOf(str,"key_check_isChange");
@@ -453,6 +460,8 @@ public class RobitOrderService extends Service {
 			Thread.sleep(200);
 			sendInfo(str,InfoCodeEnum.INFO_NOTIFICATION);
 			return true;
+		}else if(StringUtils.contains(message,"验证码")){
+			sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
 		}
 		if(jsonObject.getBooleanValue("status")
 				&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
@@ -532,7 +541,9 @@ public class RobitOrderService extends Service {
 				orderParameter = null;
 				sendStatus(StatusCodeEnum.ORDER_SUCCESS);
 			}else{
-				sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+				orderParameter.setToken(jsonObject.getString("repeatSubmitToken"));
+				checkOrderInfo(orderParameter);
+				sendInfo(jsonObject.getJSONObject("data").getString("errMsg"),InfoCodeEnum.INFO_NOTIFICATION);
 				Log.i("confirmSingleForQueue",jsonObject.getString("messages"));
 			}
 		} catch (Exception e) {
