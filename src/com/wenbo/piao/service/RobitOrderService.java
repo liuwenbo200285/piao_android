@@ -349,6 +349,9 @@ public class RobitOrderService extends Service {
 			JSONObject object = JSON.parseObject(info);
 			if(object.getBooleanValue("status")){
 				return object;
+			}else if(StringUtils.contains(object.getString("messages"),"未处理的订单")){
+				sendStatus(StatusCodeEnum.HAVA_NO_DETAIL_ORDER);
+				return object;
 			}
 		}
 		return null;

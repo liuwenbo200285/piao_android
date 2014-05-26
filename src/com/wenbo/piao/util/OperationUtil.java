@@ -336,7 +336,6 @@ public class OperationUtil {
 			}else{
 				info = EntityUtils.toString(response.getEntity());
 			}
-			System.out.println(info);
 		} catch (Exception e) {
 			Log.e("OperationUtil","selectBank",e);
 			return null;
