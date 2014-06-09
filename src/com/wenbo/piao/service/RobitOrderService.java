@@ -41,6 +41,8 @@ public class RobitOrderService extends Service {
 	
 	private boolean isBegin;
 	
+	private boolean isRush;
+	
 	private int status;
 	
 	private String orderCode;
@@ -74,6 +76,7 @@ public class RobitOrderService extends Service {
 		status = intent.getExtras().getInt(ParameterEnum.ROBIT_STATE.getValue());
 		configInfo = HttpClientUtil.getConfigInfo();
 		orderCode = intent.getExtras().getString(ParameterEnum.RANGECODE.getValue());
+		isRush = intent.getExtras().getBoolean(ParameterEnum.IS_RUSH.getValue());
 		configInfo.setSearchWatiTime(10);
 		new Thread(new Runnable() {
 			@Override
@@ -125,14 +128,19 @@ public class RobitOrderService extends Service {
 				if(info == null){
 					continue;
 				}
-				orderParameter = checkTickeAndOrder(info, date,serverDate);
-				num++;
-				if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
-					sendInfo("没有余票,继续刷票!第"+num+"次刷票!",InfoCodeEnum.INFO_TIPS);
-				}else{
+				if(isRush){
+					orderParameter = getOrderParameter(info, date);
 					break;
+				}else{
+					orderParameter = checkTickeAndOrder(info, date,serverDate);
+					num++;
+					if(orderParameter == null || StringUtils.isEmpty(orderParameter.getTicketType())){
+						sendInfo("没有余票,继续刷票!第"+num+"次刷票!",InfoCodeEnum.INFO_TIPS);
+					}else{
+						break;
+					}
+					Thread.sleep(2000);
 				}
-				Thread.sleep(2000);
 			}
 			if(orderParameter != null){
 //				Calendar calendar = Calendar.getInstance();
@@ -150,6 +158,62 @@ public class RobitOrderService extends Service {
 //			HttpClientUtils.closeQuietly(response);
 		}
 	}
+	
+	
+	/**
+	 * 获取下订单信息，在抢票的时候使用
+	 * @param message
+	 * @param date
+	 * @return
+	 */
+	public OrderParameter getOrderParameter(String message, String date){
+		JSONObject jsonObject = JSON.parseObject(message);
+		if(getErrorMessageBySearch(jsonObject) && jsonObject.containsKey("data")){
+			JSONArray jsonArray = jsonObject.getJSONArray("data");
+			String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
+			if(orderSeats.length > 1){
+				sendStatus(StatusCodeEnum.ONLY_SELECT_ONE_SEAT);
+				return orderParameter;
+			}
+			orderParameter = new OrderParameter();
+			orderParameter.setTicketType(orderSeats[0]);
+			JSONObject object = null;
+			JSONObject trainObject = null;
+			for(int i = 0; i < jsonArray.size(); i++){
+				object = jsonArray.getJSONObject(i);
+				trainObject = object.getJSONObject("queryLeftNewDTO");
+				if(trainObject.getString("train_no").equals(configInfo.getTrainNo())){
+					break;
+				}
+			}
+			orderParameter.setSecretStr(object.getString("secretStr"));
+			orderParameter.setTrainObject(trainObject);
+			orderParameter.setSearchDate(date);
+		}
+		return orderParameter;
+	}
+	
+	/**
+	 * 检查查询车次信息是否异常
+	 * @param jsonObject
+	 * @return
+	 */
+	private boolean getErrorMessageBySearch(JSONObject jsonObject){
+		if(jsonObject != null){
+			if(StringUtils.contains(jsonObject.getString("messages"),"不在预售日期范围内")){
+				sendStatus(StatusCodeEnum.TICKET_NO_BEGIN_SALE);
+				return false;
+			}
+			JSONArray jsonArray = jsonObject.getJSONArray("data");
+			if(jsonArray.size() > 0 && StringUtils.contains(jsonArray.getJSONObject(0).getString("buttonTextInfo"),"系统维护时间")){
+				sendInfo("23:00-07:00系统维护时间",InfoCodeEnum.INFO_NOTIFICATION);
+				sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * 检测出票结果以及刷票
@@ -162,6 +226,9 @@ public class RobitOrderService extends Service {
 		OrderParameter orderParameter = null;
 		try {
 			JSONObject jsonObject = JSON.parseObject(message);
+			if(!getErrorMessageBySearch(jsonObject)){
+				return orderParameter;
+			}
 			if(jsonObject.containsKey("data")){
 				JSONArray jsonArray = jsonObject.getJSONArray("data");
 				JSONObject object = null;
@@ -170,11 +237,6 @@ public class RobitOrderService extends Service {
 				String[] orderSeats = StringUtils.split(configInfo.getOrderSeat(),",");
 				if(StringUtils.isNotEmpty(configInfo.getTrainNo())){
 					isCheckTrainNo = true;
-				}
-				if(jsonArray.size() > 0 && StringUtils.contains(jsonArray.getJSONObject(0).getString("buttonTextInfo"),"系统维护时间")){
-					sendInfo("23:00-07:00系统维护时间",InfoCodeEnum.INFO_NOTIFICATION);
-					sendStatus(StatusCodeEnum.SYSTEM_MAINTENANCE);
-					return orderParameter;
 				}
 				boolean isCheck = true;
 				boolean isALl = false;
@@ -396,7 +458,7 @@ public class RobitOrderService extends Service {
 					passengerBuilder.append("N_"+seatid+",");
 					oldPassengerBuilder.append("1_"+userInfo.getPassenger_name()+",");
 				}
-				oldPassengerBuilder.append(userInfo.getPassenger_flag()+",")
+				oldPassengerBuilder.append("1,")
 				.append(userInfo.getPassenger_id_no()+",");
 				passengerBuilder.append(userInfo.getPassenger_flag()+",")
 								.append(userInfo.getPassenger_id_type_code()+",")
@@ -414,8 +476,9 @@ public class RobitOrderService extends Service {
 //			paraMap.put("oldPassengerStr","刘文波,1,430981198702272830,1_");
 			paraMap.put("tour_flag","dc");
 			paraMap.put("randCode",orderCode);
-			paraMap.put("_json_att","");
+			paraMap.put("_json_att",",");
 			paraMap.put("REPEAT_SUBMIT_TOKEN",orderParameter.getToken());
+			paraMap.put("cancel_flag",2+"");
 			String info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
 			while(checkGoing(info,orderParameter) && isBegin){
 				info = HttpClientUtil.doPost(UrlNewEnum.CHECKORDERINFO, paraMap,0);
@@ -465,6 +528,8 @@ public class RobitOrderService extends Service {
 			return true;
 		}else if(StringUtils.contains(message,"验证码")){
 			sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
+		}else if(StringUtils.contains(message,"非法的席别")){
+			sendStatus(StatusCodeEnum.ILLEGAL_SEAT);
 		}
 		if(jsonObject.getBooleanValue("status")
 				&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){

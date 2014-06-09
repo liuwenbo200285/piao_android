@@ -110,9 +110,6 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 			trainCodeMap.put(object.getString("station_train_code"),object.getString("train_no"));
 			trains.add(str);
 		}
-		if(trains.size() > 0){
-			trains.add(0,"不选择车次");
-		}
 		String[] infos = new String[trains.size()];
 		trains.toArray(infos);
 		return infos;
@@ -138,19 +135,14 @@ public class GetTrainNoTast extends AsyncTask<String,Integer,String[]> {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
-				if(arg2 != 0){
-					String info = result[arg2];
-					if(info == null){
-						return;
-					}
-					String trainNo = StringUtils.split(info,"(")[0];
-					editText.setText(info);
-					String code = trainCodeMap.get(trainNo.trim());
-					trainCode.setText(code);
-				}else{
-					editText.setText("");
-					trainCode.setText("");
+				String info = result[arg2];
+				if(info == null){
+					return;
 				}
+				String trainNo = StringUtils.split(info,"(")[0];
+				editText.setText(info);
+				String code = trainCodeMap.get(trainNo.trim());
+				trainCode.setText(code);
 				editText.clearFocus();
 				if(alertDialog != null){
 					alertDialog.dismiss();

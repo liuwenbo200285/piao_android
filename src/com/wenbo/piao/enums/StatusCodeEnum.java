@@ -6,6 +6,12 @@ package com.wenbo.piao.enums;
  *
  */
 public enum StatusCodeEnum {
+	//不在预售日期范围内
+	ILLEGAL_SEAT(20),
+	//不在预售日期范围内
+	TICKET_NO_BEGIN_SALE(19),
+	//抢票模式只能选择一个座位
+	ONLY_SELECT_ONE_SEAT(18),
 	//没有到预定日期
 	SYSTEM_ERROR(17),
 	//没有到预定日期

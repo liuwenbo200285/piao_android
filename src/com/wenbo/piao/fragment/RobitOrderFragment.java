@@ -263,6 +263,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 					intent.putExtra(ParameterEnum.ROBIT_STATE.getValue(),
 							status);
 					intent.putExtras(bundle);
+					intent.putExtra(ParameterEnum.IS_RUSH.getValue(),true);
 					activity.startService(intent);
 					type = 1;
 					orderButton.setText("停止抢票");
@@ -507,51 +508,27 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 
 	private void showSeatDialog() {
 		if (selectSeatDialog == null) {
-			final boolean[] selectSeats = new boolean[seats.length];
+			int selectedNum = 0;
 			if(StringUtils.isNotBlank(selectSeatText.getText())){
 				String [] seatNames = StringUtils.split(selectSeatText.getText().toString(),",");
 				for(String name:seatNames){
 					for(int i = 0; i < seats.length;i++){
 						if(name.equals(seats[i])){
-							selectSeats[i] = true;
+							selectedNum = i;
 							break;
 						}
 					}
 				}
 			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-					.setMultiChoiceItems(seats, selectSeats,
-							new OnMultiChoiceClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which, boolean isChecked) {
-								}
-							}).setIcon(android.R.drawable.btn_star);
-					builder.setTitle("选择乘客坐席")
-					.setPositiveButton("确定",new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							StringBuilder sbBuilder = new StringBuilder();
-							for (int i = 0; i < selectSeats.length; i++) {
-								if (selectSeats[i]) {
-									sbBuilder.append(seats[i] + ",");
-								}
-							}
-							selectSeatText.setText(sbBuilder.toString());
-							selectSeatText.clearFocus();
-						}
-						
-					})
-					.setNegativeButton("取消",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									selectSeatText.clearFocus();
-									trainCode.requestFocus();
-								}
-							})
-					.setCancelable(false);
+			.setSingleChoiceItems(seats,selectedNum,new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					selectSeatText.setText(seats[arg1]);
+					selectSeatText.clearFocus();
+					selectSeatDialog.hide();
+				}
+			});
 			selectSeatDialog = builder.create();
 			selectSeatDialog.show();
 		} else {
@@ -856,6 +833,18 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				break;
 			case 17:
 				LoginDialog.newInstance("系统忙，请稍后重试！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
+			case 18:
+				LoginDialog.newInstance("抢票模式，请只选择一个座位！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
+			case 19:
+				LoginDialog.newInstance("选择的查询日期不在预售日期范围内！").show(
+						activity.getFragmentManager(), "dialog");
+				break;
+			case 20:
+				LoginDialog.newInstance("非法的席别，请重新选择！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			default:

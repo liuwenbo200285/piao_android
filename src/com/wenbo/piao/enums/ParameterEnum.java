@@ -1,6 +1,7 @@
 package com.wenbo.piao.enums;
 
 public enum ParameterEnum {
+	IS_RUSH("isRush"),
 	
 	TRAIN_TYPE("trainType"),
 	
