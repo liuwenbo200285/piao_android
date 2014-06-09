@@ -816,7 +816,7 @@ public class RobitOrderFragment extends Fragment implements OnFocusChangeListene
 				}
 				break;
 			case 13:
-				LoginDialog.newInstance("今日将不能继续受理您的订票请求！").show(
+				LoginDialog.newInstance("对不起，由于您取消次数过多，今日将不能继续受理您的订票请求！").show(
 						activity.getFragmentManager(), "dialog");
 				break;
 			case 14:

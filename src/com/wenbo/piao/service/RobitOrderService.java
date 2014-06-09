@@ -528,8 +528,9 @@ public class RobitOrderService extends Service {
 			return true;
 		}else if(StringUtils.contains(message,"验证码")){
 			sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
-		}else if(StringUtils.contains(message,"非法的席别")){
-			sendStatus(StatusCodeEnum.ILLEGAL_SEAT);
+		}else if(StringUtils.contains(message,"取消次数过多")){
+			sendStatus(StatusCodeEnum.CANCEL_ORDER_MANY);
+			return false;
 		}
 		if(jsonObject.getBooleanValue("status")
 				&& jsonObject.getJSONObject("data").getBooleanValue("submitStatus")){
