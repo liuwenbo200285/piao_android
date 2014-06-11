@@ -183,6 +183,11 @@ public class RobitOrderService extends Service {
 				object = jsonArray.getJSONObject(i);
 				trainObject = object.getJSONObject("queryLeftNewDTO");
 				if(trainObject.getString("train_no").equals(configInfo.getTrainNo())){
+					String info  = object.getString("buttonTextInfo");
+					if(StringUtils.contains(info,"暂售至")){
+						sendInfo(info,InfoCodeEnum.INFO_NOTIFICATION);
+						sendStatus(StatusCodeEnum.TICKET_NO_BEGIN_SALE);
+					}
 					break;
 				}
 			}
@@ -409,6 +414,10 @@ public class RobitOrderService extends Service {
 		if(StringUtils.isNotBlank(info)){
 			Log.i("checkSubmitOrder",info);
 			JSONObject object = JSON.parseObject(info);
+			String messages = object.getString("messages");
+			if(StringUtils.isNotBlank(messages)){
+				sendInfo(messages,InfoCodeEnum.INFO_NOTIFICATION);
+			}
 			if(object.getBooleanValue("status")){
 				return object;
 			}else if(StringUtils.contains(object.getString("messages"),"未处理的订单")){
@@ -521,10 +530,13 @@ public class RobitOrderService extends Service {
 		Log.i("checkGoing",info);
 		JSONObject jsonObject = JSONObject.parseObject(info);
 		String message = jsonObject.getJSONObject("data").getString("errMsg");
+		if(StringUtils.isNotBlank(message)){
+			sendInfo(message,InfoCodeEnum.INFO_NOTIFICATION);
+		}
 		if(StringUtils.contains(message,"非法的席别")){
-			String str = "正在等待"+orderParameter.getTrainObject().getString("station_train_code")+"出票！";
+			//String str = "正在等待"+orderParameter.getTrainObject().getString("station_train_code")+"出票！";
 			Thread.sleep(200);
-			sendInfo(str,InfoCodeEnum.INFO_NOTIFICATION);
+			//sendInfo(str,InfoCodeEnum.INFO_NOTIFICATION);
 			return true;
 		}else if(StringUtils.contains(message,"验证码")){
 			sendStatus(StatusCodeEnum.INPUT_ORDERCODE);
